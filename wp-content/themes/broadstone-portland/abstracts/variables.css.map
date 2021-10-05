@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "variables.css",
+	"sources": [
+		"../sass/abstracts/variables.scss"
+	],
+	"names": [],
+	"mappings": "AAAA,AAAA,KAAK,CAAC;CACL,WAAW,CAAA,QAAC;CACZ"
+}

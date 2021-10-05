@@ -1,0 +1,15 @@
+nav.navbar .navbar-brand img {
+	max-width: 125px;
+}
+
+nav.navbar .navbar-nav li {
+	margin: 0 30px;
+}
+
+nav.navbar .navbar-nav li a {
+	color: var(--nav-color);
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+/*# sourceMappingURL=header.css.map */

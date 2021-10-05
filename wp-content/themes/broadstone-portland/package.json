@@ -1,0 +1,33 @@
+{
+  "name": "broadstone-portland",
+  "version": "1.0.0",
+  "description": "The Gutenberg Starter theme is designed to provide a simple, interference-free theme for testing Gutenberg. It uses no editor styles by default, and is built so that its front-end appearance is as close to the editor's default Gutenberg styles as possible.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pristinedevelopment/broadstone-portland.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pristinedevelopment/broadstone-portland/issues"
+  },
+  "homepage": "https://github.com/pristinedevelopment/broadstone-portland#readme",
+  "devDependencies": {
+    "@wordpress/scripts": "^12.1.0",
+    "dir-archiver": "^1.1.1",
+    "node-sass": "^4.14.1",
+    "rtlcss": "^2.5.0"
+  },
+  "scripts": {
+    "watch": "node-sass sass/ -o ./ --source-map true --output-style expanded --indent-type tab --indent-width 1 -w",
+    "compile:css": "node-sass sass/ -o ./ && stylelint '*.css' --fix || true && stylelint '*.css' --fix",
+    "compile:rtl": "rtlcss style.css style-rtl.css",
+    "lint:scss": "wp-scripts lint-style 'sass/**/*.scss'",
+    "lint:js": "wp-scripts lint-js 'js/*.js'",
+    "bundle": "dir-archiver --src . --dest ../broadstone-portland.zip --exclude .DS_Store .stylelintrc.json .eslintrc .git .gitattributes .github .gitignore README.md composer.json composer.lock node_modules vendor package-lock.json package.json .travis.yml phpcs.xml.dist style.css.map"
+  },
+  "dependencies": {
+    "npm-watch": "^0.11.0"
+  }
+}
