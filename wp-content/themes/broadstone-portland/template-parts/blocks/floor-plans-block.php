@@ -73,7 +73,6 @@ $plans = get_field('plan');
                                             <div class="carousel-item <?php if( $i==0 ){ echo 'active'; };?>">
                                                 <a role="button" class="gallery_image" href="<?php echo esc_url($fpimage['floor_plan_image']['sizes']['large']); ?>" data-bs-toggle="modal" data-bs-target="#floorplan-modal-<?php if( $i==0 ){ echo $i; };?>">
                                                     <i class="fas fa-expand-arrows-alt"></i>
-                                                    test
                                                     <img src="<?php echo esc_url($fpimage['floor_plan_image']['sizes']['large']); ?>" alt="<?php echo esc_attr($fpimage['floor_plan_image']['alt']); ?>" />
                                                 </a>
                                             </div>
@@ -109,7 +108,6 @@ $plans = get_field('plan');
         </div><!-- .tab-content -->
     </div><!-- div -->
 </section>
-
 
  <!-- <?php var_dump ($fpimage['floor_plan_image']); ?> -->
 <script>
