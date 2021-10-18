@@ -1,0 +1,1 @@
+[![buddy branch](https://app.buddy.works/gtma/broadstone-portland-dev/repository/branch/main/badge.svg?token=1d86589e616381719e054f9b8632cd0cbb14b451ffadee7e8010805c374212ef "buddy branch")](https://app.buddy.works/gtma/broadstone-portland-dev/repository/branch/undefined)
