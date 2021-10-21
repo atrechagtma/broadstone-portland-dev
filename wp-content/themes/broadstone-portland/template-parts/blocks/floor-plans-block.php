@@ -93,10 +93,8 @@ $plans = get_field('plan');
                                 <?php endif; ?>
                             </div>
                             <!--/ Floorplan Carousel -->
-
                         </div><!-- .slider-col-right -->
                     </div><!-- .slider-item -->
-
                 <?php endforeach; ?>
                 </div><!-- .swiper-wrapper -->
                 <div class="swiper-button-prev"></div>
