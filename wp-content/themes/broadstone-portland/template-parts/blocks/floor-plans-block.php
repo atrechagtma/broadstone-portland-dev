@@ -378,7 +378,6 @@ $plans = get_field('plan');
         }
     }
 
-
     @media (min-width: 640px){
         .swiper-container {
             padding-left: 50px;
