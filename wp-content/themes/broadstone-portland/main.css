@@ -721,6 +721,11 @@ header.entry-header h1.entry-title {
 	font-size: 1.5em;
 }
 
+.social-links a img {
+	max-width: 30px !important;
+	vertical-align: sub;
+}
+
 .hero-block {
 	position: relative;
 	background-repeat: no-repeat;
