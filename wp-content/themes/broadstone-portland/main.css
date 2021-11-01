@@ -653,10 +653,6 @@ header.entry-header h1.entry-title {
 	padding: 0;
 }
 
-.site-footer .navbar-brand img {
-	max-width: 285px;
-}
-
 @media (max-width: 768px) {
 	.site-footer .navbar-brand {
 		order: -1;
@@ -722,8 +718,16 @@ header.entry-header h1.entry-title {
 }
 
 .social-links a img {
-	max-width: 30px !important;
+	max-width: 30px;
 	vertical-align: sub;
+}
+
+.social-links a[href="https://allresco.com/"] img {
+	max-width: 150px !important;
+}
+
+.social-links a[href="https://www.greystar.com/"] img {
+	max-width: 120px !important;
 }
 
 .hero-block {

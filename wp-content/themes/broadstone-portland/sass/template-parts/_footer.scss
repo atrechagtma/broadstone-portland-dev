@@ -61,7 +61,7 @@
     .navbar-brand {
         padding: 0;
         img {
-            max-width: 285px;
+            // max-width: 285px;
         }
         @media (max-width: 768px) {
             order: -1;
@@ -112,8 +112,17 @@
             font-size: 1.5em;
         }
         img {
-            max-width: 30px !important;
+            max-width: 30px;
             vertical-align: sub;
         }
+
+        &[href="https://allresco.com/"] img {
+            max-width: 150px !important;
+        }
+            
+        &[href="https://www.greystar.com/"] img {
+            max-width: 120px !important;
+        }
+        
     }
 }
