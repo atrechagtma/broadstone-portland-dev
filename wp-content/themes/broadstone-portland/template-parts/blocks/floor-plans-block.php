@@ -25,89 +25,84 @@ if (!empty($block['align'])) {
 }
 
 // Load values and assign defaults.
-$plans = get_field('plan');
+$plan_types = get_field('plan');
 ?>
 
 <section class="block <?php echo esc_attr($className); ?> has-bg-img <?php echo empty($bg_image) ? 'theme-dark' : 'theme-light'; ?>" id="<?php echo esc_attr($id); ?>">
     <div> 
-        <ul class="tabs nav nav-tabs" role="tablist"> 
+        <ul class="tabs nav nav-tabs row" role="tablist">
         <?php
-        $count = 0;
-        foreach ($plans as $plan) {
-        $count++; ?>
-            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" role="tab" href="#tab-index-<?php echo $count; ?>"><?php echo $plan['slider_title']; ?></a></li>
-        <?php
-        }
-        ?>
+        $imgSliders = [];
+        foreach ($plan_types as $ptk => $plan_type) : ?>
+            <li class="nav-item"><a class="nav-link <?= $ptk == 0 ? 'active' : '' ?>" data-bs-toggle="tab" role="tab" href="#tab-index-<?= $ptk; ?>"><?= esc_html($plan_type['slider_title']) ?></a></li>
+        <?php endforeach; ?>
         </ul>
+
         <div class="tab-content">
         <?php
-        $count = 0;
-        foreach ($plans as $plan) {
-        $count++; ?>
-            <div class="tab-item tap-pane swiper-container" data-index="tab-index-<?php echo $count; ?>">
+        foreach ($plan_types as $ptk => $plan_type) : ?>
+            <div class="tab-item tap-pane swiper swiper-floorplans" data-index="tab-index-<?= $ptk; ?>">
                 <div class="swiper-wrapper">
                 <?php
-                    $floor_plans = $plan['floor_plans'];
-                    foreach ($floor_plans as $k => $fp) :
+                $floor_plans = $plan_type['floor_plans'];
+                foreach ($floor_plans as $fpk => $fp) :
                 ?>
+                    
                     <div class="slider-item swiper-slide" role="tabpanel">
-                        <div class="slider-column slider-col-left">
+                    <div class="container">
+                    <div class="row">
+                        <div class="slider-column col-md-6 text-center d-flex flex-column justify-content-center">
                             <div class="slider-header">
-                                <h3><?php echo $fp['title']; ?></h3>
+                                <h3><?= esc_html($fp['title']) ?></h3>
                                 <hr />
                             </div>
                             <div class="the-content">
-                                <?php echo $fp['content']; ?>
+                                <?= wp_kses_post($fp['content']) ?>
                             </div>
                         </div>
-                        <div class="slider-column slider-col-right">
+                        <div class="slider-column col-md-6">
             
                             <!-- Floorplan Carousel -->
-                            <div id="floorplanCarousel-<?php echo $k; ?>-<?php echo $count; ?>" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner">
+                            <div class="swiper fp-images swiper-fp-images<?= $ptk.$fpk ?>" >
+                                <div class="swiper-wrapper">
 
-                                <?php if ($fp['floor_plan_images']) :?>
-                                    <?php $i=0; foreach ($fp['floor_plan_images'] as $fpimage) :?>
-                                        <?php if($fpimage['floor_plan_image']['sizes']['large']) :?>
-                                            <div class="carousel-item <?php if( $i==0 ){ echo 'active'; };?>">
-                                                <a role="button" class="gallery_image" href="<?php echo esc_url($fpimage['floor_plan_image']['sizes']['large']); ?>" data-bs-toggle="modal" data-bs-target="#floorplan-modal-<?php if( $i==0 ){ echo $i; };?>">
+                                <?php $fpimages = $fp['floor_plan_images']; ?>
+                                <?php if ( $fpimages ) :?>
+                                    <?php foreach ($fpimages as $fpik => $fpimage) : ?>
+
+                                        <?php // var_dump($fpimage['floor_plan_image']); ?>
+
+                                            <div class="swiper-slide">
+                                                <a href="#" data-featherlight="<?= esc_url($fpimage['floor_plan_image']['url']); ?>">
                                                     <i class="fas fa-expand-arrows-alt"></i>
-                                                    <img src="<?php echo esc_url($fpimage['floor_plan_image']['sizes']['large']); ?>" alt="<?php echo esc_attr($fpimage['floor_plan_image']['alt']); ?>" />
+                                                    <img src="<?= esc_url($fpimage['floor_plan_image']['sizes']['large']) ?>" alt="<?= esc_attr($fpimage['floor_plan_image']['alt']) ?>" />
                                                 </a>
                                             </div>
-                                            <?php $i++; ?>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                    </div>
-                                    
-                                    <?php if ($i > 1) : ?>
-                                    <div class="carousel-indicators">
-                                    <?php $j=0; foreach ($fp['floor_plan_images'] as $fpimage) :?>
-                                        <button type="button" data-bs-target="#floorplanCarousel-<?php echo $k; ?>-<?php echo $count; ?>"
-                                        data-bs-slide-to="<?php echo $j; ?>" class="<?php if( $j==0 ){ echo 'active'; };?>" aria-current="<?php if( $k==0 ){ echo 'active'; };?>"
-                                        ></button>
-                                    <?php $j++; endforeach; ?>
-                                    </div>
+
+                                            <?php endforeach; ?>
+                                            <?php $imgSliders[] = $ptk.$fpk ?>
+                                        </div>                                   
                                     <?php endif; ?>
-                                <?php endif; ?>
-                            </div>
+                                    <div class="swiper-pagination dots-<?= $ptk.$fpk ?>"></div>
+
+                                </div>
+
                             <!--/ Floorplan Carousel -->
                         </div><!-- .slider-col-right -->
+                        </div>
+                    </div>
                     </div><!-- .slider-item -->
-                <?php endforeach; ?>
+
+                <?php endforeach ?>
                 </div><!-- .swiper-wrapper -->
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
             </div><!-- .tab-item -->
-        <?php
-        }
-        ?>
+        <?php endforeach ?>
         </div><!-- .tab-content -->
     </div><!-- div -->
 </section>
 
- <!-- <?php var_dump ($fpimage['floor_plan_image']); ?> -->
 <script>
     window.onload = () => {
         const tabs = document.querySelectorAll('#<?php echo $id; ?> .tabs a');
@@ -115,13 +110,24 @@ $plans = get_field('plan');
         const allTabs = document.querySelectorAll('#<?php echo $id; ?> .tab-item')
         const allTabsArr = Array.from(allTabs)
 
-        // initialize swiper
-        new Swiper('.tab-item', {
+        // initialize swiperTabs
+        const swiperTabs = new Swiper('.swiper-floorplans', {
             navigation: {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             },
         });
+
+        <?php foreach ($imgSliders as $imgSlider) : ?>
+        const swiperFpImages<?=$imgSlider?> = new Swiper('.swiper-fp-images<?=$imgSlider?>', {
+            debugger: true,
+            autoheight: true,
+            pagination: {
+                el: ".dots-<?=$imgSlider?>",
+                clickable: true,
+            },
+        });
+        <?php endforeach ?>
 
         tabsArr.forEach(tab => {
             tab.addEventListener('click', (e) => {
@@ -149,13 +155,16 @@ $plans = get_field('plan');
 </script>
 
 <style type="text/css">
-    .slider-column .the-content {
+.fp-images {
+    padding-bottom: 40px;
+}
+.slider-column .the-content {
         text-align: left;
     }
 
     .swiper-container {
-        margin: auto;
-        overflow: visible;
+        /* margin: auto; */
+        /* overflow: visible; */
     }
 
     .swiper-button-next,
@@ -176,6 +185,19 @@ $plans = get_field('plan');
         font-size: 2.2em;
         font-weight: 700;
         color: #294954;
+    }
+
+    .swiper-pagination-bullet {
+        background-color: transparent;
+        border: 1px solid #294954;
+        opacity: 1;
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+    }
+
+    .swiper-pagination-bullet-active {
+        background-color: #294954;
     }
 
     #<?php echo $id; ?> {
@@ -200,7 +222,6 @@ $plans = get_field('plan');
     #<?php echo $id; ?> ul.tabs li a {
         border: solid 4px #294954;
         background-color: #fff;
-        /* background-color: #294954; */
         border-radius: 12px;
         padding: 15px 1.5vw;
         color: #294954;
@@ -229,22 +250,18 @@ $plans = get_field('plan');
         display: flex;
         align-items: center;
     }
-    #<?php echo $id; ?> .slider-item .slider-column {
+    .slider-item .slider-column {
         flex: 1;
     }
 
-    #<?php echo $id; ?> .slider-item .slider-col-left {
+    .slider-col-left {
         max-width: 60%;
         text-align: center;
     }
 
-    #<?php echo $id; ?> .slider-item .slider-col-right {
+    .slider-col-right {
         max-width: 40%;
-    }
-
-    #<?php echo $id; ?> .slider-item .slider-column img {
-        width: 100%;
-        height: auto;
+        padding-right: 100px;
     }
     #<?php echo $id; ?> .slider-header hr {
         border: 0;
@@ -263,33 +280,6 @@ $plans = get_field('plan');
         line-height: 1;
         text-align: center;
     }
-    #<?php echo $id; ?> .the-content a {
-        margin-top: 20px;
-        border: solid 3px #294954;
-        border-radius: 12px;
-        padding: 13px 1.5vw;
-        color: #294954;
-        text-transform: uppercase;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 16px;
-        display: inline-block;
-        background-color: #fff;
-        
-    }
-
-    #<?php echo $id; ?> .the-content a:after {
-        /* content: " \2794"; */
-    }
-
-    #<?php echo $id; ?> .the-content a:hover {
-        color: rgba(41, 73, 84, .5);
-        text-decoration: underline;
-    }
-    #<?php echo $id; ?> .the-content a:active {
-        background-color: #294954;
-        color: white;
-    }
     #<?php echo $id; ?> .tab-item.inactive {
         display: none;
     }
@@ -298,38 +288,13 @@ $plans = get_field('plan');
     }
 
     /* Carousel Styles */
-    .swiper-wrapper .carousel-indicators [data-bs-target] {
-        background-color: transparent;
-        border: 1px solid #294954;
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-    }
-
-    .swiper-wrapper .active[data-bs-target] {
-        background: #294954;
-    }
-
-    .swiper-wrapper .carousel-indicators {
-        bottom: -80px;
-    }
-
-    .swiper-wrapper .carousel-item .fas {
+    .swiper-wrapper .fas {
         font-size: 2.5em;
         position: absolute;
         bottom: 10px;
         right: 10px;
         color: #ccc;
         opacity: .6;
-    }
-
-    .floorplan-modal {
-        max-width: inherit;
-    }
-
-    .editor-styles-wrapper #<?php echo $id; ?> .tab-item:not(:first-child),
-    .editor-styles-wrapper #<?php echo $id; ?> .slider-item:not(:first-child) {
-        display: none;
     }
     @media (max-width: 992px) {
         
@@ -344,7 +309,6 @@ $plans = get_field('plan');
         #<?php echo $id; ?> {
             padding: 40px 0;
         }
-
 
         #<?php echo $id; ?> ul.tabs {
             margin: 30px;
@@ -362,9 +326,6 @@ $plans = get_field('plan');
         }
         #<?php echo $id; ?> .slider-item .slider-column {
             max-width: 100%;
-        }
-        #<?php echo $id; ?> .the-content a {
-            font-size: 20px;
         }
         #<?php echo $id; ?> .the-content {
             margin-bottom: 40px;
