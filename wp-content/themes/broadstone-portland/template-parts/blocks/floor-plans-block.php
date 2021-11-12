@@ -29,13 +29,16 @@ $plan_types = get_field('plan');
 ?>
 
 <section class="block <?php echo esc_attr($className); ?> has-bg-img <?php echo empty($bg_image) ? 'theme-dark' : 'theme-light'; ?>" id="<?php echo esc_attr($id); ?>">
-    <div> 
+    <div class="container"> 
         <ul class="tabs nav nav-tabs row" role="tablist">
         <?php
         $imgSliders = [];
         foreach ($plan_types as $ptk => $plan_type) : ?>
             <li class="nav-item"><a class="nav-link <?= $ptk == 0 ? 'active' : '' ?>" data-bs-toggle="tab" role="tab" href="#tab-index-<?= $ptk; ?>"><?= esc_html($plan_type['slider_title']) ?></a></li>
         <?php endforeach; ?>
+        <?php if (get_field('site_map')) : ?>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" role="tab" href="#tab-site-map">Site Map</a></li>
+        <?php endif ?>
         </ul>
 
         <div class="tab-content">
@@ -99,6 +102,18 @@ $plan_types = get_field('plan');
                 <div class="swiper-button-next"></div>
             </div><!-- .tab-item -->
         <?php endforeach ?>
+        <div class="tab-item tap-pane" data-index="tab-site-map">
+        <?php $site_map = get_field('site_map') ?>
+            <div class="container">
+            <div class="row">
+            <div class="col-12">
+                <a href="#" data-featherlight="<?= $site_map['url'] ?>">
+                    <img src="<?= $site_map['url'] ?>" alt="<?= $site_map['alt'] ?>">
+                </a>
+            </div>
+            </div>
+        </div>
+        </div>
         </div><!-- .tab-content -->
     </div><!-- div -->
 </section>
