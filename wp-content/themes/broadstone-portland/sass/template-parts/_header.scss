@@ -11,7 +11,7 @@
     z-index: 100;
     width: 100%;
     padding: 0 20px;
-    height: 42px;
+    min-height: 42px;
     @media (min-width: 300px) {
         font-size: 14px;
     }
@@ -23,6 +23,25 @@
     }
     p {
         margin: 5px 0;
+    }
+
+    .close {
+        font-size: 20px;
+        background-color: rgba(255,255,255,0.2);
+        border-radius: 20px;
+        height: 25px;
+        width: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 250ms ease-in-out;
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    &.closed {
+        display:none;
     }
 }
 nav.navbar.cta-active {
@@ -38,6 +57,10 @@ nav.navbar {
     z-index: 4;
     .navbar-brand img {
         max-width: 125px;
+
+        @media (max-width: 768px) {
+            max-width: 75px;
+        }
     }
     .navbar-nav {
         align-items: center;

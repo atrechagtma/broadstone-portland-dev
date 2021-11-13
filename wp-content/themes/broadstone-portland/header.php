@@ -44,7 +44,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .cta-banner a:hover, .cta-banner * { color: <?php echo $textcolor ?>; }
             </style>
             <div class="cta-banner" style="background: <?php echo $bgcolor ?>; color: <?php echo $textcolor ?>;">
-                <?php echo get_theme_mod( 'gtma_theme_cta_content' ) ?>
+            <div class="container d-flex align-items-center justify-content-between">
+                <div>
+                    <?php echo get_theme_mod( 'gtma_theme_cta_content' ) ?>
+                </div>
+                <a class="close mr-4">×</a>
+            </div>
+
             </div>
         <?php endif ?>
             <?php if (get_theme_mod( 'gtma_theme_cta_is_active' )): ?>

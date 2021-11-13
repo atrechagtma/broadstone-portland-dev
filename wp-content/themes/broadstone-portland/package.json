@@ -16,7 +16,6 @@
   "devDependencies": {
     "@wordpress/scripts": "^12.1.0",
     "dir-archiver": "^1.1.1",
-    "node-sass": "^4.14.1",
     "rtlcss": "^2.5.0"
   },
   "scripts": {
@@ -28,6 +27,7 @@
     "bundle": "dir-archiver --src . --dest ../broadstone-portland.zip --exclude .DS_Store .stylelintrc.json .eslintrc .git .gitattributes .github .gitignore README.md composer.json composer.lock node_modules vendor package-lock.json package.json .travis.yml phpcs.xml.dist style.css.map"
   },
   "dependencies": {
+    "node-sass": "^6.0.1",
     "npm-watch": "^0.11.0"
   }
 }

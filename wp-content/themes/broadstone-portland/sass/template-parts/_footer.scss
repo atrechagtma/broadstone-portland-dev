@@ -60,8 +60,8 @@
 
     .navbar-brand {
         padding: 0;
-        img {
-            // max-width: 285px;
+        .custom-logo-link > img {
+            padding: 0 4rem;
         }
         @media (max-width: 768px) {
             order: -1;
@@ -102,6 +102,9 @@
 }
 
 .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     margin-top: 80px;
     a {
         display: inline-block;

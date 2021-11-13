@@ -35,6 +35,37 @@ function divWrapper(elements, className) {
 	return d;
 }
 
+
+function getCookie(name) {
+	var cookieArr = document.cookie.split(";");
+
+	for (var i = 0; i < cookieArr.length; i++) {
+	  var cookiePair = cookieArr[i].split("=");
+
+	  if (name == cookiePair[0].trim()) {
+		return decodeURIComponent(cookiePair[1]);
+	  }
+	}
+	return null;
+  }
+
+  const ctaBanner = document.querySelector('.cta-banner');
+  const ctaClose = document.querySelector('.cta-banner .close');
+  const navbar = document.querySelector('#masthead .navbar');
+
+  if (getCookie('ctaClosed') == 'true') {
+	ctaBanner.classList.add('closed');
+	navbar.classList.remove('cta-active')
+  }
+
+  ctaClose.addEventListener('click', function (e) {
+	e.preventDefault;
+	ctaBanner.classList.add('closed');
+	navbar.classList.remove('cta-active')
+	document.cookie = "ctaClosed=true;SameSite=Lax;path=/;max-age=" + 1 * 24 * 60 * 60;
+  });
+
+
 // header fixed
 window.onscroll = function () {
 	scrollTopNav();

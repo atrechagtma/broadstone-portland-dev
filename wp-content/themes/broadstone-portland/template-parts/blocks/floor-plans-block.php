@@ -29,17 +29,19 @@ $plan_types = get_field('plan');
 ?>
 
 <section class="block <?php echo esc_attr($className); ?> has-bg-img <?php echo empty($bg_image) ? 'theme-dark' : 'theme-light'; ?>" id="<?php echo esc_attr($id); ?>">
-    <div class="container"> 
-        <ul class="tabs nav nav-tabs row" role="tablist">
-        <?php
-        $imgSliders = [];
-        foreach ($plan_types as $ptk => $plan_type) : ?>
-            <li class="nav-item"><a class="nav-link <?= $ptk == 0 ? 'active' : '' ?>" data-bs-toggle="tab" role="tab" href="#tab-index-<?= $ptk; ?>"><?= esc_html($plan_type['slider_title']) ?></a></li>
-        <?php endforeach; ?>
-        <?php if (get_field('site_map')) : ?>
-            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" role="tab" href="#tab-site-map">Site Map</a></li>
-        <?php endif ?>
-        </ul>
+    <div> 
+        <div class="container">
+            <ul class="tabs nav nav-tabs row" role="tablist">
+            <?php
+            $imgSliders = [];
+            foreach ($plan_types as $ptk => $plan_type) : ?>
+                <li class="nav-item col-md col-xs-12"><a class="nav-link <?= $ptk == 0 ? 'active' : '' ?>" data-bs-toggle="tab" role="tab" href="#tab-index-<?= $ptk; ?>"><?= esc_html($plan_type['slider_title']) ?></a></li>
+            <?php endforeach; ?>
+            <?php if (get_field('site_map')) : ?>
+                <li class="nav-item col-md col-xs-12"><a class="nav-link" data-bs-toggle="tab" role="tab" href="#tab-site-map">Site Map</a></li>
+            <?php endif ?>
+            </ul>
+        </div>
 
         <div class="tab-content">
         <?php
@@ -144,7 +146,7 @@ $plan_types = get_field('plan');
         });
         <?php endforeach ?>
 
-        tabsArr.forEach(tab => {
+        tabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
                 let href = e.target.href?.split('#')[1];
@@ -158,7 +160,7 @@ $plan_types = get_field('plan');
             })
         })
 
-        allTabsArr.forEach((tab, index) => {
+        allTabs.forEach((tab, index) => {
             if (index === 0) {
                 allTabsArr[index].classList.add('active')
             }
@@ -170,51 +172,6 @@ $plan_types = get_field('plan');
 </script>
 
 <style type="text/css">
-.fp-images {
-    padding-bottom: 40px;
-}
-.slider-column .the-content {
-        text-align: left;
-    }
-
-    .swiper-container {
-        /* margin: auto; */
-        /* overflow: visible; */
-    }
-
-    .swiper-button-next,
-    .swiper-container-rtl .swiper-button-prev {
-        right: 50px; 
-    }
-
-    .swiper-button-prev,
-    .swiper-container-rtl .swiper-button-next {
-        left: 50px; 
-    }
-
-    .floor-plans-block .nav-tabs {
-        border: none;
-    }
-
-    .swiper-button-next:after, .swiper-button-prev:after {
-        font-size: 2.2em;
-        font-weight: 700;
-        color: #294954;
-    }
-
-    .swiper-pagination-bullet {
-        background-color: transparent;
-        border: 1px solid #294954;
-        opacity: 1;
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-    }
-
-    .swiper-pagination-bullet-active {
-        background-color: #294954;
-    }
-
     #<?php echo $id; ?> {
         margin-top: 0;
         position: relative;
@@ -228,28 +185,6 @@ $plan_types = get_field('plan');
         justify-content: space-around;
         align-items: center;
         margin-bottom: 60px;
-    }
-    #<?php echo $id; ?> ul.tabs li {
-        margin: 0 0 20px;
-        flex: 1 0 25%;
-        max-width: 25%;
-    }
-    #<?php echo $id; ?> ul.tabs li a {
-        border: solid 4px #294954;
-        background-color: #fff;
-        border-radius: 12px;
-        padding: 15px 1.5vw;
-        color: #294954;
-        text-transform: uppercase;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 20px;
-        width: 100%;
-        display: inline-block;
-        text-align: center;
-        box-shadow: 0px 3px 6px #00000029;
-        opacity: .6;
-        transition: all .2s ease-in-out;
     }
     #<?php echo $id; ?> ul.tabs li a:hover {
         color: #294954;
@@ -268,16 +203,6 @@ $plan_types = get_field('plan');
     .slider-item .slider-column {
         flex: 1;
     }
-
-    .slider-col-left {
-        max-width: 60%;
-        text-align: center;
-    }
-
-    .slider-col-right {
-        max-width: 40%;
-        padding-right: 100px;
-    }
     #<?php echo $id; ?> .slider-header hr {
         border: 0;
         border-bottom: solid 2px #AA5B3C; 
@@ -285,9 +210,6 @@ $plan_types = get_field('plan');
         background: transparent;
         margin-left: auto;
         margin-right: auto;
-    }
-    #<?php echo $id; ?> .slider-header h3 {
-        font-size: min(4vw, 72px);
     }
     #<?php echo $id; ?> .the-content {
         font-size: 24px;
@@ -311,42 +233,6 @@ $plan_types = get_field('plan');
         color: #ccc;
         opacity: .6;
     }
-    @media (max-width: 992px) {
-        
-        #<?php echo $id; ?> ul.tabs {
-            flex-direction: column;
-        }
-        #<?php echo $id; ?> ul.tabs li {
-            width: 100%;
-        }
-    }
-    @media (max-width: 768px) {
-        #<?php echo $id; ?> {
-            padding: 40px 0;
-        }
-
-        #<?php echo $id; ?> ul.tabs {
-            margin: 30px;
-        }
-        #<?php echo $id; ?> ul.tabs li {
-            width: 100%;
-            flex-basis: 100%;
-            max-width: 100%;
-        }
-        #<?php echo $id; ?> .slider-header h3 {
-            font-size: 46px;
-        }
-        #<?php echo $id; ?> .slider-item {
-            flex-direction: column;
-        }
-        #<?php echo $id; ?> .slider-item .slider-column {
-            max-width: 100%;
-        }
-        #<?php echo $id; ?> .the-content {
-            margin-bottom: 40px;
-        }
-    }
-
     @media (min-width: 360px){
         .swiper-container {
             padding-left: 50px;
