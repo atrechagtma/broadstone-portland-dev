@@ -46,10 +46,10 @@
             "maxlength": ""
         },
         {
-            "key": "field_60ded20109b92",
-            "label": "CTA Button",
-            "name": "cta_button",
-            "type": "page_link",
+            "key": "field_61a91d01d7169",
+            "label": "CTA Button Text",
+            "name": "cta_button_text",
+            "type": "text",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -58,11 +58,27 @@
                 "class": "",
                 "id": ""
             },
-            "post_type": "",
-            "taxonomy": "",
-            "allow_null": 0,
-            "allow_archives": 1,
-            "multiple": 0
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_61a91d0dd716a",
+            "label": "CTA Button Link",
+            "name": "cta_button_link",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
         },
         {
             "key": "field_60ded403726bc",
@@ -106,5 +122,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1636735346
+    "modified": 1638473814
 }
