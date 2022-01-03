@@ -34,7 +34,11 @@ h6 {
 }
 
 h3 {
-    font-size: 40px;
+    font-size: 30px;
+
+    @media (min-width: 1080px) {
+        font-size: 40px;
+    }
 }
 
 .btn {
