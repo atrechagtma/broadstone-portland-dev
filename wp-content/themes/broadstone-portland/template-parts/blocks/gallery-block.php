@@ -136,7 +136,7 @@ $galleries = get_field('gallery');
     .shuffle-container li img {
         display: inline-block;
         width: auto;
-        height: 40vh;
+        /* height: 40vh; */
         margin: 30px;
     }
 
