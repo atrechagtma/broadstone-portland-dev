@@ -143,4 +143,10 @@ $galleries = get_field('gallery');
         margin: 30px;
     }
 
+    @media (max-width: 797px) {
+        .shuffle-container li img {
+            margin: 0;
+        }
+    }
+
 </style>
