@@ -128,6 +128,7 @@ $galleries = get_field('gallery');
         padding: 0;
         width: 100%;
         max-width: 100% !important;
+        text-align: center;
     }
 
     .shuffle-container li {
@@ -145,7 +146,9 @@ $galleries = get_field('gallery');
 
     @media (max-width: 797px) {
         .shuffle-container li img {
-            margin: 0;
+            max-width: 100%;
+            width: 100%;
+            margin: 0 0 20px 0;
         }
     }
 
