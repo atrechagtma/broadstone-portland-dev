@@ -113,6 +113,7 @@ $galleries = get_field('gallery');
         text-align: center;
         box-shadow: 0px 3px 6px #00000029;
         margin-bottom: 15px;
+        margin-left: 0;
     }
 
     .shuffle-filter li.selected {
@@ -131,6 +132,7 @@ $galleries = get_field('gallery');
 
     .shuffle-container li {
         display: inline-block;
+        margin-left: 0;
     }
 
     .shuffle-container li img {
