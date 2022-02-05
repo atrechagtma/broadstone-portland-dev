@@ -96,8 +96,14 @@ $galleries = get_field('gallery');
         max-width: 100% !important;
     }
 
+    @media (min-width: 798px) {
+        .shuffle-filter {
+            display: flex;
+            justify-content: space-evenly;  
+        }
+    }
+
     .shuffle-filter li {
-        display: inline-block;
         padding: 10px;
         cursor: pointer;
         color: white;
@@ -114,7 +120,14 @@ $galleries = get_field('gallery');
         box-shadow: 0px 3px 6px #00000029;
         margin-bottom: 15px;
         margin-left: 0;
+        flex: 0 0 20%;
     }
+
+    @media (max-width: 797px) {
+        .shuffle-filter li {
+            display: block;
+        }
+    }    
 
     .shuffle-filter li.selected {
         color: rgba(41, 73, 84, 1);
