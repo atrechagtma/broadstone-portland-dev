@@ -1,0 +1,267 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.wordkeeper {
+    max-width: 98%;
+}
+
+ .wordkeeper-main {
+    margin-right: 15px;
+    margin-top: 15px;
+}
+
+.wordkeeper .message {
+    margin: 0px 0 0 8px;
+    background-color: #5b9dd9;
+    width: 17%;
+    padding: 5px 0 5px 0;
+    text-align: center;
+}
+
+.wordkeeper-page-title{
+    width: calc(100% + 20px);
+    padding: 15px 22px;
+    box-sizing: border-box;
+    background-color: white;
+    margin-left: -20px;
+    margin-top: 10px;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.wordkeeper-button {
+    background-color: #008AFF;
+    border: none;
+    text-shadow: none;
+    box-shadow: none;
+    padding: 8px 25px 10px;
+    font-size: 14px;    
+    color: #fff;
+    border-radius: 3px;
+    -webkit-appearance: none;
+}
+
+.wordkeeper-button:hover{
+    cursor: pointer;
+}
+
+.wordkeeper-page-title .wordkeeper-button {
+    float: right;
+    top: -4px;
+    position: relative;
+    padding: 4px 25px 6px;    
+}
+
+.wordkeeper .nav-tab-active, 
+.wordkeeper .nav-tab-active:focus, 
+.wordkeeper .nav-tab-active:focus:active, 
+.wordkeeper .nav-tab-active:hover{
+    border-bottom: 1px solid #fff;
+    background: #fff;
+}
+
+.wordkeeper .nav-tab-wrapper {
+    border-bottom: 1px solid #ccc;
+}
+
+.wordkeeper h2.nav-tab-wrapper, 
+.wordkeeper h1.nav-tab-wrapper{
+    border-bottom: none;
+}
+
+.wordkeeper h2.nav-tab-wrapper {
+    margin: 22px 0 0 0;
+}
+
+.wordkeeper #sections {
+    padding: 22px;
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.wordkeeper section {
+    display: none;
+}
+
+.wordkeeper section:first-child {
+    display: block;
+}
+
+.wordkeeper .no-js h2.nav-tab-wrapper {
+    display: none;
+}
+
+.wordkeeper .no-js #sections {
+    border-top: 1px solid #ccc;
+    margin-top: 22px;
+}
+
+.wordkeeper .no-js section {
+    border-top: 1px dashed #aaa;
+    margin-top: 22px;
+    padding-top: 22px;
+}
+
+.wordkeeper .no-js section:first-child {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+.wordkeeper-main a.nav-tab:focus {
+    box-shadow: none;
+}
+
+
+/*tooltip start*/
+
+.wordkeeper .btn-fix {
+    top: 4px;
+}
+
+.wordkeeper a.tooltip {
+    color: #fff;
+    font-family: verdana;
+    text-decoration: none;
+    margin-left: 5px;
+    background-color: #666;
+    border-radius: 12px;
+    vertical-align: middle;
+    padding: 1px 5px 1px 5px;
+    position: relative;
+    cursor: help;
+    font-size: 8px;
+    display: none;
+}
+
+.wordkeeper a.tooltip span {
+    z-index: 10;
+    display: none;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+}
+
+.wordkeeper a.tooltip > span {
+    width: 135px;
+    padding: 10px 12px;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 10;
+    position: absolute;
+    font-size: 12px;
+    font-style: normal;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+    /* -webkit-box-shadow: 4px 4px 4px #666; */
+   /* -moz-box-shadow: 4px 4px 4px #666;*/
+    /* box-shadow: 4px 4px 4px #666; */
+    color: #fff;
+    background: #333;
+    background: -moz-linear-gradient(top, #FBF5E6 0%, #FFFFFF 100%);
+    /* background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #FBF5E6), color-stop(100%, #FFFFFF)); */
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#FBF5E6', endColorstr='#FFFFFF', GradientType=0);
+    border: 1px solid #8c8c8c;
+    font-family: verdana;
+    font-size: 9px;
+}
+
+.wordkeeper a.tooltip:hover > span {
+    opacity: 1;
+    text-decoration: none;
+    visibility: visible;
+    overflow: visible;
+    margin-top: 27px;
+    display: inline;
+    margin-left: -83px;
+    text-align: center;
+}
+
+.wordkeeper a.tooltip span b {
+    width: 15px;
+    height: 15px;
+    margin-left: 60px;
+    margin-top: -12px;
+    display: block;
+    position: absolute;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    -webkit-box-shadow: inset -1px 1px 0 #fff;
+    -moz-box-shadow: inset 0 1px 0 #fff;
+    -o-box-shadow: inset 0 1px 0 #fff;
+    box-shadow: inset 0 1px 0 #333;
+    background: #333;
+    border-top: 1px solid #333;
+    border-right: 1px solid #333;
+    z-index: -5;
+}
+
+
+/*tooltip end*/
+
+.wordkeeper .child {
+    padding-left: 10px;
+    opacity: 0.9;
+}
+
+#toplevel_page_wordkeeper-system .wp-menu-image img{ width: 20px; }
+
+.toggle-btn{
+    width: 70px;
+    height: 36px;
+    margin: 10px 0px;
+    border-radius: 50px;
+    display: inline-block;
+    position: relative;
+    background: #e74c3c;
+    cursor: pointer;
+    -webkit-transition: background-color .40s ease-in-out;
+    -moz-transition: background-color .40s ease-in-out;
+    -o-transition: background-color .40s ease-in-out;
+    transition: background-color .40s ease-in-out;
+    cursor:pointer;
+}
+
+.toggle-btn .round-btn{
+    width: 28px;
+    height: 28px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    left: 5px;
+    top: 52%;
+    margin-top: -15px;
+    -webkit-transition: all .30s ease-in-out;
+    -moz-transition: all .30s ease-in-out;
+    -o-transition: all .30s ease-in-out;
+    transition: all .30s ease-in-out;
+}
+
+.toggle-btn .toggle-value{
+    position: absolute !important;
+    left:0;
+    right:0;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    z-index: 9 !important;
+    cursor:pointer !important;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+}
+
+.toggle-btn.active{
+    background: #2ecc71;
+}
+
+.toggle-btn.active .round-btn{
+    left: 37px;
+}

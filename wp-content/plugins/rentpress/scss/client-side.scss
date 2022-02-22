@@ -1,0 +1,30 @@
+@import 'settings';
+@import 'basic-classes';
+
+@import 'utilities/grid';
+@import 'utilities/anime';
+
+// Plugins
+@import 'js-plugins/jquery.magnific';
+// @import 'js-plugins/cal';
+@import 'js-plugins/noui-range';
+// @import 'js-plugins/slick';
+// @import 'js-plugins/slick-theme';
+
+// Templates
+
+@import "client-templates/icons";
+
+@import "client-templates/single-floorplan";
+@import "client-templates/archive-floorplans";
+// @import "client-templates/floorplans-modal";
+@import "client-templates/single-property";
+@import "client-templates/archive-properties";
+@import "client-templates/archive-cities";
+@import "client-templates/taxonomies";
+@import "client-templates/template-globals";
+
+// Shortcodes
+
+@import "shortcodes/featured-floorplan";
+@import "shortcodes/grid-of-floorplans";
