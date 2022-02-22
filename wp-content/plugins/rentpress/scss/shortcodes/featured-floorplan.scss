@@ -1,0 +1,27 @@
+/* Styles for the Featured Floor Plan short code */
+#rp-featured-floor-plan-intro{
+
+}
+
+.rp-featured-floorplan{
+	> div {
+	    display: inline-block;
+	    vertical-align: top;
+	}
+	
+	figure{
+	    max-width: 50%;
+	}
+	
+	.rp-featured-floorplan-details {
+	    max-width: 49%;
+	}
+
+	@media ( max-width: 486px ) {
+
+		figure, .rp-featured-floorplan-details {
+			max-width: 100%;
+		}
+		
+	}
+}

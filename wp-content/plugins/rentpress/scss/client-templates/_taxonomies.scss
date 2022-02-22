@@ -1,0 +1,170 @@
+.rp-main-hero{
+	width: 100%;
+	height: 60vh;
+	min-height: 200px;
+	background-size: cover;
+    background-position: center center;
+    display: flex;
+}
+
+.rp-main-hero-title {
+    background-color: transparent;
+    white-space: nowrap;
+    text-align: center;
+    text-shadow: -2px 2px 0.75rem rgba(0,0,0,0.35);
+    // padding-top: calc( 20vw - 50px ) !important;
+    color: white;
+    margin: auto;
+}
+
+.rp-taxonomy-desc {
+    max-width: 800px;
+    margin: #{$gutter * 3} auto;
+    text-align: center;
+}
+
+.rp-section-block-light {
+    background-color: $white;
+}
+
+.is-comm-photo {
+    height: 16vw;
+    width: 100%;
+    float: left;
+    margin: 0px;
+    overflow: hidden;
+}
+
+.is-comm-photo img {
+    max-width: none;
+    height: 16vw;
+}
+
+// .single-prop-wrapper {
+//     position: relative;
+//     width: 31.33%;
+//     float: left;
+//     margin: 1%;
+//     margin-bottom: 2rem;
+//     border-bottom: none;
+// }
+
+.single-prop-details {
+    width: 100%;
+    float: right;
+    padding: 1em;
+}
+
+.single-prop-detail-1 {
+    width: 100%;
+    float: left;
+}
+
+.single-prop-detail-2 {
+    float: right;
+    width: 100%;
+}
+
+.single-prop-detail-2 .button {
+    position: relative;
+    width: 100%;
+}
+
+.single-prop-address {
+    margin: 0px;
+}
+
+.single-prop-phone {
+    margin-right: 15px;
+}
+
+.is-comm-amenities li {
+    display: inline-block;
+    vertical-align: top;
+    width: 42px;
+    height: 42px;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+    background-size: 100% 100%;
+}
+
+.is-comm-amenities {
+    list-style-type: none;
+    margin: 0;
+    padding-top: 0.25rem;
+}
+
+.single-prop-bedroom-price {
+    width: fit-content;
+    float: left;
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.single-prop-view-btn {
+    width: 100%;
+    float: left;
+    bottom: 0;
+}
+
+.clearfix-1050px-size{
+  	display: none;
+}
+
+.clearfix {
+  clear: both;
+}
+
+.back-btn {
+    text-align: center;
+}
+
+@media only screen and (max-width: 1050px) {
+  .single-prop-wrapper {
+    width: 48%;
+  }
+
+  .prop-wrapper .clearfix{
+  	display: none;
+  }
+
+  .single-prop-detail-2 {
+  	min-height: 141px;
+  }
+
+  .clearfix-full-size{
+  	display: none;
+  }
+
+  .clearfix-1050px-size{
+  	display: block !important;
+  }
+}
+
+@media only screen and (max-width: 650px){
+	.single-prop-wrapper {
+    	width: 99%;
+	}
+
+	.is-comm-photo img{
+		min-width: 100%;
+	}
+}
+
+.rp-explore-footer {
+  .is-rp-prop {
+    min-height: auto !important;
+    .rp-prop-top {
+      display: flex;
+    }
+  }
+  h4 {
+    // font-size: 24px;
+    margin:auto !important;
+    text-align: center;
+  }
+}
+
+.rp-archive-search-cta-section {
+    margin: 3rem 0 6rem;
+}

@@ -1,0 +1,198 @@
+// * B A S E   G R I D  *
+
+.rp-row {
+    margin: 0 auto;
+    width: 100%;
+    max-width: $container-width;
+    @extend %clearfix;
+    &.wide {
+        max-width: $container-width * 1.5; // change to suit
+    }
+    &.narrow {
+        max-width: $container-width * .75; // change to suit
+    }
+    .row {
+        @media (min-width: $medium) {
+            [class*='col-']:nth-of-type(1) {
+                margin-left: -$gutter;
+            }
+            [class*='col-']:last-of-type {
+                margin-right: -$gutter;
+                float: right;
+            }
+        }
+    }
+}
+
+[class*='rp-col-'] {
+    // float: left; // add float back to mobile-first col if experiencing collapsing issues. But, man... it feels nice to just add 'float:left' when it's necessary
+    width: 100%;
+    float: left;
+    min-height: $one;
+    padding: $gutter;
+    .switch & {
+        float: right;
+    }
+}
+
+@media (min-width: $medium) {
+    @for $i from 1 through $grid-columns {      
+        .rp-col-#{$i}, { 
+            // float: left;        
+            width: 100% / $grid-columns * $i;   
+        }           
+    }   
+} // * mq
+
+
+[class*='large-'] { // modifier for col-x
+    //width: 100%;
+}
+
+
+    @for $i from 1 through $grid-columns {      
+        .rp-large-#{$i}, {
+            @media (min-width: $large) {
+                width: 100% / $grid-columns * $i;
+                float: left;
+                min-height: $one;
+            }
+        padding: $gutter;
+        }           
+    }   
+
+
+
+
+// G R I D  H E L P E R S
+
+.mobile-quarter {
+    @media (max-width: $max-medium) {
+        width: 25%;
+        // float: left;
+    }
+    // & + *:not(.mobile-quarter)
+    // {
+    //     clear: both;
+    // }
+}
+
+.mobile-third {
+    @media (max-width: $max-medium) {
+        width: 33.3333%;
+        // float: left;
+    }
+    // & + *:not(.mobile-third)
+    // {
+    //     clear: both;
+    // }
+}
+
+.mobile-fifty {
+    @media (max-width: $max-medium) {
+        width: 50%;
+        // float: left;
+    }
+    // & + *:not(.mobile-fifty)
+    // {
+    //     clear: both;
+    // }
+}
+
+[class*='rp-col-'].is-end {
+    @media (min-width: $medium) {
+        float: right;
+    }
+}
+
+[class*='rp-col-'].is-centered {
+    @media (min-width: $medium) {
+        float: none;
+        margin-left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+[class*='rp-col-'].is-solo {
+    @media (min-width: $medium) {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+[class*='rp-col-'].is-single {
+    @media (min-width: $medium) {
+        margin: 0 auto;
+        float: none;
+        clear: both;
+    }
+}
+
+.clearfix {
+    *zoom: 1;
+    &:before, 
+    &:after {
+        content: " ";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+
+// * M I X I N S *
+// * Apply a clearfix to an element.
+
+@mixin clearfix() {
+  &:before, &:after {
+    content: '';
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+%clearfix {
+    &:before, 
+    &:after {
+        content: " ";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+// * define a row with any size width *
+@mixin row($max-width: $container-width, $padded: 0) {
+  @include clearfix;
+  width: auto;
+  max-width: $max-width;
+  float: none;
+  display: block;
+  margin: {
+    right: auto;
+    left:  auto;
+  };
+  padding: {
+    left:  $padded;
+    right: $padded;
+  };
+}
+
+@mixin col($medium-width: $col-width, $large-width: null) {
+    width: 100%;
+    min-height: $one;
+    padding: $gutter;
+    @media (min-width: $medium) {
+        float: left;
+        width: $medium-width;
+    }
+    @media (min-width: $large) {
+        float: left;
+        width: $large-width;
+    }
+}

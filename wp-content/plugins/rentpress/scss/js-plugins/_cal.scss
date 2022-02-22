@@ -1,0 +1,122 @@
+$hello-week-color-primary :#7fcbc3;
+$hello-week-color-secondary :$dark;
+$hello-week-color-highlight :#8fbc8f;
+$hello-week-color-days : $light;
+$hello-week-color-weekend: #f3f3f3;
+$hello-week-color-disabled: #f7f8fb;
+
+$hello-week-transition: .2s cubic-bezier(.25, .1, .49, .9);
+
+:root {
+  --hello-week-bg-color: #fff;
+  --hello-week-bg-day: #fff;
+  --hello-week-color-day: #{$hello-week-color-secondary};
+  --hello-week-bg-week: #fff;
+  --hello-week-color-week: #{$hello-week-color-secondary};
+  --hello-week-bg-tody: #{$hello-week-color-days};
+  --hello-week-color-tody: #fff;
+  --hello-week-bg-selected: #{$hello-week-color-primary};
+  --hello-week-color-selected: #fff;
+  --hello-week-bg-weekend: #{$hello-week-color-weekend};
+  --hello-week-color-weekend: #{darken($hello-week-color-weekend, 20%)};
+  --hello-week-bg-disabled: #{$hello-week-color-disabled};
+  --hello-week-color-disabled: #{darken($hello-week-color-disabled, 20%)};
+  --hello-week-bg-highlight: #{$hello-week-color-highlight};
+  --hello-week-color-highlight: #fff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.hello-week {
+  width: 100%;
+  // margin: 0 auto;
+  // padding: 1rem;
+  // border-radius: var(--hello-week-border-radius);
+  // background-color: var(--hello-week-bg-color);
+  // box-shadow: 0 2px 20px 8px rgba(0, 0, 0, .12);
+  user-select: none;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  &__label {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 100;
+    text-align: center;
+  }
+
+  &__week {
+    display: flex;
+    background-color: var(--hello-week-bg-week);
+    color: var(--hello-week-color-week);
+
+    &__day {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14.28%;
+      padding: 0.25rem;
+      font-size: 0.375rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+  }
+
+  &__month {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__day {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14.28%;
+    padding: 0.25rem;
+    transition: background-color $hello-week-transition;
+    border-radius: var(--hello-week-border-radius);
+
+    &.is-active {
+      cursor: pointer;
+    }
+
+    &.is-weekend {
+      background-color: var(--hello-week-bg-weekend);
+      color: var(--hello-week-color-weekend);
+    }
+
+    &.is-selected {
+      background-color: var(--hello-week-bg-selected) !important;
+      color: var(--hello-week-color-selected) !important;
+    }
+
+    &.is-disabled {
+      border-radius: 0;
+      background-color: var(--hello-week-bg-disabled);
+      color: var(--hello-week-color-disabled);
+      cursor: not-allowed;
+    }
+
+    &.is-highlight {
+      background-color: var(--hello-week-bg-highlight);
+      color: var(--hello-week-color-highlight);
+    }
+
+    &.is-today {
+      background-color: var(--hello-week-bg-tody);
+      color: var(--hello-week-color-tody);
+    }
+
+    &.is-hover {
+      background-color: #dee;
+    }
+  }
+}

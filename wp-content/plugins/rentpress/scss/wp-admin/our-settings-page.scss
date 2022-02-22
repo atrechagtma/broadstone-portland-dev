@@ -1,0 +1,81 @@
+#rp-settings-page-wrapper,
+#rp-add-unit-wrapper{
+	
+	.rp-admin-nav{
+
+		padding: 10px 0px;
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		.rp-nav-tab-active{
+
+			&, &:focus, &:focus:active, &:hover{
+				background: white;
+				color: #0099cc;
+			}
+
+		}
+
+	}
+
+	.rp-syncing-respond{
+		width: 95.6%;
+	}
+
+	.rp-sync-ctas{
+		padding: 1rem 1rem;
+		background: #0099cc;
+		max-width: 93.8%;
+
+		> h4{
+			color: white;
+
+			margin-bottom: 1rem;
+			margin-top: 0;
+			display: inline-block;
+		}
+
+		#rp-sync-properties{
+
+			padding: 0.5rem;
+			border: 1px solid white;
+			color: white;
+			text-decoration: none;
+			display: inline-block;
+			max-width: 17rem;  
+
+			&:hover{
+
+				background: white;
+				color: #0099cc;
+
+			}
+
+		}
+
+	}
+
+	form {
+		background: white;
+		max-width: 93.8%;
+		padding: 1rem;
+		
+		h2 {
+			background: white;
+			padding-bottom: .5rem;
+			border-bottom: 1px solid black;
+		}
+	}
+}
+
+.add-unit-field {
+	td, th {
+		padding: 2px 10px;
+	}
+}
+
+input[type=url] {
+    width: 30em;
+}
+
+

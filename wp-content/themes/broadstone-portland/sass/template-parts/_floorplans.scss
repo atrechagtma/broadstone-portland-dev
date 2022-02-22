@@ -1,0 +1,138 @@
+// Floorplans overrides
+.rp-archive-fp-nav-section,
+.rp-archive-fp-filter-nav-section {
+    display: none;
+}
+
+.rentpress-core-container {
+    font-family: "Montserrat", sans-serif;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.rentpress-core-container,
+#rp-archive-fp-data,
+.is-rp-fp {
+    background-color: transparent;
+}
+
+.is-rp-fp {
+    margin-bottom: 20px;
+}
+
+#rp-archive-fp-sidebar {
+    background-color: #AA5B3C22;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-bottom: 20px;
+}
+
+.rp-archive-fp-filters-title {
+    font-weight: bold;
+}
+
+@media (min-width: 768px) {
+    #floorplan_cards {
+        margin-left: 50px;
+    }
+}
+
+.is-rp-fp,
+.is-rp-fp figure,
+.is-rp-fp .rp-prop-figure {
+    height: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.rp-fp-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.rp-fp-title h4 {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.is-rp-fp figure,
+.is-rp-fp .rp-prop-figure {
+    align-items: start;
+}
+
+.is-rp-fp figure {
+    height: auto !important;
+    margin-bottom: 20px;
+}
+
+.is-rp-fp a {
+    display: flex;
+    flex-direction: column;
+    color: #191e23;
+    background-color: #AA5B3C22;
+    margin-bottom: 20px;
+    padding: 15px;
+    height: 100%;
+    text-decoration: none;
+}
+
+.rp-button,
+.rp-button-alt {
+    background-color: #fff !important;
+    border: 3px solid #294954 !important;
+    border-radius: 12px !important;
+    color: #294954 !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: "Montserrat", sans-serif;
+}
+
+.rp-button:hover,
+.rp-button-alt:hover {
+    background-color: #294954 !important;
+    border: 3px solid #294954 !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+}
+
+.rentpress-core-container #rp-archive-fp-filters .noUi-connect {
+    background-color: #294954;
+}
+
+.rentpress-core-container #rp-archive-fp-filters .rp-archive-fp-is-filter-module .rp-module-wrapper select,
+.noUi-handle,
+.rentpress-core-container input.rp-input[type="checkbox"], .rentpress-core-container input.rp-input[type="radio"] {
+    border-color: #294954;
+    border-width: 3px;
+    border-radius: 12px;
+}
+
+.is-rp-fp .rp-fp-details {
+    padding: 0;
+}
+
+.is-rp-fp .rp-fp-details h4 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.is-rp-fp .rp-fp-details .rp-starting-at,
+.is-rp-fp .rp-fp-details .rp-starting-at > * {
+    display: block !important;
+    font-style: normal;
+}
+
+.rp-archive-fp-card-icon {
+    color: #294954;
+    margin: 0;
+    font-size: 24px;
+    line-height: 1;
+}
+
+// Floorplans modal
+// .unit-modal-data {
+//     display: block !important;
+// }

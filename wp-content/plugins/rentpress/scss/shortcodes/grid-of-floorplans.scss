@@ -1,0 +1,69 @@
+#rp-floor-plan-grid-bedroom-filters .rp-fp-filter,
+#rp-floor-plan-grid-price-sort .rp-fp-sort {
+  border: 1px solid #efefef;
+  padding: .5rem 2rem;
+  display: inline-block;
+  margin-bottom: .5rem;
+  margin-right: .5rem;
+  cursor: pointer;
+}
+
+#rp-floor-plan-grid{
+
+	&.none-found{
+
+	}
+
+	.rp-floorplan{
+		display: inline-block;
+		vertical-align: top;
+		width: 32.3333%;
+		padding: 1rem;
+		background-color: #fff;
+		border: 2px solid #efefef;
+
+		@media (max-width: 39rem) {
+			width: 49.3333%;
+		}
+
+		@media (max-width: 30rem) {
+			width: 100% !important;
+		}
+
+		@media(max-width: 768px) {
+			width: 49.3333%;
+		}
+
+		figure{
+			img{
+				min-height: 0;
+			}
+
+			@media(min-width: 40rem) {
+				margin-top: 7.5rem;
+			}
+		}
+
+		.rp-floorplan-details span {
+			color: #222;
+	
+			&:nth-of-type(1):after {
+		  		color: #2d2d2d;
+			}
+		}
+	}
+}
+
+.rp-no-results-wrapper {
+	width: 100%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    p:first-child {
+	    font-size: 38px;
+	    margin-bottom: 0;
+	    font-weight: bold;
+	}
+}
