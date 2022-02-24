@@ -10,11 +10,10 @@
 include RENTPRESS_PLUGIN_DIR . 'templates/FloorPlans/single-floorplan-data.php';
 
 get_header();
-while ( have_posts() ) : the_post(); ?>
+while ( have_posts() ) : the_post(); ?>test
 <header class="entry-header" style="background-image: url(https://bsp-staging.local/wp-content/uploads/2021/11/Broadstone-Portland-detail25.jpg);">
     <h1 class="entry-title">Floor Plans</h1>
 </header>
-
 <section class="rentpress-core-container">
     <?php
     if($floorPlanSpecial && $floorPlanSpecialExpiration !== true) { 
