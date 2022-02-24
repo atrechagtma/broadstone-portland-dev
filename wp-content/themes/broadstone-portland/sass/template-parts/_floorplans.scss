@@ -22,7 +22,8 @@
 }
 
 #rp-archive-fp-sidebar {
-    background-color: #AA5B3C22;
+    // background-color: #AA5B3C22;
+    background-color: rgba(41, 73, 84, .1);
     padding-top: 30px;
     padding-bottom: 30px;
     margin-bottom: 20px;
@@ -104,7 +105,8 @@
 
 .rentpress-core-container #rp-archive-fp-filters .rp-archive-fp-is-filter-module .rp-module-wrapper select,
 .noUi-handle,
-.rentpress-core-container input.rp-input[type="checkbox"], .rentpress-core-container input.rp-input[type="radio"] {
+.rentpress-core-container input.rp-input[type="checkbox"],
+.rentpress-core-container input.rp-input[type="radio"] {
     border-color: #294954;
     border-width: 3px;
     border-radius: 12px;
@@ -120,7 +122,7 @@
 }
 
 .is-rp-fp .rp-fp-details .rp-starting-at,
-.is-rp-fp .rp-fp-details .rp-starting-at > * {
+.is-rp-fp .rp-fp-details .rp-starting-at>* {
     display: block !important;
     font-style: normal;
 }
@@ -132,7 +134,35 @@
     line-height: 1;
 }
 
-// Floorplans modal
-.unit-modal-data {
-    display: block !important;
+.rentpress-core-container .rp-primary-accent,
+.rp-3d-tour-link, .rp-3d-tour-link:hover, .rp-3d-tour-link:active {
+    color: rgba(170, 91, 60, 1) !important;
 }
+
+.rentpress-core-container .unit-modal span.close-button {
+    display: block;
+    width: 25px;
+    height: 25px;
+    background-color: #294954;
+    color: #fff;
+    text-align: center;
+    border-radius: 50%;
+    text-transform: uppercase;
+    float: right;
+}
+
+.rentpress-core-container .unit-modal span.close-button::before {
+    content: '\e938';
+    font-family: 'icomoon';
+    top: -1.5px;
+    position: relative;
+}
+
+.rentpress-core-container .rp-button {
+    line-height: inherit;
+}
+
+// Floorplans modal
+// .unit-modal-data {
+//     display: block !important;
+// }
