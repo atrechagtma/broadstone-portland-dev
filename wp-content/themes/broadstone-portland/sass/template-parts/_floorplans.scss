@@ -140,26 +140,28 @@
 }
 
 .rentpress-core-container .unit-modal span.close-button {
-    display: block;
     width: 25px;
     height: 25px;
     background-color: #294954;
-    color: #fff;
-    text-align: center;
-    border-radius: 50%;
-    text-transform: uppercase;
-    float: right;
 }
 
 .rentpress-core-container .unit-modal span.close-button::before {
-    content: '\e938';
-    font-family: 'icomoon';
     top: -1.5px;
     position: relative;
 }
 
 .rentpress-core-container .rp-button {
     line-height: inherit;
+}
+
+.close-gallery-modal a {
+    width: 25px;
+    height: 25px;
+}
+
+.close-gallery-modal a::before {
+    top: -1.5px;
+    position: relative;
 }
 
 // Floorplans modal
