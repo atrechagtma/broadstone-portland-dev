@@ -791,7 +791,7 @@ header.entry-header h1.entry-title {
 }
 
 #rp-archive-fp-sidebar {
-	background-color: rgba(41, 73, 84, 0.1);
+	background-color: #00000008;
 	padding-top: 30px;
 	padding-bottom: 30px;
 	margin-bottom: 20px;
@@ -839,7 +839,7 @@ header.entry-header h1.entry-title {
 	display: flex;
 	flex-direction: column;
 	color: #191e23;
-	background-color: #AA5B3C22;
+	background-color: #00000008;
 	margin-bottom: 20px;
 	padding: 15px;
 	height: 100%;
