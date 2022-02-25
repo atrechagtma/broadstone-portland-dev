@@ -164,6 +164,28 @@
     position: relative;
 }
 
+.rp-is-checked input[type="checkbox"],
+.rentpress-core-container input.rp-input[type="checkbox"]:checked {
+    position: relative;
+    background-image: none;
+    background-color: #fff;
+    border: 3px solid #294954;
+}
+
+.rp-is-checked input[type="checkbox"]::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: #aa5b3c;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+}
+
 // Floorplans modal
 // .unit-modal-data {
 //     display: block !important;
