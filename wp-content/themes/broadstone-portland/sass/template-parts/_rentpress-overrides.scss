@@ -13,6 +13,17 @@
     .rentpress-top-floorplan-search-filter-wrapper {
         width: 20%;
         min-width: 200px;
+
+        .row {
+            display: block;
+            margin: 0;
+
+            .col-xl-4,
+            .col-xl-2 {
+                width: 100%;
+                max-width: inherit;
+            }
+        }
     }
 
     .rentpress-floorplan-card-wrapper {
