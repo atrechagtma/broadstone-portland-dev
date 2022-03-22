@@ -785,6 +785,17 @@ header.entry-header h1.entry-title {
 	min-width: 200px;
 }
 
+.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper .row {
+	display: block;
+	margin: 0;
+}
+
+.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper .row .col-xl-4,
+.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper .row .col-xl-2 {
+	width: 100%;
+	max-width: inherit;
+}
+
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
 	width: 80%;
 }
