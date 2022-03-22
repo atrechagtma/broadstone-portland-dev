@@ -23,6 +23,10 @@
                 width: 100%;
                 max-width: inherit;
             }
+
+            .v-text-field.v-text-field--solo .v-label {
+                left: 10px;
+            }
         }
     }
 

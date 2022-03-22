@@ -796,6 +796,10 @@ header.entry-header h1.entry-title {
 	max-width: inherit;
 }
 
+.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper .row .v-text-field.v-text-field--solo .v-label {
+	left: 10px;
+}
+
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
 	width: 80%;
 }
