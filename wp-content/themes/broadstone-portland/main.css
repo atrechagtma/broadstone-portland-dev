@@ -797,7 +797,7 @@ header.entry-header h1.entry-title {
 }
 
 .rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper .row .v-text-field.v-text-field--solo .v-label {
-	left: 10px;
+	left: 10px !important;
 }
 
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
