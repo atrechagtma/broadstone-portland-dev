@@ -23,7 +23,7 @@
 
         @media (min-width: 960px) {
             width: 20%;
-            min-width: 200px;
+            min-width: 250px;
         }
 
         .row {
@@ -58,7 +58,11 @@
 
 
             @media (min-width: 960px) {
-                grid-template-columns: repeat(2,45%) !important;
+                grid-template-columns: repeat(1,100%) !important;
+            }
+
+            @media (min-width: 120px) {
+                grid-template-columns: repeat(2,42%) !important;
             }
 
             @media (min-width: 1600px) {
