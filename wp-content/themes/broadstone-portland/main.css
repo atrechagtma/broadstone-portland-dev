@@ -829,6 +829,20 @@ header.entry-header h1.entry-title {
 	}
 }
 
+.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
+	display: grid;
+	gap: 40px;
+	grid-template-columns: 100%;
+	grid-template-rows: 1fr;
+	justify-content: space-between;
+}
+
+@media (min-width: 960px) {
+	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
+		grid-template-columns: repeat(3, 30%);
+	}
+}
+
 .hero-block {
 	position: relative;
 	background-repeat: no-repeat;
