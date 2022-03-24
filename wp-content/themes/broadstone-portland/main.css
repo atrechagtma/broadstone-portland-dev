@@ -830,6 +830,7 @@ header.entry-header h1.entry-title {
 
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
 	gap: 1em !important;
+	grid-template-columns: 100% !important;
 	padding: 0 20px;
 }
 
