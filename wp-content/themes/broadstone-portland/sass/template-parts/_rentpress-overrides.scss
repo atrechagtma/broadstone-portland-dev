@@ -50,7 +50,7 @@
 
         @media (min-width: 960px) {
             width: 80%;
-            width: calc(100% - 250px);
+            width: calc(100% - 300px);
         }
 
         .rentpress-floorplan-card-container {
@@ -58,7 +58,7 @@
 
 
             @media (min-width: 960px) {
-                grid-template-columns: repeat(1,100%) !important;
+                grid-template-columns: repeat(2,40%) !important;
             }
 
             @media (min-width: 1200px) {
