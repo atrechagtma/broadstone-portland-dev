@@ -5,14 +5,22 @@
 // Rentpress plugin
 .rentpress-shortcode-floorplan-search-wrapper {
     padding: 20px;
+    display: block;
+
+    @media (min-width: 600px) {
+        display: grid;
+    }
 }
 
 .rentpress-floorplan-search-container {
     display: flex;
 
     .rentpress-top-floorplan-search-filter-wrapper {
-        width: 20%;
-        min-width: 200px;
+
+        @media (min-width: 600px) {
+            width: 20%;
+            min-width: 200px;
+        }
 
         .row {
             display: block;
@@ -37,4 +45,8 @@
     .rentpress-floorplan-card-wrapper {
         width: 80%;
     }
+}
+
+@media (max-width: 599px) {
+
 }

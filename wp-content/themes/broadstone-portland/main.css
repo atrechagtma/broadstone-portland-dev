@@ -774,15 +774,24 @@ header.entry-header h1.entry-title {
 
 .rentpress-shortcode-floorplan-search-wrapper {
 	padding: 20px;
+	display: block;
+}
+
+@media (min-width: 600px) {
+	.rentpress-shortcode-floorplan-search-wrapper {
+		display: grid;
+	}
 }
 
 .rentpress-floorplan-search-container {
 	display: flex;
 }
 
-.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
-	width: 20%;
-	min-width: 200px;
+@media (min-width: 600px) {
+	.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
+		width: 20%;
+		min-width: 200px;
+	}
 }
 
 .rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper .row {
