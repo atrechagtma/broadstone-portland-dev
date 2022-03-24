@@ -7,7 +7,7 @@
     padding: 20px;
     display: block;
 
-    @media (min-width: 600px) {
+    @media (min-width: 960px) {
         display: grid;
     }
 }
@@ -21,7 +21,7 @@
 
     .rentpress-top-floorplan-search-filter-wrapper {
 
-        @media (min-width: 600px) {
+        @media (min-width: 960px) {
             width: 20%;
             min-width: 200px;
         }
@@ -47,7 +47,11 @@
     }
 
     .rentpress-floorplan-card-wrapper {
-        width: 80%;
+        width: 100%;
+
+        @media (min-width: 960px) {
+            width: 80%;
+        }
     }
 }
 
