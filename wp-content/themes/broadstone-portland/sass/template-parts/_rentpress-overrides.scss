@@ -4,7 +4,7 @@
 
 // Rentpress plugin
 .rentpress-shortcode-floorplan-search-wrapper {
-    padding: 20px;
+    padding: 30px;
     display: block;
 
     @media (min-width: 960px) {
@@ -23,6 +23,7 @@
 
         @media (min-width: 960px) {
             flex: 0 300px;
+            padding-right: 30px;
         }
 
         .row {
@@ -33,6 +34,10 @@
             .col-xl-2 {
                 width: 100%;
                 max-width: inherit;
+            }
+
+            .col, .col-12 {
+                padding: 0;
             }
 
             .v-text-field.v-text-field--solo .v-label {
