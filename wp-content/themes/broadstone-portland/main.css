@@ -777,7 +777,7 @@ header.entry-header h1.entry-title {
 	display: block;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 960px) {
 	.rentpress-shortcode-floorplan-search-wrapper {
 		display: grid;
 	}
@@ -793,7 +793,7 @@ header.entry-header h1.entry-title {
 	}
 }
 
-@media (min-width: 600px) {
+@media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
 		width: 20%;
 		min-width: 200px;
@@ -820,7 +820,13 @@ header.entry-header h1.entry-title {
 }
 
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
-	width: 80%;
+	width: 100%;
+}
+
+@media (min-width: 960px) {
+	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
+		width: 80%;
+	}
 }
 
 .hero-block {
