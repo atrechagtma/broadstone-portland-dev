@@ -58,15 +58,15 @@
 
 
             @media (min-width: 960px) {
-                grid-template-columns: repeat(2,38%) !important;
+                grid-template-columns: repeat(2,50%) !important;
             }
 
             @media (min-width: 1200px) {
-                grid-template-columns: repeat(2,42%) !important;
+                grid-template-columns: repeat(2,50%) !important;
             }
 
             @media (min-width: 1600px) {
-                grid-template-columns: repeat(3,30%) !important;
+                grid-template-columns: repeat(3,33%) !important;
             }
         }
     }
