@@ -61,7 +61,7 @@
             justify-content: space-between;
 
             @media (min-width: 960px) {
-                grid-template-columns: repeat(3,30%);
+                grid-template-columns: repeat(3,30%) !important;
             }
         }
     }
