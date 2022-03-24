@@ -796,7 +796,7 @@ header.entry-header h1.entry-title {
 @media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
 		width: 20%;
-		min-width: 200px;
+		min-width: 250px;
 	}
 }
 
@@ -835,7 +835,13 @@ header.entry-header h1.entry-title {
 
 @media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
-		grid-template-columns: repeat(2, 45%) !important;
+		grid-template-columns: repeat(1, 100%) !important;
+	}
+}
+
+@media (min-width: 120px) {
+	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
+		grid-template-columns: repeat(2, 42%) !important;
 	}
 }
 
