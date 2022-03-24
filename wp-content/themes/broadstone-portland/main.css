@@ -787,7 +787,7 @@ header.entry-header h1.entry-title {
 	display: flex;
 }
 
-@media (max-width: 599px) {
+@media (max-width: 959px) {
 	.rentpress-floorplan-search-container {
 		flex-direction: column;
 	}
