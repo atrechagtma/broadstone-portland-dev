@@ -787,6 +787,12 @@ header.entry-header h1.entry-title {
 	display: flex;
 }
 
+@media (max-width: 599px) {
+	.rentpress-floorplan-search-container {
+		flex-direction: column;
+	}
+}
+
 @media (min-width: 600px) {
 	.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
 		width: 20%;
