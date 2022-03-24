@@ -10,6 +10,10 @@
     @media (min-width: 960px) {
         display: grid;
     }
+
+    input[type="text"] {
+        border: none !important;
+    }
 }
 
 .rentpress-floorplan-search-container {
@@ -43,10 +47,6 @@
             .v-text-field.v-text-field--solo .v-label {
                 left: 10px !important;
             }
-        }
-        
-        input[type="text"] {
-            border: none !important;
         }
     }
 
