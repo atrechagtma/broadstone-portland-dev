@@ -830,6 +830,7 @@ header.entry-header h1.entry-title {
 
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
 	gap: 1em !important;
+	padding: 0 20px;
 }
 
 @media (min-width: 960px) {
@@ -848,6 +849,10 @@ header.entry-header h1.entry-title {
 	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
 		grid-template-columns: repeat(3, 30%) !important;
 	}
+}
+
+.rentpress-floorplan-search-container .v-responsive__content {
+	width: auto !important;
 }
 
 .hero-block {

@@ -54,6 +54,7 @@
 
         .rentpress-floorplan-card-container {
             gap: 1em !important;
+            padding: 0 20px;
 
 
             @media (min-width: 960px) {
@@ -68,6 +69,10 @@
                 grid-template-columns: repeat(3,30%) !important;
             }
         }
+    }
+
+    .v-responsive__content {
+        width: auto !important;
     }
 }
 
