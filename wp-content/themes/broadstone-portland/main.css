@@ -824,18 +824,17 @@ header.entry-header h1.entry-title {
 
 @media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
-		width: 80%;
 		width: calc(100% - 300px);
 	}
 }
 
 .rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
-	gap: 40px !important;
+	gap: 1em !important;
 }
 
 @media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper .rentpress-floorplan-card-container {
-		grid-template-columns: repeat(2, 40%) !important;
+		grid-template-columns: repeat(2, 38%) !important;
 	}
 }
 
