@@ -785,6 +785,7 @@ header.entry-header h1.entry-title {
 
 .rentpress-floorplan-search-container {
 	display: flex;
+	flex: 0 250px;
 }
 
 @media (max-width: 959px) {
@@ -826,6 +827,7 @@ header.entry-header h1.entry-title {
 @media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-floorplan-card-wrapper {
 		width: 80%;
+		width: calc(100% - 250px);
 	}
 }
 
