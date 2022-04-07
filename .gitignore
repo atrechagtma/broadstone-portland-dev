@@ -12,7 +12,6 @@ wp-content/upgrade/
 wp-content/uploads/
 wp-content/wp-cache-config.php
 wp-content/plugins/hello.php
-wp-content/plugins/wordkeeper-system/
 wp-content/themes/broadstone-portland/node_modules/
 
 /.htaccess
