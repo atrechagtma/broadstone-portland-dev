@@ -77,7 +77,7 @@ function rentpress_standardizeUnitFeedData($unit)
         'unit_rent_max' => isset($unit->Rent->MaxRent) && (int) $unit->Rent->MaxRent > 100 ? (int) $unit->Rent->MaxRent : null,
         'unit_rent_terms' => isset($unit->Rent->TermRent) ? json_encode($unit->Rent->TermRent) : null,
         'unit_rent_term_best' => null,
-        'unit_rent_best' => isset($unit->Rent->BestPrice) && (int) $unit->Rent->BestPrice > 100 ? (int) $unit->Rent->BestPrice : null,
+        'unit_rent_best' => null,
         'unit_bedrooms' => isset($unit->Rooms->Bedrooms) ? $unit->Rooms->Bedrooms : null,
         'unit_bathrooms' => isset($unit->Rooms->Bathrooms) ? $unit->Rooms->Bathrooms : null,
         'unit_floor_level' => isset($unit->Rooms->FloorLevel) ? $unit->Rooms->FloorLevel : null,

@@ -6,7 +6,7 @@
 Plugin Name: RentPress for Websites
 Plugin URI: https://rentpress.io/
 Description: Connects real estate agents to their property information for any WordPress site. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan, Encasa, Appfolio.
-Version: 7.0
+Version: 7.2.0
 Requires at least: 5.8
 Requires PHP: 7.2
 Author: 30 Lines
@@ -21,7 +21,12 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('RENTPRESS_PLUGIN_VERSION', '7.0.beta.1');
+if (defined('RENTPRESS_PLUGIN_DIR')) {
+    echo "You have an old version of RentPress active while attempting to activate RentPress For Websites. Please deactivate or delete your old RentPress plugin and then activate RentPress For Websites.";
+    die();
+}
+
+define('RENTPRESS_PLUGIN_VERSION', '7.2.0');
 define('RENTPRESS_MINIMUM_WP_VERSION', '5.3.2');
 define('RENTPRESS_DELETE_LIMIT', 100000);
 define('RENTPRESS_MENU_POSITION', 5);
@@ -31,7 +36,8 @@ define('RENTPRESS_SERVER_ENDPOINT', 'https://toplineconnect.com'); // no trailin
 // File Paths
 define('RENTPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('RENTPRESS_PLUGIN_DIST', plugin_dir_url(__FILE__) . 'dist/');
-define('RENTPRESS_PLUGIN_VUE_DIST', plugin_dir_url(__FILE__) . 'public/vue/dist/');
+define('RENTPRESS_PLUGIN_VUE_MAIN_DIST', plugin_dir_url(__FILE__) . 'public/vue/main-app/dist/');
+define('RENTPRESS_PLUGIN_VUE_MAPBOX_DIST', plugin_dir_url(__FILE__) . 'public/vue/mapbox-app/dist/');
 define('RENTPRESS_PLUGIN_ASSETS', plugin_dir_url(__FILE__) . 'assets/');
 define('RENTPRESS_PLUGIN_ADMIN_DIR', plugin_dir_path(__FILE__) . 'admin/');
 define('RENTPRESS_PLUGIN_ADMIN_VIEW_DIR', plugin_dir_path(__FILE__) . 'admin/view/');

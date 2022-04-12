@@ -1,32 +1,32 @@
 === RentPress for Websites ===
-Contributors: 30lines, chancebcobb, mumbles12, nicknieman, ryanmarch, szyam, wfaiz
+Contributors: 30lines, chancebcobb, elfirl, mumbles12, ryanmarch, szyam
 Tags: apartments, floor plans, multifamily, property management, rentals, configurable, entrata, rentcafe, realpage, vaultware
 Requires at least: 5.8
-Tested up to: 5.8.2
+Tested up to: 5.9.2
 Requires PHP: 7.2
-Stable tag: 7.0
+Stable tag: 7.2.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Connects real estate agents to their property information for any WordPress site. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan, Encasa, Appfolio.
+Connects property information to any WordPress site to help market your apartments. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan, Appfolio.
 
 == Description ==
 ### Meet RentPress for Apartments
 
-RentPress for Apartments is a powerful, extendable plugin that helps you market your apartments and rental properties.
+RentPress for Apartments is a powerful, extendable plugin that helps you market your apartments and rental properties. Build a high-performance online leasing office.
 
-Transform your WordPress website into an incredible apartment marketing tool. Delivering enterprise-level quality and features, all backed by industry veterans with a deep understanding of digital marketing best practices and the online rental market.
+Transform your WordPress website into an incredible apartment marketing tool. Delivering enterprise-level quality and features, all backed and used by industry veterans with a deep understanding of digital marketing best practices and the online rental market.
 
-Supercharge your RentPress experience by connecting your data feeds from RentCafe, Entrata, RealPage, MRI MarketConnect/Vaultware, ResMan, and AppFolio. [Contact 30 Lines](https://via.30lines.com/U1qnf-Pd) for a subscription.
+Supercharge your RentPress experience by connecting your data feeds from RentCafe, Entrata, RealPage, MRI MarketConnect/Vaultware, ResMan, and AppFolio (currently in beta). [Contact 30 Lines](https://via.30lines.com/U1qnf-Pd) for a subscription.
 
 Get started quickly by enabling our out-of-the-box page templates. Or code your own templates using RentPress to import property data. A variety of shortcodes are also available.
 
 RentPress is built by the award-winning team at 30 Lines who also offer apartment websites, email marketing tools, and targeted content to further enhance your property’s online presence.
 
-Don't see your preferred property management system? Looking for a new integration in the plugin? [Let us know](https://via.30lines.com/wbh68-O2) you\'re interested!
+Don't see your preferred property management system? Looking for a new integration in the plugin? [Let us know](https://via.30lines.com/wbh68-O2) you're interested!
 
 ### New with RentPress 7
-RentPress 7 has been rebuilt from the ground up. Single or multi-property websites can quickly take advantage of real-time pricing and availability with RentPress. With one click, add property listing pages to your site with all the information from your data feed, showcase apartment layouts, and show the property location on a map (Google API required). Add in a photo gallery using a shortcode. Build landing pages for your marketing campaigns.
+RentPress 7 has been rebuilt from the ground up. Single or multi-property websites can quickly take advantage of real-time pricing and availability with RentPress. With one click, add property listing pages to your site with all the information from your data feed. Showcase apartment layouts, and show the property location on a map (Google API required). Add in a photo gallery using a shortcode. Build landing pages for your marketing campaigns.
 
 Easily enable a properties search page on your site with the Search Page template. Display all properties across your portfolio, search and filter by beds, price, and pets.
 
@@ -34,12 +34,18 @@ Shoppers can now easily find properties by location with a “Cities” taxonomy
 
 All RentPress page templates report full Schema Markup, helping search engines get a better understanding of your website and your properties. All RentPress page templates report Google Analytics Events for all shopper actions.
 
+### Get Started Quickly
+RentPress is designed to let you get started in a flash. Check out our video showing the 3-minute set up process.
+
+https://www.youtube.com/watch?v=-sBC-V4wi94
+
+For more information, check out our article [Get Started with RentPress](https://via.30lines.com/ONg6mVRH).
 == Installation ==
 RentPress can be installed using one of the following methods:
 1. Install and Activate the plugin through the \'Plugins\' screen in WordPress (recommended).
 2. Upload the plugin files to a `/wp-content/plugins/rentpress` directory via FTP, or install the plugin through the WordPress plugins screen directly.
 
-Once activated, use the RentPress -> RentPress Settings page to start setting up your site. To use the included templates, visit the Enable Templates section and choose which templates you\'d like to add to your theme.
+Once activated, use the RentPress -> RentPress Settings page to start setting up your site. To use the included templates, visit the Enable Templates section and choose which templates you'd like to add to your theme.
 
 More information can be found in the [Getting Started Guide](https://via.30lines.com/ONg6mVRH).
 
@@ -54,7 +60,7 @@ With a subscription to our RentPress service to parse through property data feed
 - RealPage
 - MRI MarketConnect / Vaultware
 - ResMan
-- AppFolio
+- AppFolio (beta)
 
 And yes, you can mix multiple data sources on one website.
 
@@ -73,6 +79,45 @@ We have an extended FAQ page that's regularly updated at [https://rentpress.io/f
 You can also check our [Getting Started Guide](https://via.30lines.com/ONg6mVRH).
 
 == Changelog ==
+### 7.2.0 Forest
+
+### New Features
+* Properties now have per-bedroom pricing
+  *  Property card has been updated to display pricing for each of Studio, 1 Bed, 2 Bed, etc.
+* Adds new parameters to property search shortcode
+  * Find properties by price, bedrooms, only available, or combine all of these.
+* Property card now better highlights pet-friendliness.
+* Adds Mapbox support (beta)
+  * Optionally choose to properties on a map from Mapbox.
+  * Display a property pin on map from Mapbox.
+* Per-property contact form options
+  * New section in property editor allows a property to choose contact form method.
+  * Insert a contact unique URL per property.
+  * Add a Gravity Form shortcode to display a form in a modal.
+  * Use the Global Contact Form URL.
+* Property search filters are now dynamic
+  * Filters now update in real-time in response to other filters.
+  * Shoppers should be unable to reach search dead ends through filters alone.
+* Better handling of best price calculations.
+
+### Updates
+* Property search updated to better handle different screen sizes.
+* Changed icons to use span tags and added aria-hidden="true" so screen readers skip over them.
+* Updated http to https where possible.
+* Better compatibility with previous versions of RentPress.
+* Adds styles to templates for better compatibility with Foundation.
+* Added missing alt text.
+* Added title attributes to iframes.
+* Adds helpful links throughout Settings pages
+
+### Bugfixes
+* Fixes amenity categorization for property pet-friendliness.
+* Resolves an issue where floor plans may not delete properly.
+* Resolves an issue where properties may not delete properly.
+* Fixed an issue with quotes that could cause pages to break.
+* Resolves an issue with comments getting accidentally enabled.
+* Removed duplicated CSS.
+
 ### 7.0 Eclipse
 
 ### New Features
@@ -112,10 +157,10 @@ You can also check our [Getting Started Guide](https://via.30lines.com/ONg6mVRH)
     *   When enabled, will automatically generate a product page for each floor plan.
     *   Display a floor plan's current and future available units, square footage, and price.
     *   Display lease term price options where available.
-    *   Includes CTA's to Request Info, Apply Now, and optionaly, Schedule Tour or Join Waitlist when units aren't available.
+    *   Includes CTAs to Request Info, Apply Now, and optionally, Schedule Tour or Join Waitlist when units aren't available.
     *   Display information from the floor plan's parent property like description, amenities, pet policy, and office hours.
     *   Display a banner to announce leasing specials on a floor plan. Specials can be linked and also set to automatically expire.
-    *   Includes support for embedding virutal tours from Matterport, YouTube, and more.
+    *   Includes support for embedding virtual tours from Matterport, YouTube, and more.
     *	Add images for the floor plan to display in a carousel.
     *	Manually add units into a floor plan.
 	*	"Features" taxonomy for floor plans to note distinguishing characteristics like "Den," "Townhome," and can be extended to fit your inventory.
@@ -134,10 +179,10 @@ You can also check our [Getting Started Guide](https://via.30lines.com/ONg6mVRH)
 *	Shortcodes
 	*   All templates are also available through shortcodes to place in your templates or in content pages.
 	*	Shortcodes available for: single property, property search floor plan grid, single floor plan.
-	*	Additional shortcodes avilable for property hours, property address, property phone, property social, and equal housing.
+	*	Additional shortcodes available for property hours, property address, property phone, property social, and equal housing.
 
 *	Taxonomies
-	*	Properties have taxnomies for Cities (automatically generated), Amenities (automatically generated), Pet policy, and Property Type
+	*	Properties have taxonomies for Cities (automatically generated), Amenities (automatically generated), Pet policy, and Property Type
 	*	Each can be built out and customized to become landing pages for your website.
 
 *	General Features
@@ -147,8 +192,12 @@ You can also check our [Getting Started Guide](https://via.30lines.com/ONg6mVRH)
 	*	Set a rent price display type at a global level or on a per-property basis.
 	*	Disable all pricing with one setting.
 	*	Choose a consistent format for phone numbers.
-	*	Set default URL's for Applications, Contact page, Tour page, and Waitlist page.
+	*	Set default URLs for Applications, Contact page, Tour page, and Waitlist page.
 	*	Choose if price ranges should be set by only-available units.
 	*	Set a max lookahead to determine how far ahead to look for available units.
 	*	Set a limit for number of units to save to each floor plan.
-	*	Display last time data synced occured in settings.
+	*	Display last time data synced occurred in settings.
+
+== Upgrade Notice ==
+= 7.2.0 =
+Brings Mapbox support, per-bed pricing, per-property guestcards, and more.

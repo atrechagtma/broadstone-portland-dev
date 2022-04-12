@@ -44,6 +44,27 @@ function rentpress_getNearbyProperties($city, $limit = null, $excluded_property_
 }
 
 /*
+ * Get neighborhood properties for single property page
+ */
+function rentpress_getNeighborhoodProperties($neighborhood, $limit = null, $excluded_property_code = null)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_properties';
+
+    $limit = !empty($limit) ? "LIMIT $limit" : "";
+    $excludeString = "";
+    if (!empty($excluded_property_code)) {
+        $excludeString = "AND NOT `property_code` = '$excluded_property_code'";
+    }
+
+    $sql_neighborhood_str = "(`property_neighborhood_post_name` = '$neighborhood' OR `property_neighborhood_post_id` = '$neighborhood')";
+
+    $properties = $wpdb->get_results("SELECT * FROM $table_name WHERE $sql_neighborhood_str $excludeString ORDER BY `property_available_units` DESC $limit");
+
+    return $properties;
+}
+
+/*
  * Get all properties for taxonomy page
  */
 function rentpress_getAllPropertiesForTaxonomies($terms)
@@ -67,6 +88,78 @@ function rentpress_getAllPropertiesForTaxonomies($terms)
     }
 
     $properties = $wpdb->get_results("SELECT * FROM $table_name $sql_term_str");
+
+    return $properties;
+}
+
+/*
+ * Get city properties with taxonomy
+ */
+function rentpress_getCityPropertiesWithTaxonomies($city, $terms, $limit = null, $excluded_property_code = null)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_properties';
+
+    $limit = !empty($limit) ? "LIMIT $limit" : "";
+    $excludeString = "";
+    if (!empty($excluded_property_code)) {
+        $excludeString = "AND NOT `property_code` = '$excluded_property_code'";
+    }
+
+    $sql_term_str = "AND `property_terms` ";
+    $terms_count = count($terms);
+
+    if ($terms_count > 1) {
+        for ($i = 0; $i < $terms_count; $i++) {
+            $term = $terms[$i];
+            $sql_term_str .= "REGEXP '\"$term\"'";
+            if ($i != $terms_count - 1) {
+                $sql_term_str .= " AND `property_terms` ";
+            }
+        }
+    } else {
+        $term = $terms[0];
+        $sql_term_str .= "REGEXP '\"$term\"'";
+    }
+
+    $properties = $wpdb->get_results("SELECT * FROM $table_name WHERE `property_city` = '$city' $sql_term_str $excludeString ORDER BY `property_available_units` DESC $limit");
+
+    return $properties;
+}
+
+/*
+ * Get neighborhood properties with taxonomy
+ */
+function rentpress_getNeighborhoodPropertiesWithTaxonomies($neighborhood, $terms, $limit = null, $excluded_property_code = null)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_properties';
+
+    $limit = !empty($limit) ? "LIMIT $limit" : "";
+    $excludeString = "";
+    if (!empty($excluded_property_code)) {
+        $excludeString = "AND NOT `property_code` = '$excluded_property_code'";
+    }
+
+    $sql_term_str = "`property_terms` ";
+    $terms_count = count($terms);
+
+    if ($terms_count > 1) {
+        for ($i = 0; $i < $terms_count; $i++) {
+            $term = $terms[$i];
+            $sql_term_str .= "REGEXP '\"$term\"'";
+            if ($i != $terms_count - 1) {
+                $sql_term_str .= " AND `property_terms` ";
+            }
+        }
+    } else {
+        $term = $terms[0];
+        $sql_term_str .= "REGEXP '\"$term\"'";
+    }
+
+    $sql_neighborhood_str = "(`property_neighborhood_post_name` = '$neighborhood' OR `property_neighborhood_post_id` = '$neighborhood')";
+
+    $properties = $wpdb->get_results("SELECT * FROM $table_name WHERE $sql_neighborhood_str AND $sql_term_str $excludeString ORDER BY `property_available_units` DESC $limit");
 
     return $properties;
 }
@@ -580,4 +673,22 @@ function rentpress_getRefreshRow($property_code)
     $data = $wpdb->get_row("SELECT * FROM $table_name WHERE `property_code` = '$property_code'");
 
     return $data;
+}
+
+/*****************
+ *
+ *  Data manipulation
+ *
+ ******************/
+
+/*
+ * Remove a db row for when posts get deleted
+ */
+function rentpress_deleteRowRowFromTableWithPostID($table_name, $column_name, $postID)
+{
+    global $wpdb;
+    return $wpdb->delete(
+        $wpdb->prefix . $table_name,
+        [$column_name => $postID]
+    );
 }

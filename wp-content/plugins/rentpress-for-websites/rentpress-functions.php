@@ -1,6 +1,6 @@
 <?php
 
-// flush rewrite rules for cpts
+// flush rewrite rules for custom post types
 function rentpress_flush_rewrite_rules()
 {
     // if the plugin has been recently activated, flush the rules and remove the flag
@@ -17,7 +17,7 @@ function rentpress_updateDatabaseTablesAfterPluginVersionChange()
 {
     // if the plugin database versions do not match the current plugin version, then reactivate the plugin
     if (get_option('rentpress_plugin_version') !== RENTPRESS_PLUGIN_VERSION) {
-        // update plugin version so that this doesnt run again
+        // update plugin version so that this doesn't run again
         update_option('rentpress_plugin_version', RENTPRESS_PLUGIN_VERSION);
 
         // remove the crons in case they were updated as well
@@ -56,11 +56,31 @@ if (is_admin()) {
     require_once RENTPRESS_PLUGIN_ADMIN_DIR . 'admin_ajax.php';
     //Tell WordPress to register the scripts
     add_action('admin_enqueue_scripts', 'func_load_admin_cpt_styles_and_scripts');
+} else {
+    // disable shortcode render in admin
+    require_once RENTPRESS_PLUGIN_PUBLIC_SHORTCODES . 'rentpress_shortcodes.php';
 }
 
 // files that always need to run
 require_once RENTPRESS_PLUGIN_ADMIN_DIR . 'admin_crons.php';
-require_once RENTPRESS_PLUGIN_PUBLIC_SHORTCODES . 'rentpress_shortcodes.php';
 require_once RENTPRESS_PLUGIN_ADMIN_POSTS . 'register_rentpress_posts.php';
 require_once RENTPRESS_PLUGIN_ADMIN_DIR . 'taxonomy/register_rentpress_taxonomies.php';
 rentpress_registerAllPostTypes();
+
+function rentpress_removeDBRowForDeletedPost($postid, $post)
+{
+    if ($post->post_type === 'rentpress_property') {
+        require_once RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php';
+        rentpress_deleteRowRowFromTableWithPostID('rentpress_properties', 'property_post_id', $postid);
+    }
+
+    if ($post->post_type === 'rentpress_floorplan') {
+        require_once RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php';
+        rentpress_deleteRowRowFromTableWithPostID('rentpress_floorplans', 'floorplan_post_id', $postid);
+    }
+
+    if ($post->post_type === 'rentpress_hood') {
+        // do neighborhood specific stuff
+    }
+}
+add_action('before_delete_post', 'rentpress_removeDBRowForDeletedPost', 9, 2);

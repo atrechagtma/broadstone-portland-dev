@@ -1,192 +1,99 @@
-// Floorplans overrides
-.rp-archive-fp-nav-section,
-.rp-archive-fp-filter-nav-section {
-    display: none;
+.rentpress-shortcode-wrapper {
+    max-width: 100%;
 }
 
-.rentpress-core-container {
-    font-family: "Montserrat", sans-serif;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-}
+// Rentpress plugin
 
-.rentpress-core-container,
-#rp-archive-fp-data,
-.is-rp-fp {
-    background-color: transparent;
-}
+.rentpress-shortcode-floorplan-search-wrapper {
+    padding: 30px;
+    display: block;
+    justify-content: start;
 
-.is-rp-fp {
-    margin-bottom: 20px;
-}
+    @media (min-width: 960px) {
+        display: grid;
+    }
 
-#rp-archive-fp-sidebar {
-    // background-color: #AA5B3C22;
-    background-color: #00000008;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    margin-bottom: 20px;
-}
-
-.rp-archive-fp-filters-title {
-    font-weight: bold;
-}
-
-@media (min-width: 768px) {
-    #floorplan_cards {
-        margin-left: 50px;
+    input[type="text"] {
+        border: none !important;
     }
 }
 
-.is-rp-fp,
-.is-rp-fp figure,
-.is-rp-fp .rp-prop-figure {
-    height: auto;
-    padding-top: 0;
-    padding-bottom: 0;
-}
-
-.rp-fp-title {
-    display: flex;
-    justify-content: space-between;
-}
-
-.rp-fp-title h4 {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.is-rp-fp figure,
-.is-rp-fp .rp-prop-figure {
-    align-items: start;
-}
-
-.is-rp-fp figure {
-    height: auto !important;
-    margin-bottom: 20px;
-}
-
-.is-rp-fp a {
+.rentpress-floorplan-search-container {
     display: flex;
     flex-direction: column;
-    color: #191e23;
-    background-color: #00000008;
-    margin-bottom: 20px;
-    padding: 15px;
-    height: 100%;
-    text-decoration: none;
+
+    @media (max-width: 959px) {
+        flex-direction: column;
+    }
+
+    .rentpress-top-floorplan-search-filter-wrapper {
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        grid-gap: 0;
+
+        @media (min-width: 960px) {
+            flex: 0 300px;
+            padding-right: 30px;
+        }
+
+        .row {
+            display: block;
+            margin: 0;
+
+            .col-xl-4,
+            .col-xl-2 {
+                width: 100%;
+                max-width: inherit;
+            }
+
+            .col, .col-12 {
+                padding: 0;
+            }
+
+            .v-text-field.v-text-field--solo .v-label {
+                left: 10px !important;
+            }
+        }
+    }
+
+    .rentpress-floorplan-card-wrapper {
+        width: 100%;
+
+        @media (min-width: 960px) {
+            width: calc(100% - 300px);
+        }
+
+        .rentpress-floorplan-card-container {
+            gap: 2em !important;
+            grid-template-columns: 100% !important;
+            justify-content: center !important;
+            padding: 0 20px;
+
+
+            @media (min-width: 960px) {
+                grid-template-columns: repeat(2,50%) !important;
+            }
+
+            @media (min-width: 1200px) {
+                grid-template-columns: repeat(2,50%) !important;
+            }
+
+            @media (min-width: 1600px) {
+                grid-template-columns: repeat(3,33%) !important;
+            }
+        }
+    }
+
+    .v-responsive__content {
+        width: auto !important;
+    }
 }
 
-.rp-button,
-.rp-button-alt {
-    background-color: #fff !important;
-    border: 3px solid #294954 !important;
-    border-radius: 12px !important;
-    color: #294954 !important;
-    text-transform: uppercase;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
-    font-family: "Montserrat", sans-serif;
-}
+.rentpress-top-floorplan-search-filters {
+    flex-direction: column;
 
-.rp-button:hover,
-.rp-button-alt:hover {
-    background-color: #294954 !important;
-    border: 3px solid #294954 !important;
-    border-radius: 12px !important;
-    color: #fff !important;
+    & > div {
+        flex-direction: column !important;
+        grid-gap: 0 !important;
+    }
 }
-
-.rentpress-core-container #rp-archive-fp-filters .noUi-connect {
-    background-color: #294954;
-}
-
-.rentpress-core-container #rp-archive-fp-filters .rp-archive-fp-is-filter-module .rp-module-wrapper select,
-.noUi-handle,
-.rentpress-core-container input.rp-input[type="checkbox"],
-.rentpress-core-container input.rp-input[type="radio"] {
-    border-color: #294954;
-    border-width: 3px;
-    border-radius: 12px;
-}
-
-.is-rp-fp .rp-fp-details {
-    padding: 0;
-}
-
-.is-rp-fp .rp-fp-details h4 {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.is-rp-fp .rp-fp-details .rp-starting-at,
-.is-rp-fp .rp-fp-details .rp-starting-at>* {
-    display: block !important;
-    font-style: normal;
-}
-
-.rp-archive-fp-card-icon {
-    color: #294954;
-    margin: 0;
-    font-size: 24px;
-    line-height: 1;
-}
-
-.rentpress-core-container .rp-primary-accent,
-.rp-3d-tour-link, .rp-3d-tour-link:hover, .rp-3d-tour-link:active {
-    color: rgba(170, 91, 60, 1) !important;
-}
-
-.rentpress-core-container .unit-modal span.close-button {
-    width: 25px;
-    height: 25px;
-    background-color: #294954;
-}
-
-.rentpress-core-container .unit-modal span.close-button::before {
-    top: -1.5px;
-    position: relative;
-}
-
-.rentpress-core-container .rp-button {
-    line-height: inherit;
-}
-
-.close-gallery-modal a {
-    width: 25px;
-    height: 25px;
-}
-
-.close-gallery-modal a::before {
-    top: -1.5px;
-    position: relative;
-}
-
-.rp-is-checked input[type="checkbox"],
-.rentpress-core-container input.rp-input[type="checkbox"]:checked {
-    position: relative;
-    background-image: none;
-    background-color: #fff;
-    border: 3px solid #294954;
-}
-
-.rp-is-checked input[type="checkbox"]::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border-radius: 50%;
-    width: 10px;
-    height: 10px;
-    background-color: #aa5b3c;
-    z-index: 20;
-    transform: translate(-50%, -50%);
-}
-
-// Floorplans modal
-// .unit-modal-data {
-//     display: block !important;
-// }

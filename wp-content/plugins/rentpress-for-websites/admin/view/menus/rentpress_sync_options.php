@@ -52,7 +52,7 @@ function do_settings_fields_with_wrapper($page, $section)
             $class = ' id="' . $label . '" class="' . esc_attr($field['args']['class']) . '"';
         }
 
-        echo "<tr ". wp_kses_post($class) .">";
+        echo "<tr " . wp_kses_post($class) . ">";
 
         if (!empty($field['args']['label_for'])) {
             echo '<th scope="row"><label for="' . esc_attr($field['args']['label_for']) . '">' . esc_html($field['title']) . '</label></th>';
@@ -133,7 +133,7 @@ function rentpress_sync_options_page_html()
     $timezone_string = get_option('timezone_string');
     $timezone = '';
     if ($timezone_string && !is_null($timezone_string)) {
-        $timezone = new DateTimeZone( $timezone_string);
+        $timezone = new DateTimeZone($timezone_string);
     }
     $date_format = get_option('date_format');
     $time_format = get_option('time_format');
@@ -148,52 +148,59 @@ function rentpress_sync_options_page_html()
         }
     }
     ?>
-    <div id="rentpress-resync-loading-image" class="rentpress-pop-up-background" style="display: none;">
-        <div></div>
-        <img src="<?php echo RENTPRESS_PLUGIN_ADMIN_IMAGES_DIR . '30l-square.png'; ?>" style="position: absolute;" class="rentpress-animate">
-    </div>
-    <section class="rentpress-settings-main">
-        <div class="rentpress-settings-header">
-            <img class="rentpress-settings-img" src="<?php echo RENTPRESS_PLUGIN_ADMIN_IMAGES_DIR . '30l-square.png'; ?>">
-            <h1 class="rentpress-settings-title">RentPress</h1>
+<div id="rentpress-resync-loading-image" class="rentpress-pop-up-background" style="display: none;">
+  <div></div>
+  <img src="<?php echo RENTPRESS_PLUGIN_ADMIN_IMAGES_DIR . '30l-square.png'; ?>" style="position: absolute;"
+    class="rentpress-animate" alt="RentPress logo">
+</div>
+<section class="rentpress-settings-main">
+  <div class="rentpress-settings-header">
+    <img class="rentpress-settings-img" alt="RentPress logo"
+      src="<?php echo RENTPRESS_PLUGIN_ADMIN_IMAGES_DIR . '30l-square.png'; ?>">
+    <h1 class="rentpress-settings-title">RentPress</h1>
+  </div>
+  <div class="rentpress-settings-controls">
+    <aside class="rentpress-settings-menu-sticky">
+      <div class="rentpress-tabs-menu">
+        <ul class="rentpress-tabs-menu-list" id="rentpress-tabs-menu-list">
+        </ul>
+        <div class="resync-options-container">
+          <input onclick="submitForm()" type="submit" name="submit" id="submit"
+            class="button button-primary rentpress-options-submit" value="Save Settings">
         </div>
-        <div class="rentpress-settings-controls">
-            <aside class="rentpress-settings-menu-sticky">
-                <div class="rentpress-tabs-menu">
-                    <ul class="rentpress-tabs-menu-list" id="rentpress-tabs-menu-list">
-                    </ul>
-                    <div  class="resync-options-container">
-                        <input onclick="submitForm()" type="submit" name="submit" id="submit" class="button button-primary rentpress-options-submit" value="Save Settings">
-                    </div>
-                    <?php if ($lastSyncStr): ?>
-                        <h3>Last Sync: <?php echo $lastSyncStr; ?></h3>
-                    <?php endif;?>
-                </div>
-            </aside>
-            <div class="rentpress-admin-tabs-container">
+        <?php if ($lastSyncStr): ?>
+        <h3>Last Sync: <?php echo $lastSyncStr; ?></h3>
+        <?php endif;?>
+      </div>
+    </aside>
+    <div class="rentpress-admin-tabs-container">
 
-                <div class="rentpress-admin-tab is-active-rentpress-admin-tab" id="rentpress_settings">
-                  <h1><?php esc_html(get_admin_page_title());?></h1>
-                    <h3 style="color: red"><div id="results_for_sync"></div></h3>
+      <div class="rentpress-admin-tab is-active-rentpress-admin-tab" id="rentpress_settings">
+        <h1><?php esc_html(get_admin_page_title());?></h1>
+        <h3 style="color: red">
+          <div id="results_for_sync"></div>
+        </h3>
 
-                    <form action="options.php" method="post" id="main-rentpress-settings">
-                        <?php
+        <form action="options.php" method="post" id="main-rentpress-settings">
+          <?php
 // output security fields for the registered setting "rentpress_options"
     settings_fields('rentpress_settings');
     // output setting sections and their fields
     // (sections are registered for "rentpress", each field is registered to a specific section)
     do_settings_sections_with_wrapper('rentpress_settings');
     ?>
-                        <div class="rentpress-settings-wrapper" id="rentpress-marketing-resync-section" data-page="Data Sync" style="display: none;">
-                            <input id="rentpress-marketing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn" type="button" value="Sync Properties">
-                            <!-- <input id="rentpress-pricing-resync-button"  class="rentpress-resync-button rentpress-settings-dark-btn" type="button" value="Resync Pricing"> -->
-                        </div>
-                    </form>
-                </div>
+          <div class="rentpress-settings-wrapper" id="rentpress-marketing-resync-section" data-page="Data Sync"
+            style="display: none;">
+            <input id="rentpress-marketing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn"
+              type="button" value="Sync Properties">
+            <!-- <input id="rentpress-pricing-resync-button"  class="rentpress-resync-button rentpress-settings-dark-btn" type="button" value="Resync Pricing"> -->
+          </div>
+        </form>
+      </div>
 
-            </div>
-        </div>
-    </section>
+    </div>
+  </div>
+</section>
 <?php
 }
 
@@ -224,6 +231,17 @@ function rentpress_settings_init()
         'rentpress_settings',
         [
             'setting_page' => 'Data Sync',
+        ]
+    );
+
+//register a new section in the "rentpress_settings" page
+    add_settings_section_with_page(
+        'rentpress_appearance_jump_section',
+        'Jump to Section',
+        'rentpress_appearance_jump_section_field_cb',
+        'rentpress_settings',
+        [
+            'setting_page' => 'Appearance',
         ]
     );
 
@@ -684,48 +702,6 @@ function rentpress_settings_init()
 
     // register a new section in the "rentpress_settings" page
     add_settings_section_with_page(
-        'rentpress_disable_lease_term_pricing_section',
-        'Disable Lease Term Pricing',
-        'rentpress_disable_lease_term_pricing_section_cb',
-        'rentpress_settings',
-        [
-            'setting_page' => 'Appearance',
-        ]
-    );
-
-    // register a new field in the "rentpress_disable_lease_term_pricing_section" section, inside the "rentpress_settings" page
-    add_settings_field(
-        'rentpress_disable_lease_term_pricing_section_disable_specific_id',
-        'Disable Lease Term Pricing by ID',
-        'rentpress_createSettingsTextField_cb',
-        'rentpress_settings',
-        'rentpress_disable_lease_term_pricing_section',
-        [
-            'label_for' => 'rentpress_disable_lease_term_pricing_section_disable_specific_id',
-            'class' => 'rentpress_row',
-            'rentpress_custom_data' => [
-                'label_text' => "<br />*You may enter comma-separated ID's for properties, floor plans, and units.",
-            ],
-        ]
-    );
-
-    add_settings_field(
-        'rentpress_disable_lease_term_pricing_section_disable_lease_term_pricing',
-        'Disable Lease Term Pricing',
-        'rentpress_createSettingsCheckboxField_cb',
-        'rentpress_settings',
-        'rentpress_disable_lease_term_pricing_section',
-        [
-            'label_for' => 'rentpress_disable_lease_term_pricing_section_disable_lease_term_pricing',
-            'class' => 'rentpress_row',
-            'rentpress_custom_data' => [
-                'label_text' => "Disable Lease Term Pricing",
-            ],
-        ]
-    );
-
-    // register a new section in the "rentpress_settings" page
-    add_settings_section_with_page(
         'rentpress_format_phone_numbers_section',
         'Format Phone Numbers',
         'rentpress_format_phone_numbers_section_cb',
@@ -760,6 +736,32 @@ function rentpress_settings_init()
         ]
     );
 
+    // google analytics id
+    add_settings_section_with_page(
+        'rentpress_google_analytics_api_section',
+        'Google Analytics',
+        'rentpress_google_analytics_api_section_field_cb',
+        'rentpress_settings',
+        [
+            'setting_page' => 'Integrations',
+        ]
+    );
+
+    add_settings_field(
+        'rentpress_google_analytics_api_section_tracking_id',
+        'Google Analytics ID',
+        'rentpress_createSettingsTextField_cb',
+        'rentpress_settings',
+        'rentpress_google_analytics_api_section',
+        [
+            'label_for' => 'rentpress_google_analytics_api_section_tracking_id',
+            'class' => 'rentpress_row',
+            'rentpress_custom_data' => [
+                'placeholder_text' => 'ex: UA-130303030-1',
+            ],
+        ]
+    );
+
     // google maps api key
     add_settings_section_with_page(
         'rentpress_google_maps_api_section',
@@ -786,11 +788,11 @@ function rentpress_settings_init()
         ]
     );
 
-    // google analytics id
+    // Mapbox maps api key
     add_settings_section_with_page(
-        'rentpress_google_analytics_api_section',
-        'Google Analytics',
-        'rentpress_google_analytics_api_section_field_cb',
+        'rentpress_mapbox_maps_api_section',
+        'Mapbox API',
+        'rentpress_mapbox_maps_api_section_field_cb',
         'rentpress_settings',
         [
             'setting_page' => 'Integrations',
@@ -798,16 +800,46 @@ function rentpress_settings_init()
     );
 
     add_settings_field(
-        'rentpress_google_analytics_api_section_tracking_id',
-        'Google Analytics ID',
+        'rentpress_mapbox_maps_api_section_api_key',
+        'Mapbox API Key',
         'rentpress_createSettingsTextField_cb',
         'rentpress_settings',
-        'rentpress_google_analytics_api_section',
+        'rentpress_mapbox_maps_api_section',
         [
-            'label_for' => 'rentpress_google_analytics_api_section_tracking_id',
+            'label_for' => 'rentpress_mapbox_maps_api_section_api_key',
             'class' => 'rentpress_row',
             'rentpress_custom_data' => [
-                'placeholder_text' => 'ex: UA-130303030-1',
+                'placeholder_text' => 'ex: AIzmSyBB2ND1X4K-LBkWS18uF2oKKinMINxFzWA',
+            ],
+        ]
+    );
+
+    // Maps selector
+    add_settings_section_with_page(
+        'rentpress_map_source_api_section',
+        'Template Map Source',
+        'rentpress_map_source_api_section_field_cb',
+        'rentpress_settings',
+        [
+            'setting_page' => 'Integrations',
+        ]
+    );
+
+    add_settings_field(
+        'rentpress_map_source_api_section_selection',
+        'Map Source',
+        'rentpress_createSettingsSelectorField_cb',
+        'rentpress_settings',
+        'rentpress_map_source_api_section',
+        [
+            'label_for' => 'rentpress_map_source_api_section_selection',
+            'class' => 'rentpress_row',
+            'rentpress_custom_data' => [
+                'label_text' => '',
+                'options' => [
+                    'Google Maps',
+                    'Mapbox',
+                ],
             ],
         ]
     );
@@ -969,10 +1001,12 @@ add_action('admin_init', 'rentpress_settings_init');
 function rentpress_resync_submit_section_cb($args)
 {
     ?>
-        <p>Connected to Top Line Connect. You can resync pricing and availability information whenever you like.</p>
-            <input id="rentpress-marketing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn" type="button" value="Resync Properties">
-            <input id="rentpress-pricing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn" type="button" value="Resync Pricing">
-    <?php
+<p>Connected to Top Line Connect. You can resync pricing and availability information whenever you like.</p>
+<input id="rentpress-marketing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn" type="button"
+  value="Resync Properties">
+<input id="rentpress-pricing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn" type="button"
+  value="Resync Pricing">
+<?php
 // this form will fire off this hook when submitted
     add_action('admin_post_rentpress_resync_properties', 'rentpress_refresh_all_data_for_properties');
 }
@@ -980,55 +1014,59 @@ function rentpress_resync_submit_section_cb($args)
 function rentpress_api_credentials_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Fill out these credentials to connect RentPress to your property data. Contact 30 Lines to get your license key for this website.')?>
-        <br /><br />
-        <?php esc_html_e('Once connected, your website will automatically resync every hour.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Fill out these credentials to connect RentPress to your property data. Contact 30 Lines to get your license key for this website. ')?><a href="https://via.30lines.com/vXP1UPFD" target="_blank" rel="noopener noreferrer">Purchase a subscription.</a>
+  <br /><br />
+  <?php esc_html_e('Once connected, your website will automatically resync every hour.', 'rentpress_settings');?>
+  <br /><br />
+  <strong>Need Help?</strong> Check the support site for assistance setting up RentPress: <a href="https://via.30lines.com/0F-Q2UnT">Get Started with RentPress</a>.
+</p>
+<?php
 }
 
 function rentpress_unit_availability_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Use these options for pricing calculation. If no units are available, it will fall-back to default pricing ranges that come through the feed.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Use these options for pricing calculation. If no units are available, it will fall-back to default pricing ranges that come through the feed.', 'rentpress_settings');?>
+</p>
+<?php
 }
 
 function rentpress_unit_rent_type_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Choose which type of rent to show on your website.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Choose which type of rent to show on your website.', 'rentpress_settings');?></p>
+<?php
 }
 
 function rentpress_default_pricing_display_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Choose which type of rent to show on your website.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Choose which type of rent to show on your website.', 'rentpress_settings');?></p>
+<?php
 }
 
 function rentpress_floorplan_display_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Choose how floor plans display on your website.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Choose how floor plans display on your website.', 'rentpress_settings');?></p>
+<?php
 }
 
 function rentpress_disable_pricing_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('You can opt to disable displaying pricing on the website.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('You can opt to disable displaying pricing on the website.', 'rentpress_settings');?></p>
+<?php
 }
 
-function rentpress_disable_lease_term_pricing_section_cb($args)
+function rentpress_post_templates_section_cb($args)
 {
-    ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Provide a comma-separated list of unit codes that you want to omit from using pricing matrices from property and floor plan rent calculations.', 'rentpress_settings');?></p>
-    <?php
-}
-
-function rentpress_post_templates_section_cb( $args ) {
     $options = get_option('rentpress_options');
     $fields = [
         isset($options['rentpress_post_templates_property_archive_section']) ? intval($options['rentpress_post_templates_property_archive_section']) : '',
@@ -1045,61 +1083,115 @@ function rentpress_post_templates_section_cb( $args ) {
         isset($options['rentpress_post_templates_pet_single_section']) ? intval($options['rentpress_post_templates_pet_single_section']) : '',
     ];
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Choose post types you want to use RentPress templates on, then click Save Changes.', 'rentpress_settings');?></p>
-        <?php if (in_array(1, $fields)): ?>
-            <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Click Add Theme Files to add your chosen templates to your active theme.', 'rentpress_settings');?></p>
-            <input type="button" value="Add Theme Files" id="rentpress-theme-template-create" class="rentpress-settings-dark-btn">
-            <br />
-        <?php endif;?>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Choose post types you want to use RentPress templates on, then click Save Changes.', 'rentpress_settings');?>
+</p>
+<?php if (in_array(1, $fields)): ?>
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Click Add Theme Files to add your chosen templates to your active theme.', 'rentpress_settings');?>
+</p>
+<p><strong>Need Help? </strong>Check the support site for assistance setting up page templates: <a href="https://via.30lines.com/ZFHb1gFC" target="_blank" rel="noopener noreferrer">RentPress Settings: Enable Templates</a>.</p>
+<input type="button" value="Add Theme Files" id="rentpress-theme-template-create" class="rentpress-settings-dark-btn">
+<br />
+<?php endif;?>
+<?php
 }
 
 function rentpress_format_phone_numbers_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Select a default format for phone numbers.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Select a default format for phone numbers.', 'rentpress_settings');?></p>
+<?php
 }
 
 function rentpress_application_link_section_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Use these fields to set default link targets for CTA\'s. Empty fields will not be used.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Use these fields to set default link targets for CTA\'s. Empty fields will not be used.', 'rentpress_settings');?>
+</p>
+<?php
 }
 
 function rentpress_accent_color_section_field_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Use these colors to customize templates to your brand. Most buttons and links use the Primary Accent Color.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Use these colors to customize templates to your brand. Most buttons and links use the Primary Accent Color.', 'rentpress_settings');?>
+</p>
+<?php
+}
+
+function rentpress_appearance_jump_section_field_cb($args)
+{
+    ?>
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <a href="#rentpress_accent_color_section">Color</a> | 
+  <a href="#rentpress-floor-plan-display-settings-settings-section">Floor Plan Display</a> | 
+  <a href="#rentpress-pricing-display-settings-settings-section">Price Display</a> | 
+  <a href="#rentpress-disable-pricing-settings-section">Disable Pricing</a> | 
+  <a href="#rentpress-format-phone-numbers-settings-section">Phone Format</a> | 
+  <a href="#rentpress-placeholder-images-settings-section">Images</a> | 
+  <a href="#rentpress-default-urls-settings-section">Default URLs</a>
+  </a>
+  <br /><br />
+  <strong>Need Help? </strong>Check the support site for assistance setting up page templates: <a href="https://via.30lines.com/tFezGUBS" target="_blank" rel="noopener noreferrer">RentPress Settings: Appearance</a>.
+</p>
+<?php
 }
 
 function rentpress_google_maps_api_section_field_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
-            Enter your Google API key to use in RentPress templates. You can find the API key from your <a target="_blank" href="https://developers.google.com/maps/documentation/javascript/">Google Map Developer console</a>. <br /><br />
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  Enter your Google API key to use in RentPress templates. You can find the API key from your <a target="_blank"
+    href="https://developers.google.com/maps/documentation/javascript/">Google Map Developer console</a>. <br /><br />
 
-            This API key will be used to retrieve reviews when using the Reviews Add-On, and can be used to display maps on this site. More information can be found at: <a target="blank" rel="noopener noreferrer" href="https://via.30lines.com/X7TllTnK">Understanding RentPress + Google Maps integration</a>.
-        </p>
-    <?php
+  This API key will be used to retrieve reviews when using the Reviews Add-On, and can be used to display maps on this
+  site. More information can be found at: <a target="blank" rel="noopener noreferrer"
+    href="https://via.30lines.com/X7TllTnK">Understanding RentPress + Google Maps integration</a>.
+</p>
+<?php
+}
+
+function rentpress_mapbox_maps_api_section_field_cb($args)
+{
+    ?>
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  Enter your Mapbox API key to use in RentPress templates.
+</p>
+<?php
+}
+
+function rentpress_map_source_api_section_field_cb($args)
+{
+    ?>
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  Select which map to use in RentPress templates.
+</p>
+<?php
 }
 
 function rentpress_google_analytics_api_section_field_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">When connected, shopper clicks and actions on RentPress templates will be automatically reported into your Google Analytics account. To find your tracking ID, go to your Google Analytics account and click on Admin in the sidebar. <br /><br />
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">When connected, shopper clicks and
+  actions on RentPress templates will be automatically reported into your Google Analytics account. To find your
+  tracking ID, go to your Google Analytics account and click on Admin in the sidebar. <br /><br />
 
-More information can be found at: <a target="blank" rel="noopener noreferrer" href="https://via.30lines.com/WIoDyQiF">Understanding RentPress + Google Analytics integration</a>.</p>
-    <?php
+  More information can be found at: <a target="blank" rel="noopener noreferrer"
+    href="https://via.30lines.com/WIoDyQiF">Understanding RentPress + Google Analytics integration</a>.</p>
+<?php
 }
 
 function rentpress_cluster_image_section_field_cb($args)
 {
     ?>
-        <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title"><?php esc_html_e('Upload placeholder images for use in RentPress shortcodes and templates.', 'rentpress_settings');?></p>
-    <?php
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <?php esc_html_e('Upload placeholder images for use in RentPress shortcodes and templates.', 'rentpress_settings');?>
+</p>
+<?php
 }
 
 function rentpress_createSettingsTextField_cb($args)
@@ -1111,17 +1203,16 @@ function rentpress_createSettingsTextField_cb($args)
 
     // output the field
     ?>
-        <input
-            type="<?php echo isset($args['rentpress_custom_data']['text_field_type']) ? $args['rentpress_custom_data']['text_field_type'] : 'text' ?>"
-            id="<?php echo esc_attr($args['label_for']); ?>"
-            class="<?php echo esc_attr($args['class']); ?> rentpress-text-field rentpress-settings-input"
-            data-custom=""
-            placeholder="<?php echo isset($args['rentpress_custom_data']['placeholder_text']) ? esc_attr($args['rentpress_custom_data']['placeholder_text']) : '' ?>"
-            name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
-            value="<?php echo isset($options[$args['label_for']]) && $needsValue ? esc_attr($options[$args['label_for']]) : $defaultValue ?>">
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-text-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['label_text']) ? esc_html($args['rentpress_custom_data']['label_text']) : '' ?></label>
-    <?php
+<input
+  type="<?php echo isset($args['rentpress_custom_data']['text_field_type']) ? $args['rentpress_custom_data']['text_field_type'] : 'text' ?>"
+  id="<?php echo esc_attr($args['label_for']); ?>"
+  class="<?php echo esc_attr($args['class']); ?> rentpress-text-field rentpress-settings-input" data-custom=""
+  placeholder="<?php echo isset($args['rentpress_custom_data']['placeholder_text']) ? esc_attr($args['rentpress_custom_data']['placeholder_text']) : '' ?>"
+  name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
+  value="<?php echo isset($options[$args['label_for']]) && $needsValue ? esc_attr($options[$args['label_for']]) : $defaultValue ?>">
+<label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-text-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['label_text']) ? wp_kses_post($args['rentpress_custom_data']['label_text']) : '' ?></label>
+<?php
 }
 
 function rentpress_createSettingsNumberField_cb($args)
@@ -1130,19 +1221,16 @@ function rentpress_createSettingsNumberField_cb($args)
     $options = get_option('rentpress_options');
     // output the field
     ?>
-        <input
-            type="number"
-            id="<?php echo esc_attr($args['label_for']); ?>"
-            class="<?php echo esc_attr($args['class']); ?> rentpress-text-field rentpress-settings-input"
-            data-custom=""
-            max="<?php echo esc_attr($args['rentpress_custom_data']['max']) ?? '' ?>"
-            min="<?php echo esc_attr($args['rentpress_custom_data']['min']) ?? '' ?>"
-            placeholder="<?php echo isset($args['rentpress_custom_data']['placeholder_text']) ? esc_attr($args['rentpress_custom_data']['placeholder_text']) : '' ?>"
-            name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
-            value="<?php echo isset($options[$args['label_for']]) ? esc_attr($options[$args['label_for']]) : '' ?>">
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-text-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['label_text']) ? esc_html($args['rentpress_custom_data']['label_text']) : '' ?></label>
-    <?php
+<input type="number" id="<?php echo esc_attr($args['label_for']); ?>"
+  class="<?php echo esc_attr($args['class']); ?> rentpress-text-field rentpress-settings-input" data-custom=""
+  max="<?php echo esc_attr($args['rentpress_custom_data']['max']) ?? '' ?>"
+  min="<?php echo esc_attr($args['rentpress_custom_data']['min']) ?? '' ?>"
+  placeholder="<?php echo isset($args['rentpress_custom_data']['placeholder_text']) ? esc_attr($args['rentpress_custom_data']['placeholder_text']) : '' ?>"
+  name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
+  value="<?php echo isset($options[$args['label_for']]) ? esc_attr($options[$args['label_for']]) : '' ?>">
+<label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-text-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['label_text']) ? esc_html($args['rentpress_custom_data']['label_text']) : '' ?></label>
+<?php
 }
 
 function rentpress_createSettingsCheckboxField_cb($args)
@@ -1151,42 +1239,39 @@ function rentpress_createSettingsCheckboxField_cb($args)
     $options = get_option('rentpress_options');
     // output the field
     ?>
-        <input
-            type="checkbox"
-            id="<?php echo esc_attr($args['label_for']); ?>"
-            class="<?php echo esc_attr($args['class']); ?> rentpress-checkbox-field rentpress-settings-input"
-            data-custom=""
-            name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
-            value="1"
-            <?php echo isset($options[$args['label_for']]) ? (($options[$args['label_for']] == '1') ? ' checked' : '') : '' ?>>
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-checkbox-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['label_text']) ? esc_html($args['rentpress_custom_data']['label_text']) : '' ?></label>
+<input type="checkbox" id="<?php echo esc_attr($args['label_for']); ?>"
+  class="<?php echo esc_attr($args['class']); ?> rentpress-checkbox-field rentpress-settings-input" data-custom=""
+  name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]" value="1"
+  <?php echo isset($options[$args['label_for']]) ? (($options[$args['label_for']] == '1') ? ' checked' : '') : '' ?>>
+<label for="<?php echo esc_attr($args['label_for']); ?>"
+  class="rentpress-checkbox-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['label_text']) ? esc_html($args['rentpress_custom_data']['label_text']) : '' ?></label>
 
-    <?php
+<?php
 }
 
 function rentpress_createSettingsSelectorField_cb($args)
 {
     $options = get_option('rentpress_options');
     ?>
-        <select
-            id="<?php echo esc_attr($args['label_for']); ?>"
-            class="<?php echo esc_attr($args['class']); ?> rentpress-selector-field rentpress-settings-input"
-            data-custom=""
-            name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]" >
-            <?php if (isset($args['rentpress_custom_data']['options'])):
+<select id="<?php echo esc_attr($args['label_for']); ?>"
+  class="<?php echo esc_attr($args['class']); ?> rentpress-selector-field rentpress-settings-input" data-custom=""
+  name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]">
+  <?php if (isset($args['rentpress_custom_data']['options'])):
         foreach ($args['rentpress_custom_data']['options'] as $opt): ?>
-								                    <option value="<?php echo esc_attr($opt) ?>" class="rentpress-selector-field-option"
-								                        <?php echo isset($options[$args['label_for']]) ? (selected($options[$args['label_for']], $opt, false)) : (''); ?>>
-								                        <?php esc_html_e($opt, 'rentpress_settings');?>
-								                    </option>
-								                    <?php
+  <option value="<?php echo esc_attr($opt) ?>" class="rentpress-selector-field-option"
+    <?php echo isset($options[$args['label_for']]) ? (selected($options[$args['label_for']], $opt, false)) : (''); ?>>
+    <?php esc_html_e($opt, 'rentpress_settings');?>
+  </option>
+  <?php
 endforeach;
     endif;?>
-        </select>
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-selector-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['label_text']) ? esc_html($args['rentpress_custom_data']['label_text']) : '' ?></label>
-    <?php
+</select>
+<label for="<?php echo esc_attr($args['label_for']); ?>"
+  class="rentpress-selector-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['label_text']) ? wp_kses_post($args['rentpress_custom_data']['label_text']) : '' ?>
+</label>
+<?php
 }
 
 function rentpress_createSettingsRadioField_cb($args)
@@ -1194,15 +1279,11 @@ function rentpress_createSettingsRadioField_cb($args)
     $options = get_option('rentpress_options');
     if (isset($args['rentpress_custom_data']['options'])):
         foreach ($args['rentpress_custom_data']['options'] as $index => $opt): ?>
-            <div class="rentpress-radio-field-wrapper">
-                <input
-                    type="radio"
-                    id="<?php echo esc_attr($args['label_for']) . esc_attr($index); ?>"
-                    class="rentpress-radio-field rentpress-settings-input"
-                    name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
-                    data-custom=""
-                    value="<?php echo esc_attr($opt) ?>"
-                    <?php
+<div class="rentpress-radio-field-wrapper">
+  <input type="radio" id="<?php echo esc_attr($args['label_for']) . esc_attr($index); ?>"
+    class="rentpress-radio-field rentpress-settings-input"
+    name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]" data-custom=""
+    value="<?php echo esc_attr($opt) ?>" <?php
     // if the value has not been set, then set the default value if it exists
         if (!isset($options[$args['label_for']])) {
             echo isset($args['default']) && $args['default'] == $opt ? ' checked' : '';
@@ -1210,9 +1291,10 @@ function rentpress_createSettingsRadioField_cb($args)
             echo $options[$args['label_for']] == $opt ? ' checked' : '';
         }
         ?>>
-								                <label for="<?php echo esc_attr($args['label_for']) . esc_attr($index); ?>" class="rentpress-radio-field-label rentpress-settings-label"><?php echo esc_html($opt); ?></label><br>
-								            </div>
-								            <?php
+  <label for="<?php echo esc_attr($args['label_for']) . esc_attr($index); ?>"
+    class="rentpress-radio-field-label rentpress-settings-label"><?php echo esc_html($opt); ?></label><br>
+</div>
+<?php
 endforeach;
     endif;
 }
@@ -1222,18 +1304,16 @@ function rentpress_accent_color_section_cb($args)
     $options = get_option('rentpress_options');
     // output the field
     ?>
-        <input
-            type="color"
-            id="<?php echo esc_attr($args['label_for']); ?>"
-            class="<?php echo esc_attr($args['label_for']); ?> rentpress-color-field rentpress-settings-input"
-            data-custom=""
-            name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
-            value="<?php echo esc_attr($options[$args['label_for']]); ?>"
-            <?php echo isset($options[$args['label_for']]) ? (($options[$args['label_for']] == '1') ? ' checked' : '') : '' ?>>
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-checkbox-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['title']) ? esc_html($args['label_for']) : '' ?></label>
+<input type="color" id="<?php echo esc_attr($args['label_for']); ?>"
+  class="<?php echo esc_attr($args['label_for']); ?> rentpress-color-field rentpress-settings-input" data-custom=""
+  name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
+  value="<?php echo esc_attr($options[$args['label_for']]); ?>"
+  <?php echo isset($options[$args['label_for']]) ? (($options[$args['label_for']] == '1') ? ' checked' : '') : '' ?>>
+<label for="<?php echo esc_attr($args['label_for']); ?>"
+  class="rentpress-checkbox-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['title']) ? esc_html($args['label_for']) : '' ?></label>
 
-    <?php
+<?php
 }
 
 function rentpress_cluster_image_section_cb($args)
@@ -1241,16 +1321,19 @@ function rentpress_cluster_image_section_cb($args)
     $options = get_option('rentpress_options');
     // output the field
     ?>
-        <input id="rentpress-cluster-image-upload" value="<?php echo esc_attr($options[$args['label_for']]) ?? ''; ?>" type="text" name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]">
-        <button class="button wpse-228085-upload">Upload</button>
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-checkbox-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['title']) ? esc_html($args['label_for']) : '' ?></label>
-            <?php if (isset($options[$args['label_for']]) && $options[$args['label_for']] != ''): ?>
-                <div>
-                    <img id="rentpress-custom-cluster-pin-image" class="rentpress-custom-cluster-pin-image" src="<?php echo esc_attr($options[$args['label_for']]) ?? ''; ?>">
-                </div>
-            <?php endif;?>
-    <?php
+<input id="rentpress-cluster-image-upload" value="<?php echo esc_attr($options[$args['label_for']]) ?? ''; ?>"
+  type="text" name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]">
+<button class="button wpse-228085-upload">Upload</button>
+<label for="<?php echo esc_attr($args['label_for']); ?>"
+  class="rentpress-checkbox-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['title']) ? esc_html($args['label_for']) : '' ?></label>
+<?php if (isset($options[$args['label_for']]) && $options[$args['label_for']] != ''): ?>
+<div>
+  <img id="rentpress-custom-cluster-pin-image" class="rentpress-custom-cluster-pin-image"
+    alt="Cluster of items on the map" src="<?php echo esc_attr($options[$args['label_for']]) ?? ''; ?>">
+</div>
+<?php endif;?>
+<?php
 }
 
 function rentpress_image_upload_section_cb($args)
@@ -1260,19 +1343,28 @@ function rentpress_image_upload_section_cb($args)
     $needsValue = $defaultValue ? $options[$args['label_for']] : true;
     // output the field
     ?>
-        <input id="<?php echo esc_attr($args['label_for']); ?>-field" value="<?php echo isset($options[$args['label_for']]) && $needsValue ? esc_attr($options[$args['label_for']]) : esc_attr($defaultValue) ?>" type="text" name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]">
-        <span class="button rentpress-image-uploader-field <?php echo esc_attr($args['label_for']); ?>" data-target="<?php echo esc_attr($args['label_for']); ?>" data-limit='true'>Upload</span>
-        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-checkbox-field-label rentpress-settings-label">
-            <?php echo isset($args['rentpress_custom_data']['title']) ? esc_html($args['label_for']) : '' ?></label>
-            <?php if (isset($options[$args['label_for']]) && $options[$args['label_for']] != ''): ?>
-                <div id="<?php echo esc_attr($args['label_for']); ?>-upload-preview-container" class="<?php echo esc_attr($args['label_for']); ?>-image-wrapper">
-                    <img id="<?php echo esc_attr($args['label_for']); ?>-image" class="<?php echo esc_attr($args['label_for']); ?>-image rentpress-image-upload-preview" src="<?php echo esc_attr($options[$args['label_for']]) ?? ''; ?>">
-                </div>
-            <?php else: ?>
-                <div style="display: none;" id="<?php echo esc_attr($args['label_for']); ?>-image-wrapper" class="<?php echo esc_attr($args['label_for']); ?>-image-wrapper">
-                    <img id="<?php echo esc_attr($args['label_for']); ?>-image" class="<?php echo esc_attr($args['label_for']); ?>-image rentpress-image-upload-preview">
-                </div>
-            <?php endif;
+<input id="<?php echo esc_attr($args['label_for']); ?>-field"
+  value="<?php echo isset($options[$args['label_for']]) && $needsValue ? esc_attr($options[$args['label_for']]) : esc_attr($defaultValue) ?>"
+  type="text" name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]">
+<span class="button rentpress-image-uploader-field <?php echo esc_attr($args['label_for']); ?>"
+  data-target="<?php echo esc_attr($args['label_for']); ?>" data-limit='true'>Upload</span>
+<label for="<?php echo esc_attr($args['label_for']); ?>"
+  class="rentpress-checkbox-field-label rentpress-settings-label">
+  <?php echo isset($args['rentpress_custom_data']['title']) ? esc_html($args['label_for']) : '' ?></label>
+<?php if (isset($options[$args['label_for']]) && $options[$args['label_for']] != ''): ?>
+<div id="<?php echo esc_attr($args['label_for']); ?>-upload-preview-container"
+  class="<?php echo esc_attr($args['label_for']); ?>-image-wrapper">
+  <img id="<?php echo esc_attr($args['label_for']); ?>-image"
+    class="<?php echo esc_attr($args['label_for']); ?>-image rentpress-image-upload-preview" alt="Image upload preview"
+    src="<?php echo esc_attr($options[$args['label_for']]) ?? ''; ?>">
+</div>
+<?php else: ?>
+<div style="display: none;" id="<?php echo esc_attr($args['label_for']); ?>-image-wrapper"
+  class="<?php echo esc_attr($args['label_for']); ?>-image-wrapper">
+  <img id="<?php echo esc_attr($args['label_for']); ?>-image"
+    class="<?php echo esc_attr($args['label_for']); ?>-image rentpress-image-upload-preview">
+</div>
+<?php endif;
 }
 /**
  * Resync Hooks
@@ -1347,12 +1439,12 @@ function rentpress_createThemeTemplateFile()
         if ($template) {
             $theme = get_template_directory() . '/' . $template;
             $plugin = RENTPRESS_PLUGIN_DIR . 'public/templates/' . $template;
-            
+
             if ($template == 'taxonomy.php' && file_exists($theme) && !file_exists(get_template_directory() . '/original_taxonomy.php')) {
                 $rename = rename($theme, get_template_directory() . '/original_taxonomy.php');
             }
-            if(!copy($plugin, $theme)) {
-                $errors= error_get_last();
+            if (!copy($plugin, $theme)) {
+                $errors = error_get_last();
                 echo ('error: ' . $errors['message'] . ' ' . $template);
             } else {
                 echo ('Success: ' . $template . ' has been created ');

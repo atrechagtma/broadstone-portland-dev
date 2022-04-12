@@ -1,3 +1,6 @@
+var apply_link = {};
+var gravity_form = {};
+
 function openTab(event, tabId) {
 	var i, tabSection, tabButtons;
 
@@ -745,8 +748,34 @@ function getTemplateCheckBoxes() {
         }
     }
 
+    function ApplySettingsEventListener(value='') {
+    	let fieldValue = this.value;
+    	if (value && typeof value === 'string') {
+    		fieldValue = value;
+    	}
+    	switch(fieldValue) {
+			case '1':
+		    	apply_link.style.display = 'none';
+		    	gravity_form.style.display = 'none';
+		    	break;
+			case '2':
+		    	apply_link.style.display = 'block';
+		    	gravity_form.style.display = 'none';
+		    	break;
+
+		    case '3':
+		    	apply_link.style.display = 'none';
+		    	gravity_form.style.display = 'block';
+		    	break;
+		}
+    }
+
     window.onload = function() {
-		fields = document.getElementsByClassName('rentpress-shadow-field');
+		const fields = document.getElementsByClassName('rentpress-shadow-field');
+		const applyType = document.getElementById('rentpress_custom_field_property_contact_type');
+		apply_link = document.getElementById('rentpress_custom_field_property_specific_contact_link_group');
+    	gravity_form = document.getElementById('rentpress_custom_field_property_specific_gravity_form_group');
+
 	    for (var i = fields.length - 1; i >= 0; i--) {
 	    	field = fields[i];
 	    	field.addEventListener("change", function() {
@@ -755,4 +784,9 @@ function getTemplateCheckBoxes() {
 	    		}
 	    	});
 	    }
+
+	    if (applyType) {
+        applyType.addEventListener("change", ApplySettingsEventListener);
+        ApplySettingsEventListener(applyType.value);
+      }
 	}
