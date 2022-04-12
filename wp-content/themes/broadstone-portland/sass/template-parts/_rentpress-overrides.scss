@@ -3,6 +3,7 @@
 }
 
 // Rentpress plugin
+
 .rentpress-shortcode-floorplan-search-wrapper {
     padding: 30px;
     display: block;
@@ -24,6 +25,9 @@
     }
 
     .rentpress-top-floorplan-search-filter-wrapper {
+        flex-direction: column;
+        justify-content: flex-start !important;
+        grid-gap: 0;
 
         @media (min-width: 960px) {
             flex: 0 300px;
@@ -80,5 +84,14 @@
 
     .v-responsive__content {
         width: auto !important;
+    }
+}
+
+.rentpress-top-floorplan-search-filters {
+    flex-direction: column;
+
+    & > div {
+        flex-direction: column !important;
+        grid-gap: 0 !important;
     }
 }

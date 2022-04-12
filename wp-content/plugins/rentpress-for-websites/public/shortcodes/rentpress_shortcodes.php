@@ -1,12 +1,18 @@
 <?php
 
-function rentpress_shortcode_scripts($tracking_id = null)
+function rentpress_shortcode_vue_scripts($tracking_id = null, $use_mapbox = false)
 {
     if (!empty($tracking_id)) {
         wp_enqueue_script('google_analytics', "https://www.googletagmanager.com/gtag/js?id=$tracking_id#asyncload", '', '', true);
     }
-    wp_enqueue_script('rentpress_shorcode_js', RENTPRESS_PLUGIN_VUE_DIST . 'app.js', [], '1.0.0', true);
-    wp_enqueue_style('rentpress_shorcode_css', RENTPRESS_PLUGIN_VUE_DIST . 'app.css');
+
+    if ($use_mapbox) {
+        wp_enqueue_script('rentpress_shortcode_js', RENTPRESS_PLUGIN_VUE_MAPBOX_DIST . 'app.js', [], '1.0.0', true);
+        wp_enqueue_style('rentpress_shortcode_css', RENTPRESS_PLUGIN_VUE_MAPBOX_DIST . 'app.css');
+    } else {
+        wp_enqueue_script('rentpress_shortcode_js', RENTPRESS_PLUGIN_VUE_MAIN_DIST . 'app.js', [], '1.0.0', true);
+        wp_enqueue_style('rentpress_shortcode_css', RENTPRESS_PLUGIN_VUE_MAIN_DIST . 'app.css');
+    }
 }
 
 // this function runs when scripts are being enqueued, any script that needs to be async just needs to be appended with '#asyncload'
@@ -33,7 +39,7 @@ function rentpress_single_floorplan_shortcode_cb($atts = [], $content = '')
     $options = get_option('rentpress_options');
     $options["site_url"] = get_bloginfo("url");
     $options["site_name"] = get_bloginfo("name");
-    rentpress_shortcode_scripts($options["rentpress_google_analytics_api_section_tracking_id"]);
+    rentpress_shortcode_vue_scripts($options["rentpress_google_analytics_api_section_tracking_id"]);
 
     // get data for floorplan and child units
     require_once RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php';
@@ -44,6 +50,17 @@ function rentpress_single_floorplan_shortcode_cb($atts = [], $content = '')
         $floorplan = rentpress_getAllFloorplanDataWithCodeOrPostID($atts['code']);
     } else {
         return "Shortcode Requires a valid floorplan code or floorplan post id";
+    }
+
+    $formShortcodeHTML = '';
+    $hasFormShortcode = !is_null($floorplan->floorplan_parent_property_contact_type) && isset($floorplan->floorplan_parent_property_contact_type) ? $floorplan->floorplan_parent_property_contact_type == "3" : '';
+    if ($hasFormShortcode) {
+        $shortcode = $floorplan->floorplan_parent_property_gravity_form;
+        $shortcode = str_replace("[","",$shortcode);
+        $shortcode = str_replace("]","",$shortcode);
+        $shortcode = '[' . $shortcode . ' field_values="property_code='. $floorplan->floorplan_parent_property_code .'&floorplan_code=floorplan_code"]';
+
+        $formShortcodeHTML = '<div id="'. $floorplan->floorplan_parent_property_code .'_form_wrapper">' . do_shortcode($shortcode) . '</div>';
     }
 
     $similar_floorplans = rentpress_getSimilarFloorplans($floorplan);
@@ -57,7 +74,7 @@ function rentpress_single_floorplan_shortcode_cb($atts = [], $content = '')
     $options = json_encode($options);
 
     $content = $content . "
-        <div id='rentpress-app' data-floorplan='$floorplan' data-floorplans='$similar_floorplans' data-options='$options' data-shortcode='single-floorplan-page'></div>
+        <div id='rentpress-app' data-floorplan='$floorplan' data-floorplans='$similar_floorplans' data-options='$options' data-shortcode='single-floorplan-page'></div><div id='floorplan-search-form-shortcodes' style='display: none;'>$formShortcodeHTML</div>
     ";
 
     return $content;
@@ -75,7 +92,17 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
     $options["site_name"] = get_bloginfo("name");
     $options["site_url"] = get_bloginfo("url");
     $options["default_sort"] = isset($atts['default_sort']) ? $atts['default_sort'] : "AVAIL";
-    rentpress_shortcode_scripts($options["rentpress_google_analytics_api_section_tracking_id"]);
+    $attributes_string = strtoupper(json_encode($atts));
+
+    // Is the shortcode using mapbox, or is it overridden from default settings
+    $use_mapbox = isset($options['rentpress_map_source_api_section_selection']) && $options['rentpress_map_source_api_section_selection'] == "Mapbox";
+    if (strpos($attributes_string, 'MAPBOX')) {
+        $use_mapbox = true;
+    }
+    if (strpos($attributes_string, 'GOOGLEMAPS')) {
+        $use_mapbox = false;
+    }
+    rentpress_shortcode_vue_scripts($options["rentpress_google_analytics_api_section_tracking_id"], $use_mapbox);
 
     // TODO: 7.2 @Ryan figure out a way to insert Gravity forms
 
@@ -93,6 +120,18 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
         $property = $GLOBALS['rentpress_property_data'];
     } else {
         return "Shortcode Requires a valid property code or property post id";
+    }
+
+    $formShortcodeHTML = '';
+    $hasFormShortcode = !is_null($property->property_contact_type) && isset($property->property_contact_type) ? $property->property_contact_type == "3" : '';
+
+    if ($hasFormShortcode) {
+        $shortcode = $property->property_gravity_form;
+        $shortcode = str_replace("[","",$shortcode);
+        $shortcode = str_replace("]","",$shortcode);
+        $shortcode = '[' . $shortcode . ' field_values="property_code='. $property->property_code .'&floorplan_code=floorplan_code"]';
+
+        $formShortcodeHTML = '<div id="'. $property->property_code .'_form_wrapper">' . do_shortcode($shortcode) . '</div>';
     }
 
     $nearby_properties = rentpress_getNearbyProperties($property->property_city, 3, $property->property_code);
@@ -127,9 +166,19 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
         }
         $neighborhood_meta = htmlspecialchars(json_encode($neighborhood_meta), ENT_QUOTES, 'UTF-8');
     } else {
-        $city_meta = get_term_by('name', $property->property_city, 'city');
-        $city_meta->link = get_term_link($city_meta);
+        $city_term = get_term_by('name', $property->property_city, 'city');
+        $city_meta = get_term_meta($city_term->term_id);
+        $city_meta['post']['post_title'] = $city_term->name;
+        $city_meta['post']['guid'] = get_term_link($city_term);
+        $city_meta['image_src'] = !empty($city_meta["rentpress_custom_field_city_image"][0]) ? $city_meta["rentpress_custom_field_city_image"][0] : '';
+        $city_meta['image_srcset'] = '';
+        $city_meta['rentpress_custom_field_neighborhood_romance_copy'] = !empty($city_meta['rentpress_custom_field_city_short_description'][0]) ? $city_meta['rentpress_custom_field_city_short_description'] : '';
         $city_meta = htmlspecialchars(json_encode($city_meta), ENT_QUOTES, 'UTF-8');
+    }
+
+    $use_modals = 'true';
+    if (strpos($attributes_string, 'USEPOSTPAGE')) {
+        $use_modals = 'false';
     }
 
     // a lot of special characters in property descriptions
@@ -147,7 +196,10 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
             data-neighborhood='$neighborhood_meta'
             data-city='$city_meta'
             data-has_gallery_shortcode='$has_gallery_shortcode'
+            data-use_mapbox='$use_mapbox'
+            data-use_modals='$use_modals'
         ></div>
+        <div id='floorplan-search-form-shortcodes' style='display: none;'>$formShortcodeHTML</div>
         $gallery_shortcode_html
     ";
     return $content;
@@ -165,7 +217,7 @@ function rentpress_floorplan_search_shortcode_cb($atts = [], $content = '')
     $options["site_url"] = get_bloginfo("url");
     $options["site_name"] = get_bloginfo("name");
     $options["default_sort"] = isset($atts['default_sort']) ? $atts['default_sort'] : "AVAIL";
-    rentpress_shortcode_scripts($options["rentpress_google_analytics_api_section_tracking_id"]);
+    rentpress_shortcode_vue_scripts($options["rentpress_google_analytics_api_section_tracking_id"]);
 
     // TODO: 7.1 @Charles add features search to shortcode
     // TODO: 7.1 @Charles add ability to search for specific bed count
@@ -197,6 +249,30 @@ function rentpress_floorplan_search_shortcode_cb($atts = [], $content = '')
         $floorplans = rentpress_getAllFloorplansAndUnits();
     }
 
+    $formShortcodes = [];
+    $formShortcodesHTML = [];
+    foreach ($floorplans as $floorplan) {
+        $parent_property_contact_type = isset($floorplan->floorplan_parent_property_contact_type) ? $floorplan->floorplan_parent_property_contact_type : null;
+        $hasFormShortcode = !is_null($parent_property_contact_type) && isset($parent_property_contact_type) ? $parent_property_contact_type == "3" : '';
+        if ($hasFormShortcode) {
+            if (!in_array($floorplan->floorplan_parent_property_gravity_form, $formShortcodes)) {
+
+                $shortcode = $floorplan->floorplan_parent_property_gravity_form;
+                $shortcode = str_replace("[","",$shortcode);
+                $shortcode = str_replace("]","",$shortcode);
+                $shortcode = '[' . $shortcode . ' field_values="property_code='. $floorplan->floorplan_parent_property_code .'&floorplan_code=floorplan_code"]';
+
+                $formShortcodesHTML[] = '<div id="'. $floorplan->floorplan_parent_property_code .'_form_wrapper">' . do_shortcode($shortcode) . '</div>';
+                $formShortcodes[$floorplan->floorplan_parent_property_code] = $floorplan->floorplan_parent_property_gravity_form;
+            }
+        }
+    }
+
+    if (is_countable($formShortcodesHTML) ? count($formShortcodesHTML) : '') {
+        $formShortcodesHTML = implode($formShortcodesHTML);
+        $options['floorplan_forms'] = $formShortcodes;
+    }
+
     if (count($floorplans) == 0) {
         return "No floorplans found with given information";
     }
@@ -224,7 +300,7 @@ function rentpress_floorplan_search_shortcode_cb($atts = [], $content = '')
     $options = json_encode($options);
 
     $content = $content . "
-        <div id='rentpress-app' data-floorplans='$floorplans' data-options='$options' data-shortcode='floorplan-search' data-hidefilters='$hidefilters' data-sidebarfilters='$sidebarfilters' data-use_modals='$use_modals'/></div>
+        <div id='rentpress-app' data-floorplans='$floorplans' data-options='$options' data-shortcode='floorplan-search' data-hidefilters='$hidefilters' data-sidebarfilters='$sidebarfilters' data-use_modals='$use_modals'/></div><div id='floorplan-search-form-shortcodes' style='display: none;'>$formShortcodesHTML</div>
     ";
     return $content;
 }
@@ -240,19 +316,20 @@ function rentpress_property_search_shortcode_cb($atts = [], $content = '')
     $options = get_option('rentpress_options');
     $options["site_url"] = get_bloginfo("url");
     $options["site_name"] = get_bloginfo("name");
-    rentpress_shortcode_scripts($options["rentpress_google_analytics_api_section_tracking_id"]);
-
     $attributes_string = strtoupper(json_encode($atts));
 
-    // TODO: 7.1 @Charles add ability to search for specific bed count
-    // TODO: 7.1 @Charles add ability to search for only available units
-    // TODO: 7.1 @Charles add ability to search for specific price max
-    // TODO: 7.1 @Charles add ability to search for specific price min
+    // Is the shortcode using mapbox, or is it overridden from default settings
+    $use_mapbox = isset($options['rentpress_map_source_api_section_selection']) && $options['rentpress_map_source_api_section_selection'] == "Mapbox";
+    if (strpos($attributes_string, 'MAPBOX')) {
+        $use_mapbox = true;
+    }
+    if (strpos($attributes_string, 'GOOGLEMAPS')) {
+        $use_mapbox = false;
+    }
+    rentpress_shortcode_vue_scripts($options["rentpress_google_analytics_api_section_tracking_id"], $use_mapbox);
+
     // TODO: 7.1 @Charles add ability to search for specials
-
-    // TODO: 7.1 @Charles add ability to limit properties
     // TODO: 7.1 @Charles add an 'order by' attribute is people want to limit by something other than most available
-
     // TODO: 7.2 @Charles allow shortcode attribute to select default sort
 
     // get all properties that match taxonomy and term criteria
@@ -272,12 +349,23 @@ function rentpress_property_search_shortcode_cb($atts = [], $content = '')
     } elseif (isset($atts['post_ids'])) {
         $post_ids = explode(',', $atts['post_ids']);
         $properties = rentpress_getAllPropertiesWithCodesOrIDs($post_ids);
+    } elseif (isset($atts['terms']) && isset($atts['city'])) {
+        $terms = explode('|', $atts['terms']);
+        $limit = isset($atts['limit']) ? $atts['limit'] : '';
+        $properties = rentpress_getCityPropertiesWithTaxonomies($atts['city'], $terms, $limit);
+    } elseif (isset($atts['terms']) && isset($atts['neighborhood'])) {
+        $terms = explode('|', $atts['terms']);
+        $limit = isset($atts['limit']) ? $atts['limit'] : '';
+        $properties = rentpress_getNeighborhoodPropertiesWithTaxonomies($atts['neighborhood'], $terms, $limit);
     } elseif (isset($atts['terms'])) {
         $terms = explode('|', $atts['terms']);
         $properties = rentpress_getAllPropertiesForTaxonomies($terms);
     } elseif (isset($atts['city'])) {
         $limit = isset($atts['limit']) ? $atts['limit'] : '';
         $properties = rentpress_getNearbyProperties($atts['city'], $limit);
+    } elseif (isset($atts['neighborhood'])) {
+        $limit = isset($atts['limit']) ? $atts['limit'] : '';
+        $properties = rentpress_getNeighborhoodProperties($atts['neighborhood'], $limit);
     } else {
         $properties = rentpress_getAllProperties();
     }
@@ -290,6 +378,26 @@ function rentpress_property_search_shortcode_cb($atts = [], $content = '')
     $showmap = 'false';
     if (strpos($attributes_string, 'SHOWMAP')) {
         $showmap = 'true';
+    }
+
+    $options['show_matrix'] = false;
+    if (strpos($attributes_string, 'SHOWMATRIX')) {
+        $options['show_matrix'] = true;
+    }
+
+    $options['requested_beds'] = "";
+    if (isset($atts['bed'])) {
+        $options['requested_beds'] = $atts['bed'];
+    }
+
+    $options['max_price'] = "";
+    if (isset($atts['max_price'])) {
+        $options['max_price'] = $atts['max_price'];
+    }
+
+    $options['only_available'] = false;
+    if (strpos($attributes_string, 'ONLYAVAILABLE')) {
+        $options['only_available'] = true;
     }
 
     $featured_search_terms = new stdClass();
@@ -313,7 +421,8 @@ function rentpress_property_search_shortcode_cb($atts = [], $content = '')
             data-properties='$properties'
             data-options='$options'
             data-hidefilters='$hidefilters'
-            data-showmap='$showmap'
+            data-usemap='$showmap'
+            data-use_mapbox='$use_mapbox'
             data-featured_search_terms='$featured_search_terms'
             data-shortcode='property-search'/></div>
     ";
@@ -464,6 +573,6 @@ function rentpress_equal_housing_shortcode_cb($atts = [], $content = '')
 
     $svgString = "<svg xmlns='http://www.w3.org/2000/svg' width='$size' height='$size' viewBox='0 0 192.756 192.756'><g fill-rule='evenodd' clip-rule='evenodd'><path fill='$fillColor' d='M26.473 148.555h-7.099v2.81h6.52v2.373h-6.52v3.453h7.414v2.375H16.636v-13.378h9.837v2.367zM35.45 155.928l1.342 1.264a3.247 3.247 0 0 1-1.509.357c-1.51 0-3.635-.93-3.635-4.674s2.125-4.674 3.635-4.674c1.509 0 3.632.93 3.632 4.674 0 1.254-.242 2.18-.614 2.873l-1.416-1.322-1.435 1.502zm6.317 3.09l-1.457-1.371c.82-1.045 1.4-2.572 1.4-4.771 0-6.277-4.658-7.039-6.428-7.039-1.769 0-6.425.762-6.425 7.039 0 6.281 4.656 7.041 6.425 7.041.78 0 2.16-.146 3.427-.898l1.586 1.514 1.472-1.515zM54.863 154.889c0 3.516-2.127 5.027-5.499 5.027-1.228 0-3.054-.297-4.246-1.619-.726-.814-1.006-1.904-1.042-3.242v-8.867h2.85v8.678c0 1.869 1.08 2.684 2.382 2.684 1.921 0 2.701-.93 2.701-2.551v-8.811h2.855v8.701h-.001zM62.348 149.207h.041l1.655 5.291H60.63l1.718-5.291zm-2.464 7.594h4.939l.858 2.766h3.037l-4.71-13.379h-3.225l-4.769 13.379h2.943l.927-2.766zM73.692 157.145h6.65v2.421h-9.448v-13.378h2.798v10.957zM90.938 153.562v6.004h-2.79v-13.378h2.79v5.066h5.218v-5.066h2.791v13.378h-2.791v-6.004h-5.218zM104.273 152.875c0-3.744 2.127-4.674 3.631-4.674 1.512 0 3.637.93 3.637 4.674s-2.125 4.674-3.637 4.674c-1.504 0-3.631-.93-3.631-4.674zm-2.791 0c0 6.281 4.66 7.041 6.422 7.041 1.777 0 6.432-.76 6.432-7.041 0-6.277-4.654-7.039-6.432-7.039-1.761 0-6.422.762-6.422 7.039zM127.676 154.889c0 3.516-2.127 5.027-5.5 5.027-1.23 0-3.051-.297-4.248-1.619-.725-.814-1.006-1.904-1.039-3.242v-8.867h2.846v8.678c0 1.869 1.084 2.684 2.391 2.684 1.918 0 2.699-.93 2.699-2.551v-8.811h2.852v8.701h-.001zM132.789 155.445c.025.744.4 2.162 2.838 2.162 1.32 0 2.795-.316 2.795-1.736 0-1.039-1.006-1.322-2.42-1.656l-1.436-.336c-2.168-.502-4.252-.98-4.252-3.924 0-1.492.807-4.119 5.145-4.119 4.102 0 5.199 2.68 5.219 4.32h-2.686c-.072-.592-.297-2.012-2.738-2.012-1.059 0-2.326.391-2.326 1.602 0 1.049.857 1.264 1.41 1.395l3.264.801c1.826.449 3.5 1.195 3.5 3.596 0 4.029-4.096 4.379-5.271 4.379-4.877 0-5.715-2.814-5.715-4.471h2.673v-.001zM146.186 159.566H143.4v-13.378h2.786v13.378zM157.35 146.188h2.605v13.378h-2.791l-5.455-9.543h-.047v9.543h-2.605v-13.378H152l5.303 9.316h.047v-9.316zM169.307 152.355h5.584v7.211h-1.859l-.279-1.676c-.707.812-1.732 2.025-4.174 2.025-3.221 0-6.143-2.309-6.143-7.002 0-3.648 2.031-7.098 6.533-7.078 4.105 0 5.727 2.66 5.867 4.512h-2.791c0-.523-.953-2.203-2.924-2.203-1.998 0-3.84 1.377-3.84 4.803 0 3.654 1.994 4.602 3.893 4.602.615 0 2.67-.238 3.242-2.943h-3.109v-2.251zM18.836 173.197c0-3.744 2.123-4.678 3.63-4.678 1.509 0 3.631.934 3.631 4.678 0 3.742-2.122 4.68-3.631 4.68-1.507 0-3.63-.938-3.63-4.68zm-2.794 0c0 6.275 4.656 7.049 6.425 7.049 1.77 0 6.426-.773 6.426-7.049s-4.657-7.039-6.426-7.039c-1.769 0-6.425.764-6.425 7.039zM36.549 172.748v-3.934h2.217c1.731 0 2.459.545 2.459 1.85 0 .596 0 2.084-2.088 2.084h-2.588zm0 2.314h3.202c3.597 0 4.265-3.059 4.265-4.268 0-2.625-1.561-4.285-4.153-4.285h-6.107v13.379h2.793v-4.826zM51.599 172.748v-3.934h2.213c1.733 0 2.46.545 2.46 1.85 0 .596 0 2.084-2.083 2.084h-2.59zm0 2.314h3.204c3.594 0 4.267-3.059 4.267-4.268 0-2.625-1.563-4.285-4.153-4.285h-6.113v13.379h2.795v-4.826zM66.057 173.197c0-3.744 2.118-4.678 3.633-4.678 1.502 0 3.63.934 3.63 4.678 0 3.742-2.127 4.68-3.63 4.68-1.515 0-3.633-.938-3.633-4.68zm-2.795 0c0 6.275 4.655 7.049 6.428 7.049 1.765 0 6.421-.773 6.421-7.049s-4.656-7.039-6.421-7.039c-1.773 0-6.428.764-6.428 7.039zM83.717 172.396v-3.582h3.479c1.64 0 1.954 1.049 1.954 1.756 0 1.324-.705 1.826-2.159 1.826h-3.274zm-2.746 7.493h2.746v-5.236h2.882c2.07 0 2.184.705 2.184 2.531 0 1.375.105 2.064.292 2.705h3.095v-.361c-.596-.221-.596-.707-.596-2.656 0-2.504-.596-2.91-1.694-3.396 1.322-.443 2.064-1.713 2.064-3.182 0-1.158-.648-3.783-4.207-3.783H80.97v13.378h.001zM102.355 179.889h-2.793v-11.012h-4.04v-2.367H106.4v2.367h-4.045v11.012zM121.395 175.207c0 3.52-2.123 5.039-5.498 5.039-1.223 0-3.049-.311-4.244-1.631-.727-.816-1.006-1.898-1.039-3.238v-8.867h2.846v8.678c0 1.863 1.082 2.689 2.385 2.689 1.918 0 2.699-.938 2.699-2.557v-8.811h2.852v8.698h-.001zM134.916 166.51h2.613v13.379h-2.8l-5.459-9.543h-.03v9.543h-2.613V166.51h2.943l5.313 9.312h.033v-9.312zM145.412 179.889h-2.803V166.51h2.803v13.379zM156.32 179.889h-2.793v-11.012h-4.035v-2.367h10.873v2.367h-4.045v11.012zM170.928 179.889h-2.799v-5.051l-4.615-8.328h3.295l2.775 5.814 2.652-5.814h3.162l-4.47 8.361v5.018zM95.706 6.842L5.645 51.199v20.836h10.08v62.502h159.284V72.035h12.104V51.199L95.706 6.842zm59.815 108.871H35.216V58.592l60.49-30.914 59.816 30.914v57.121h-.001z'/><path fill='$fillColor' d='M123.256 78.75H67.479V58.592h55.777V78.75zM123.256 107.662H67.479V87.491h55.777v20.171z'/></g></svg>";
 
-    return $content . "<div class='rentpres-equal-housing-shortcode-wrapper'>$svgString</div>";
+    return $content . "<div class='rentpress-equal-housing-shortcode-wrapper'>$svgString</div>";
 
 }

@@ -9,7 +9,7 @@ function my_specific_style(){
   wp_enqueue_style( 'city-archive', RENTPRESS_PLUGIN_PUBLIC_TEMPLATES_DIR . 'template-city-archive-styles.css');
 }
 
-get_header(); 
+get_header();
 $options = get_option('rentpress_options');
 $city_image = $options['rentpress_default_city_image_section'];
 $term_meta = get_term_meta(get_queried_object()->term_id);
@@ -36,61 +36,66 @@ foreach ($citiesInt as $cityInt) {
 </header>
 
 <main class="main-content" role="main">
-			<div class="rentpress-page-hero">
-				<header class="rentpress-page-hero-full">
-					<h1 class="rentpress-page-title"><?php echo 'Apartments With<br />' . wp_kses_post(get_queried_object()->name); ?></h1>
-					<img src="<?php echo esc_url($featured_image ? $featured_image : $city_image); ?>" class="lazyload">
-				</header>
-			</div>
+  <div class="rentpress-page-hero">
+    <header class="rentpress-page-hero-full">
+      <h1 class="rentpress-page-title"><?php echo 'Apartments With<br />' . wp_kses_post(get_queried_object()->name); ?>
+      </h1>
+      <img src="<?php echo esc_url($featured_image ? $featured_image : $city_image); ?>" class="lazyload" alt="">
+    </header>
+  </div>
 
-		<section class="clearfix rentpress-term-short-description">
-			<div class="container">
-				<?php echo wp_kses_post($short_description); ?>
-			</div>
-		</section>
+  <section class="clearfix rentpress-term-short-description">
+    <div class="container">
+      <?php echo wp_kses_post($short_description); ?>
+    </div>
+  </section>
 
-		<section class="clearfix rentpress-term-properties">
-				<?php echo do_shortcode('[rentpress_property_search terms="'. get_queried_object()->name .'" HIDEFILTERS=true][/rentpress_property_search]'); ?>
-		</section>
+  <section class="clearfix rentpress-term-properties">
+    <?php echo do_shortcode('[rentpress_property_search terms="'. get_queried_object()->name .'" HIDEFILTERS=true][/rentpress_property_search]'); ?>
+  </section>
 
-		<section class="clearfix rentpress-extended-term-description">
-			<div class="container">
-				<?php echo wp_kses_post($extended_description); ?>
-			</div>
-		</section>
+  <section class="clearfix rentpress-extended-term-description">
+    <div class="container">
+      <?php echo wp_kses_post($extended_description); ?>
+    </div>
+  </section>
 
-		<?php if($shortcode) : ?>
-			<section class="clearfix rentpress-term-shortcode">
-				<div class="container">
-					<?php echo do_shortcode($shortcode); ?>
-				</div>
-			</section>
-		<?php endif ; ?>
+  <?php if($shortcode) : ?>
+  <section class="clearfix rentpress-term-shortcode">
+    <div class="container">
+      <?php echo do_shortcode($shortcode); ?>
+    </div>
+  </section>
+  <?php endif ; ?>
 
-		<section>
-			<h3><center>Explore Other Options</center></h3>
-			<div class="city-term-grid">
-				<?php foreach ($cities as $city) : 
+  <section>
+    <h3 style="text-align: center;">
+      Explore Other Options
+    </h3>
+    <div class="city-term-grid">
+      <?php foreach ($cities as $city) :
 					$meta = get_term_meta($city->term_id);
 					$image = isset($meta['rentpress_custom_field_city_image'][0]) && !empty($meta['rentpress_custom_field_city_image'][0]) ? $meta['rentpress_custom_field_city_image'][0] : $city_image;
 					?>
 
-					<div class="is-rp-city flex-grid-thirds">
-						<a href="<?php echo esc_url(get_term_link($city->term_id)); ?>">
-							<figure class="rp-city-figure">
-									<img class="rp-city-image" src="<?php echo esc_url($image); ?>">
-							</figure>
-							<section class="rp-city-details">
-								<div class="rp-city-top">
-								  	<h2 class="rp-city-name" style="font-weight: bold; color: #007ff3;"><?php echo wp_kses_post($city->name); ?></h2>
-								</div>
-			       </section>
-			      </a>
-			    </div>
+      <div class="is-rp-city flex-grid-thirds">
+        <a href="<?php echo esc_url(get_term_link($city->term_id)); ?>">
+          <figure class="rp-city-figure">
+            <img class="rp-city-image" src="<?php echo esc_url($image); ?>"
+              alt="View of <?php echo wp_kses_post($city->name); ?>">
+          </figure>
+          <section class="rp-city-details">
+            <div class="rp-city-top">
+              <h2 class="rp-city-name" style="font-weight: bold; color: #007ff3;">
+                <?php echo wp_kses_post($city->name); ?></h2>
+            </div>
+          </section>
+        </a>
+      </div>
 
-				<?php endforeach ; ?>
-			</div>
-		</section>
+      <?php endforeach ; ?>
+    </div>
+  </section>
 
 </main>
 

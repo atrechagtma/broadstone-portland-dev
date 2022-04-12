@@ -797,6 +797,12 @@ header.entry-header h1.entry-title {
 	}
 }
 
+.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
+	flex-direction: column;
+	justify-content: flex-start !important;
+	grid-gap: 0;
+}
+
 @media (min-width: 960px) {
 	.rentpress-floorplan-search-container .rentpress-top-floorplan-search-filter-wrapper {
 		flex: 0 300px;
@@ -860,6 +866,15 @@ header.entry-header h1.entry-title {
 
 .rentpress-floorplan-search-container .v-responsive__content {
 	width: auto !important;
+}
+
+.rentpress-top-floorplan-search-filters {
+	flex-direction: column;
+}
+
+.rentpress-top-floorplan-search-filters > div {
+	flex-direction: column !important;
+	grid-gap: 0 !important;
 }
 
 .hero-block {

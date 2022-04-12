@@ -16,6 +16,6 @@ get_header(); ?>
 <header class="entry-header" style="background-image: url(https://bsp-staging.local/wp-content/uploads/2021/11/Broadstone-Portland-detail25.jpg);">
     <h1 class="entry-title">Floor Plans</h1>
 </header>
-<?php echo do_shortcode( '[floorplan_grid property_code="4853343"]' ); ?>
+
 <?php
 get_footer();

@@ -12,6 +12,11 @@ function rentpress_savePropertyData($property)
             $property['property_bed_types'] = json_encode($property['property_bed_types']);
         }
 
+        if (isset($property['property_availability_matrix'])) {
+            ksort($property['property_availability_matrix']);
+            $property['property_availability_matrix'] = json_encode($property['property_availability_matrix']);
+        }
+
         global $wpdb;
         $table_name = $wpdb->prefix . 'rentpress_properties';
         $result = 'NoCode';
@@ -131,6 +136,7 @@ function rentpress_makePropertyDBTable()
 		property_latitude longtext,
 		property_longitude longtext,
 		property_neighborhood_post_id longtext,
+		property_neighborhood_post_name longtext,
 		property_staff longtext,
 		property_images longtext,
 		property_gallery_shortcode longtext,
@@ -152,6 +158,7 @@ function rentpress_makePropertyDBTable()
 		property_ils_tracking_codes longtext,
 		property_floorplan_count longtext,
 		property_bed_types longtext,
+        property_availability_matrix longtext,
 		property_available_units smallint,
 		property_unavailable_units smallint,
 		property_available_floorplans smallint,
@@ -168,6 +175,9 @@ function rentpress_makePropertyDBTable()
 		property_terms longtext,
 		property_pet_policy longtext,
 		property_additional_keywords longtext,
+        property_gravity_form longtext,
+        property_contact_link longtext,
+        property_contact_type longtext,
 
 
 		UNIQUE KEY property_code (property_code)
