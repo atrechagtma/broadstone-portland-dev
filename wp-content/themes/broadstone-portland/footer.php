@@ -39,8 +39,8 @@
                 <?php
                     if( have_rows('social_links', 'options') ): ?>
                         <div class="social-links">
-                            <a href="https://www.greystar.com/" target="_blank"><img src="/wp-content/uploads/2021/12/greystar-logo-2.png"></a>
-                            <a href="https://allresco.com/" target="_blank"><img src="/wp-content/uploads/2021/11/alliance-logo.png"></a>
+                            <a href="https://www.greystar.com/" target="_blank"><img src="/wp-content/uploads/2022/05/logo-managed-by-greystar.jpg"></a>
+                            <a href="https://allresco.com/" target="_blank"><img src="/wp-content/uploads/2022/05/logo-alliance.jpg"></a>
                             <a href="https://www.greystar.com/fair-housing-statement" target="_blank"><img src="/wp-content/uploads/2021/10/equal-housing-opportunity.svg"></a>
                             <a href="https://www.greystar.com/fair-housing-statement" target="_blank"><img src="/wp-content/uploads/2021/10/wheelchair-symbol.svg"></a>
                             <?php while( have_rows('social_links', 'options') ) : the_row();
