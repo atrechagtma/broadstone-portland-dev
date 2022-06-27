@@ -38,9 +38,10 @@
 
 <body <?php body_class(); ?>>
 <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K99XKFX"
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSZ4J32"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
     <div id="page" class="site">
         <a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e('Skip to content', 'gutenberg-starter-theme'); ?></a>
         <header id="masthead" class="site-header">
