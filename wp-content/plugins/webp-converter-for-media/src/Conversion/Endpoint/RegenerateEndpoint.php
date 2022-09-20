@@ -36,6 +36,13 @@ class RegenerateEndpoint extends EndpointAbstract {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function get_http_methods(): string {
+		return \WP_REST_Server::CREATABLE;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get_url_lifetime(): int {
 		return ( 7 * 24 * 60 * 60 );
 	}
@@ -44,24 +51,27 @@ class RegenerateEndpoint extends EndpointAbstract {
 	 * {@inheritdoc}
 	 */
 	public function get_route_args(): array {
-		return [
-			'regenerate_force' => [
-				'description'       => 'Option to force all images to be converted again (set `1` to enable)',
-				'required'          => false,
-				'default'           => false,
-				'sanitize_callback' => function ( $value ) {
-					return ( (string) $value === '1' );
-				},
-			],
-			'paths'            => [
-				'description'       => 'Array of file paths (server paths)',
-				'required'          => true,
-				'default'           => [],
-				'validate_callback' => function ( $value ) {
-					return ( is_array( $value ) && $value );
-				},
-			],
-		];
+		return array_merge(
+			parent::get_route_args(),
+			[
+				'regenerate_force' => [
+					'description'       => 'Option to force all images to be converted again (set `1` to enable)',
+					'required'          => false,
+					'default'           => false,
+					'sanitize_callback' => function ( $value ) {
+						return ( (string) $value === '1' );
+					},
+				],
+				'paths'            => [
+					'description'       => 'Array of file paths (server paths)',
+					'required'          => true,
+					'default'           => [],
+					'validate_callback' => function ( $value ) {
+						return ( is_array( $value ) && $value );
+					},
+				],
+			]
+		);
 	}
 
 	/**

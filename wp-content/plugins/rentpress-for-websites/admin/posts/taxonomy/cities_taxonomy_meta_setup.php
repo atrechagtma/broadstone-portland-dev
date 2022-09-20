@@ -49,7 +49,7 @@ function rentpress_edit_city_meta($term) {
 
       <div class="rentpress-settings-group">
         <label class="rentpress-settings-title">Short Description</label>
-        <?php echo wp_kses(rentpress_metaShadowTextArea('rentpress_custom_field_city_short_description', $rpm, 6, '', 'description'), $rentpress_allowed_HTML); ?>
+        <?php echo wp_kses(rentpress_metaShadowTextArea('rentpress_custom_field_city_short_description', $rpd, 6, '', 'description'), $rentpress_allowed_HTML); ?>
       </div>
     </div>
     <!-- tab accordion end -->
@@ -100,6 +100,11 @@ function rentpress_edit_city_meta($term) {
         <label class="rentpress-settings-title">Slug</label>
         <?php echo wp_kses(rentpress_metaShadowField('rentpress_custom_field_city_slug', $rpd, 'text', '', 'slug'), $rentpress_allowed_HTML); ?>
       </div>
+
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">State</label>
+        <?php echo wp_kses(rentpress_metaField('rentpress_custom_field_city_state', $rpm, 'text'), $rentpress_allowed_HTML); ?>
+      </div>
     </div>
     <!-- tab accordion end -->
 
@@ -125,22 +130,20 @@ function rentpress_edit_city_meta($term) {
 add_action( 'city_edit_form_fields', 'rentpress_edit_city_meta', 10, 2 );
 
 function rentpress_save_city_meta( $term_id ) {
-    $termFields = [
-        'rentpress_custom_field_city_name',
-        'rentpress_custom_field_city_slug',
-        'rentpress_custom_field_city_descrition',
-    ];
-    $args = array();
-    foreach ($_POST as $key => $value) {
-        if ( strpos($key, 'rentpress_custom_field') !== false ) {
-            if (!get_term_meta($term_id, $key)) {
-                add_term_meta($term_id, $key, '', true);
-            }
-            if (isset($_POST[$key])) {
-                update_term_meta($term_id, $key, sanitize_text_field($_POST[$key]));
-            }
-        }
+  foreach ($_POST as $key => $value) {
+    if ( strpos($key, 'rentpress_custom_field') !== false ) {
+      if (!get_term_meta($term_id, $key)) {
+          add_term_meta($term_id, $key, '', true);
+      }
+      if ($key === "rentpress_custom_field_city_extended_content" && isset($_POST[$key])) {
+        update_term_meta( $term_id, $key, wp_kses_post($_POST[$key]) );
+        continue ;
+      }
+      if (isset($_POST[$key])) {
+        update_term_meta($term_id, $key, sanitize_text_field($_POST[$key]));
+      }
     }
+  }
 }
 add_action( 'edited_city', 'rentpress_save_city_meta', 10, 2 );
 add_action( 'create_city', 'rentpress_save_city_meta', 10, 2 );

@@ -31,7 +31,12 @@ abstract class EndpointAbstract implements EndpointInterface {
 	 * {@inheritdoc}
 	 */
 	public function get_route_args(): array {
-		return [];
+		return [
+			'nonce_token' => [
+				'description' => 'WordPress Nonce',
+				'required'    => true,
+			],
+		];
 	}
 
 	/**
@@ -41,14 +46,14 @@ abstract class EndpointAbstract implements EndpointInterface {
 		$nonce_value = ( new NonceManager( $this->get_url_lifetime(), false ) )
 			->generate_nonce( sprintf( EndpointIntegration::ROUTE_NONCE_ACTION, $this->get_route_name() ) );
 
-		$url = get_rest_url(
+		return get_rest_url(
 			null,
 			sprintf(
-				'%1$s/%2$s',
+				'%1$s/%2$s-%3$s',
 				EndpointIntegration::ROUTE_NAMESPACE,
-				$this->get_route_name()
+				$this->get_route_name(),
+				$nonce_value
 			)
 		);
-		return add_query_arg( EndpointIntegration::ROUTE_NONCE_PARAM, $nonce_value, $url );
 	}
 }

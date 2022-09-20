@@ -2,6 +2,8 @@
 
 namespace WebpConverter\Settings\Option;
 
+use WebpConverter\Repository\TokenRepository;
+
 /**
  * .
  */
@@ -14,32 +16,39 @@ class OptionsAggregator {
 	 */
 	private $options = [];
 
-	public function __construct() {
-		$conversion_method = new ConversionMethodOption();
+	public function __construct( TokenRepository $token_repository = null ) {
+		$token_repository  = $token_repository ?: new TokenRepository();
+		$conversion_method = new ConversionMethodOption( $token_repository );
+
+		$this->set_option( new ImagesQualityOption() );
+		$this->set_option( new OutputFormatsOption( $token_repository, $conversion_method ) );
+		$this->set_option( new SupportedDirectoriesOption() );
+		$this->set_option( new ImageResizeOption( $token_repository ) );
+		$this->set_option( new AutoConversionOption() );
+
+		$this->set_option( new AccessTokenOption( $token_repository ) );
 
 		$this->set_option( new SupportedExtensionsOption() );
-		$this->set_option( new SupportedDirectoriesOption() );
-		$this->set_option( new AccessTokenOption() );
-		$this->set_option( new OutputFormatsOption( $conversion_method ) );
 		$this->set_option( $conversion_method );
-		$this->set_option( new ImagesQualityOption() );
 		$this->set_option( new LoaderTypeOption() );
 		$this->set_option( new ExtraFeaturesOption() );
+		$this->set_option( new MediaStatsOption() );
 	}
 
 	/**
+	 * @param string|null $form_name .
+	 *
 	 * @return OptionInterface[]
 	 */
-	public function get_options(): array {
-		$options = apply_filters( 'webpc_settings_options', $this->options );
-
-		usort(
-			$options,
-			function ( OptionInterface $option_a, OptionInterface $option_b ) {
-				return $option_a->get_priority() <=> $option_b->get_priority();
+	public function get_options( string $form_name = null ): array {
+		$options = [];
+		foreach ( $this->options as $option ) {
+			if ( ( $form_name === null ) || ( $form_name === $option->get_form_name() ) ) {
+				$options[] = $option;
 			}
-		);
-		return $options;
+		}
+
+		return apply_filters( 'webpc_settings_options', $options );
 	}
 
 	/**

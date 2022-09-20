@@ -8,10 +8,12 @@ namespace WebpConverter\Service;
 class ServerConfigurator {
 
 	/**
+	 * @param int $value .
+	 *
 	 * @return void
 	 */
-	public function set_memory_limit() {
-		ini_set( 'memory_limit', '1G' ); // phpcs:ignore
+	public function set_memory_limit( int $value = 2 ) {
+		ini_set( 'memory_limit', sprintf( '%sG', $value ) ); // phpcs:ignore
 	}
 
 	/**

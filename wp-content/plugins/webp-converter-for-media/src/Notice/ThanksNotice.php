@@ -23,8 +23,8 @@ class ThanksNotice extends NoticeAbstract implements NoticeInterface {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function get_default_value(): string {
-		return (string) strtotime( '+ 1 week' );
+	public static function get_default_value(): string {
+		return (string) strtotime( '+ 2 weeks' );
 	}
 
 	/**
@@ -62,7 +62,8 @@ class ThanksNotice extends NoticeAbstract implements NoticeInterface {
 	 */
 	public function get_vars_for_view(): array {
 		return [
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'ajax_url'     => admin_url( 'admin-ajax.php' ),
+			'close_action' => self::NOTICE_OPTION,
 		];
 	}
 
@@ -70,6 +71,6 @@ class ThanksNotice extends NoticeAbstract implements NoticeInterface {
 	 * {@inheritdoc}
 	 */
 	public function get_ajax_action_to_disable(): string {
-		return 'webpc_notice';
+		return self::NOTICE_OPTION;
 	}
 }

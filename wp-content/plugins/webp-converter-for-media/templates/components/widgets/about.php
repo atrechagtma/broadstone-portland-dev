@@ -1,27 +1,20 @@
 <?php
 /**
- * Widget displayed information about plugin operation on plugin settings page.
+ * Widget displayed on plugin settings page.
  *
- * @package WebP Converter for Media
+ * @package Converter for Media
  */
 
 ?>
-<div class="webpPage__widget">
-	<h3 class="webpPage__widgetTitle webpPage__widgetTitle--second">
-		<?php echo esc_html( __( 'How does this work?', 'webp-converter-for-media' ) ); ?>
+<div class="webpcPage__widget">
+	<h3 class="webpcPage__widgetTitle">
+		<?php echo esc_html( __( 'How does it work?', 'webp-converter-for-media' ) ); ?>
 	</h3>
-	<div class="webpContent">
+	<div class="webpcContent">
 		<p>
 			<?php
 			echo wp_kses_post(
-				__( 'By adding images to your media library, they are automatically converted and saved in a separate directory. Images are converted using GD or Imagick native extension for PHP.', 'webp-converter-for-media' )
-			);
-			?>
-		</p>
-		<p>
-			<?php
-			echo wp_kses_post(
-				__( 'When the browser tries to download an image file, the server verifies if it supports image/webp files and if the file exists. If everything is OK, instead of the original image, the browser will receive its equivalent in WebP format.', 'webp-converter-for-media' )
+				__( 'When the browser tries to download an image file, the server checks if it supports the AVIF format (if enabled in the plugin settings). If so, the browser will receive an equivalent of the original image in AVIF format. If it does not support AVIF, but supports the WebP format, the browser will receive an equivalent of the original image in WebP format. If the browser does not support either WebP or AVIF, the original image is loaded. This means full support for all browsers.', 'webp-converter-for-media' )
 			);
 			?>
 		</p>
@@ -32,12 +25,13 @@
 			);
 			?>
 		</p>
-		<p>
-			<?php
-			echo wp_kses_post(
-				__( 'Image URLs are modified using the module mod_rewrite on the server, i.e. the same, thanks to which we can use friendly links in WordPress. Additionally, the MIME type of the sent file is modified to image/webp.', 'webp-converter-for-media' )
-			);
-			?>
+		<p class="center">
+			<a href="https://url.mattplugins.com/converter-widget-about-button-instruction"
+				target="_blank"
+				class="webpcButton webpcButton--blue"
+			>
+				<?php echo esc_html( __( 'Find out more', 'webp-converter-for-media' ) ); ?>
+			</a>
 		</p>
 	</div>
 </div>

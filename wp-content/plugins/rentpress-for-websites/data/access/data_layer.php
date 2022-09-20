@@ -57,7 +57,7 @@ function rentpress_getNeighborhoodProperties($neighborhood, $limit = null, $excl
         $excludeString = "AND NOT `property_code` = '$excluded_property_code'";
     }
 
-    $sql_neighborhood_str = "(`property_neighborhood_post_name` = '$neighborhood' OR `property_neighborhood_post_id` = '$neighborhood')";
+    $sql_neighborhood_str = "(`property_neighborhood_post_name` = '$neighborhood' OR `property_primary_neighborhood_post_id` = '$neighborhood')";
 
     $properties = $wpdb->get_results("SELECT * FROM $table_name WHERE $sql_neighborhood_str $excludeString ORDER BY `property_available_units` DESC $limit");
 
@@ -157,7 +157,7 @@ function rentpress_getNeighborhoodPropertiesWithTaxonomies($neighborhood, $terms
         $sql_term_str .= "REGEXP '\"$term\"'";
     }
 
-    $sql_neighborhood_str = "(`property_neighborhood_post_name` = '$neighborhood' OR `property_neighborhood_post_id` = '$neighborhood')";
+    $sql_neighborhood_str = "(`property_neighborhood_post_name` = '$neighborhood' OR `property_primary_neighborhood_post_id` = '$neighborhood')";
 
     $properties = $wpdb->get_results("SELECT * FROM $table_name WHERE $sql_neighborhood_str AND $sql_term_str $excludeString ORDER BY `property_available_units` DESC $limit");
 
@@ -348,6 +348,37 @@ function rentpress_getFloorplansAndUnitsWithParentPropertyCodesOrPostIDs($floorp
     $fp_codes_sql = substr($fp_codes_sql, 0, -3);
 
     $floorplans = $wpdb->get_results("SELECT * FROM $table_name WHERE $fp_codes_sql");
+    $units = rentpress_getAllAvailableUnits();
+
+    foreach ($floorplans as $fp) {
+        $fp->units = array();
+        foreach ($units as $unit_key => $unit) {
+            if ($unit->unit_parent_floorplan_code == $fp->floorplan_code) {
+                array_push($fp->units, $unit);
+                unset($units[$unit_key]);
+            }
+        }
+    }
+
+    return $floorplans;
+}
+
+/*
+ * Get floorplans, units and parent property data from parent property codes or post ids
+ */
+function rentpress_getAllFloorplansDataWithParentPropertyCodesOrPostIDs($floorplans_info)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_floorplans';
+    $prop_table = $wpdb->prefix . 'rentpress_properties';
+
+    $fp_codes_sql = '';
+    foreach ($floorplans_info as $fp) {
+        $fp_codes_sql .= "(`floorplan_parent_property_code` = '$fp' OR `floorplan_parent_property_post_id` = '$fp') OR ";
+    }
+    $fp_codes_sql = substr($fp_codes_sql, 0, -3);
+
+    $floorplans = $wpdb->get_results("SELECT * FROM $table_name AS fp INNER JOIN $prop_table as prop ON fp.floorplan_parent_property_code = prop.property_code WHERE $fp_codes_sql");
     $units = rentpress_getAllAvailableUnits();
 
     foreach ($floorplans as $fp) {
@@ -663,6 +694,50 @@ function rentpress_getRefreshData()
 }
 
 /*
+ * Get all refresh data paginated
+ */
+function rentpress_getPaginatedRefreshData($offset = 0, $limit = 10)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_refresh';
+
+    $data = $wpdb->get_results("SELECT * FROM $table_name ORDER BY `property_code` LIMIT $offset, $limit");
+
+    return $data;
+}
+
+/*
+ * Get all refresh data
+ */
+function rentpress_getRefreshPropertyCodes()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_refresh';
+
+    $data = $wpdb->get_results("SELECT `property_code` FROM $table_name");
+
+    $property_codes = array();
+    foreach ($data as $property_code) {
+        array_push($property_codes, $property_code->property_code);
+    }
+
+    return $property_codes;
+}
+
+/*
+ * Get oldest refresh time
+ */
+function rentpress_getOldestRefreshTS()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_refresh';
+
+    $data = $wpdb->get_results("SELECT MIN(`last_refresh_time`) AS 'oldest_ts' FROM $table_name");
+
+    return $data[0]->oldest_ts;
+}
+
+/*
  * Get refresh data for specific property
  */
 function rentpress_getRefreshRow($property_code)
@@ -671,6 +746,29 @@ function rentpress_getRefreshRow($property_code)
     $table_name = $wpdb->prefix . 'rentpress_refresh';
 
     $data = $wpdb->get_row("SELECT * FROM $table_name WHERE `property_code` = '$property_code'");
+
+    return $data;
+}
+
+/*
+ * Get refresh data for property list
+ */
+function rentpress_getRefreshRowsFromPropertyCodes($property_codes)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'rentpress_refresh';
+    $sql_str = "WHERE ";
+    $codes_count = count($property_codes);
+
+    for ($i = 0; $i < $codes_count; $i++) {
+        $property_code = $property_codes[$i];
+        $sql_str .= "`property_code` = '$property_code'";
+        if ($i + 1 < $codes_count) {
+            $sql_str .= " OR ";
+        }
+    }
+
+    $data = $wpdb->get_results("SELECT * FROM $table_name $sql_str");
 
     return $data;
 }

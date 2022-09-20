@@ -44,7 +44,9 @@ $galleries = get_field('gallery');
             <?php $images = $gallery['images']; ?>
             <?php foreach ((array) $images as $img) : ?>
             <li data-groups='["all","<?php echo sanitize_title($gallery['slide_title']); ?>"]'>
-                <img src="<?php echo $img['url']; ?>" alt="">
+            <a href="<?php echo $img['url'] ;?>" data-lightbox="<?php echo $img['url'] ;?>">
+            <img src="<?php echo $img['url']; ?>" alt="<?php echo $img['title']; ?>" width="<?php echo $img['width']; ?>" height="<?php echo $img['height']; ?>" />
+            </a>
             </li>
             <?php endforeach; ?>
             <?php endforeach; ?>
@@ -166,3 +168,6 @@ $galleries = get_field('gallery');
     }
 
 </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js" integrity="sha512-k2GFCTbp9rQU412BStrcD/rlwv1PYec9SNrkbQlo6RZCf75l6KcC3UwDY8H5n5hl4v77IDtIPwOk9Dqjs/mMBQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />

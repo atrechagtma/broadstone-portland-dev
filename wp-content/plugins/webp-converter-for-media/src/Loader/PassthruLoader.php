@@ -3,6 +3,7 @@
 namespace WebpConverter\Loader;
 
 use WebpConverter\Settings\Option\LoaderTypeOption;
+use WebpConverter\Settings\Option\OutputFormatsOption;
 use WebpConverter\Settings\Option\SupportedDirectoriesOption;
 use WebpConverter\Settings\Option\SupportedExtensionsOption;
 
@@ -34,6 +35,7 @@ class PassthruLoader extends LoaderAbstract {
 	 * {@inheritdoc}
 	 */
 	public function activate_loader( bool $is_debug = false ) {
+		$settings    = ( ! $is_debug ) ? $this->plugin_data->get_plugin_settings() : $this->plugin_data->get_debug_settings();
 		$path_source = $this->plugin_info->get_plugin_directory_path() . self::LOADER_SOURCE;
 		$source_code = ( is_readable( $path_source ) ) ? file_get_contents( $path_source ) ?: '' : '';
 		if ( ! $source_code ) {
@@ -43,6 +45,7 @@ class PassthruLoader extends LoaderAbstract {
 		$path_dir_uploads = apply_filters( 'webpc_dir_name', '', 'uploads' );
 		$path_dir_webp    = apply_filters( 'webpc_dir_name', '', 'webp' );
 		$upload_suffix    = implode( '/', array_diff( explode( '/', $path_dir_uploads ), explode( '/', $path_dir_webp ) ) );
+		$mime_types       = $this->format_factory->get_mime_types( $settings[ OutputFormatsOption::OPTION_NAME ] );
 
 		$source_code = preg_replace(
 			'/(PATH_UPLOADS(?:\s+)= \')(\')/',
@@ -56,7 +59,7 @@ class PassthruLoader extends LoaderAbstract {
 		);
 		$source_code = preg_replace(
 			'/(MIME_TYPES(?:\s+)= \')(\')/',
-			'$1' . json_encode( $this->get_mime_types() ) . '$2',
+			'$1' . json_encode( $mime_types ) . '$2',
 			$source_code ?: ''
 		);
 

@@ -6,7 +6,6 @@ use WebpConverter\HookableInterface;
 use WebpConverter\PluginInfo;
 use WebpConverter\Service\OptionsAccessManager;
 use WebpConverter\Service\ViewLoader;
-use WebpConverter\Settings\AdminAssets;
 
 /**
  * Supports ability to display notice and its management.
@@ -50,11 +49,10 @@ class NoticeIntegration implements HookableInterface {
 			return;
 		}
 
-		( new AdminAssets( $this->plugin_info ) )->init_hooks();
 		if ( ! is_multisite() ) {
-			add_action( 'admin_notices', [ $this, 'load_notice' ] );
+			add_action( 'admin_notices', [ $this, 'load_notice' ], 0 );
 		} else {
-			add_action( 'network_admin_notices', [ $this, 'load_notice' ] );
+			add_action( 'network_admin_notices', [ $this, 'load_notice' ], 0 );
 		}
 	}
 
@@ -74,14 +72,17 @@ class NoticeIntegration implements HookableInterface {
 	/**
 	 * Sets value for option that specifies whether to display notice.
 	 *
+	 * @param string $notice_name   .
+	 * @param string $default_value .
+	 *
 	 * @return void
 	 */
-	public function set_default_value() {
-		if ( OptionsAccessManager::get_option( $this->notice->get_option_name() ) !== null ) {
+	public static function set_default_value( string $notice_name, string $default_value ) {
+		if ( OptionsAccessManager::get_option( $notice_name ) !== null ) {
 			return;
 		}
 
-		OptionsAccessManager::update_option( $this->notice->get_option_name(), $this->notice->get_default_value() );
+		OptionsAccessManager::update_option( $notice_name, $default_value );
 	}
 
 	/**

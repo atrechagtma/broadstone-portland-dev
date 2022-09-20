@@ -69,6 +69,7 @@ class GdMethod extends LibraryMethodAbstract {
 	 * @throws Exception\ExtensionUnsupportedException
 	 * @throws Exception\FunctionUnavailableException
 	 * @throws Exception\ImageInvalidException
+	 * @throws Exception\ImageAnimatedException
 	 */
 	public function create_image_by_path( string $source_path, array $plugin_settings ) {
 		$extension = strtolower( pathinfo( $source_path, PATHINFO_EXTENSION ) );
@@ -80,6 +81,10 @@ class GdMethod extends LibraryMethodAbstract {
 				'imagecreatefromgif'  => [ 'gif' ],
 			]
 		);
+
+		if ( ( $extension === 'gif' ) && $this->is_animated( $source_path ) ) {
+			throw new Exception\ImageAnimatedException( $source_path );
+		}
 
 		foreach ( $methods as $method => $extensions ) {
 			if ( ! in_array( $extension, $plugin_settings[ SupportedExtensionsOption::OPTION_NAME ] )
@@ -164,5 +169,25 @@ class GdMethod extends LibraryMethodAbstract {
 		if ( filesize( $output_path ) % 2 === 1 ) {
 			file_put_contents( $output_path, "\0", FILE_APPEND );
 		}
+	}
+
+	/**
+	 * @param string $source_path .
+	 *
+	 * @link https://www.php.net/manual/en/function.imagecreatefromgif.php#104473
+	 */
+	private function is_animated( string $source_path ): bool {
+		if ( ! ( $fh = @fopen( $source_path, 'rb' ) ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			return false;
+		}
+
+		$count = 0;
+		while ( ! feof( $fh ) && ( $count < 2 ) ) {
+			$chunk = fread( $fh, 1024 * 100 );
+			$count = $count + preg_match_all( '#\x00\x21\xF9\x04.{4}\x00(\x2C|\x21)#s', $chunk ?: '', $matches );
+		}
+
+		fclose( $fh );
+		return ( $count > 1 );
 	}
 }

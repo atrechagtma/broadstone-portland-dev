@@ -13,6 +13,8 @@ function rentpress_save_floorplan_meta($post_id, $post)
     if (isset($_POST['rentpress_custom_field_floorplan_nonce']) &&
         wp_verify_nonce($_POST['rentpress_custom_field_floorplan_nonce'], basename(__FILE__)) &&
         current_user_can($post_type->cap->edit_post, $post_id)) {
+        // firstly mark this floorplan as no longer a feed floorplan, this will be undone immediately during next resync if it is in the feed still
+        update_post_meta($post_id, 'rentpress_custom_field_floorplan_is_feed', false);
         // get all the post meta
         $rpm = get_post_meta($post_id);
 
@@ -23,12 +25,12 @@ function rentpress_save_floorplan_meta($post_id, $post)
             sanitize_text_field($_POST['rentpress_custom_field_floorplan_parent_property_code'])
         );
 
-        // delete the override post meta if it doesnt exist in the form submit
+        // delete the override post meta if it doesn't exist in the form submit
         foreach ($rpm as $meta_override_key => $meta_override_value) {
             if (strpos($meta_override_key, 'rentpress_custom_field_floorplan') !== false &&
                 strpos($meta_override_key, 'override') !== false) {
 
-                // if the override doesnt exist in the request delete the unused meta
+                // if the override doesn't exist in the request delete the unused meta
                 if (!isset($_POST[$meta_override_key])) {
                     delete_post_meta($post_id, $meta_override_key);
                 }
@@ -284,10 +286,17 @@ function rentpress_custom_floorplan_data_box_html($post)
         <label class="rentpress-settings-title">Best Rent</label>
         <?php echo wp_kses(rentpress_overrideMetaField('rentpress_custom_field_floorplan_rent_best', $rpm, $overrides, 'number', '0'), $rentpress_allowed_HTML); ?>
       </div>
-
       <div class="rentpress-settings-group">
         <label class="rentpress-settings-title">Property Rent Type</label>
         <?php echo "<input type='text' value='$parent_property_rent_type_selection' readonly>" ?>
+      </div>
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">Minimum Deposit</label>
+        <?php echo wp_kses(rentpress_overrideMetaField('rentpress_custom_field_floorplan_deposit_min', $rpm, $overrides, 'number', '0'), $rentpress_allowed_HTML); ?>
+      </div>
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">Maximum Deposit</label>
+        <?php echo wp_kses(rentpress_overrideMetaField('rentpress_custom_field_floorplan_deposit_max', $rpm, $overrides, 'number', '0'), $rentpress_allowed_HTML); ?>
       </div>
     </div>
   </div>
@@ -593,6 +602,8 @@ function rentpress_createFloorplanTextFieldMetaList()
         'rentpress_custom_field_floorplan_rent_term',
         'rentpress_custom_field_floorplan_rent_effective',
         'rentpress_custom_field_floorplan_rent_best',
+        'rentpress_custom_field_floorplan_deposit_min',
+        'rentpress_custom_field_floorplan_deposit_max',
     ];
 }
 

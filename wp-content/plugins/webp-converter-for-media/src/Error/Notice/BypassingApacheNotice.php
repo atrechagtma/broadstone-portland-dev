@@ -21,17 +21,45 @@ class BypassingApacheNotice implements ErrorNotice {
 	 */
 	public function get_message(): array {
 		return [
-			__( 'Requests to images are processed by your server bypassing Apache. When loading images, rules from the .htaccess file are not executed. Change the server settings to handle the rules in the .htaccess file when loading static files.', 'webp-converter-for-media' ),
 			sprintf(
-				'%2$s %1$s - %3$s %1$s - %4$s %1$s - %5$s',
-				'<br>',
-				__( 'Potential settings in the server or hosting configuration (usually you will find them in your hosting control panel) that may be causing this issue:', 'webp-converter-for-media' ),
-				__( '"Smart static files processing" and "Serve static files directly by Nginx" or similar in the section related to Apache and Nginx configuration', 'webp-converter-for-media' ),
-				__( '"Nginx Direct Delivery" or similar in the section related to speed or caching', 'webp-converter-for-media' ),
-				__( '"Nginx Caching" or similar (you can instead of disabling this setting remove the following extensions from the list of saved to the cache: .jpg, .jpeg, .png and .gif)', 'webp-converter-for-media' )
+			/* translators: %1$s: open strong tag, %2$s: close strong tag */
+				__( 'Requests to images are processed by Nginx server bypassing Apache. Please log in to your hosting control panel, go to management of this website and try to find one of the following settings %1$sand disable it if it is active%2$s:', 'webp-converter-for-media' ),
+				'<strong>',
+				'</strong>'
 			),
-			__( 'If you have any of the above settings active, you must disable them for .htaccess rules to work properly.', 'webp-converter-for-media' ),
-			__( 'In this case, please contact your server administrator.', 'webp-converter-for-media' ),
+			implode(
+				'<br>',
+				[
+					sprintf(
+					/* translators: %1$s: button label, %2$s: tab name, %3$s: tab name, %4$s: section name */
+						__( '- for SiteGround hosting click %1$s button on the websites list -> click %2$s and %3$s tab -> find %4$s section', 'webp-converter-for-media' ),
+						'"Site Tools"',
+						'"Speed"',
+						'"Caching"',
+						'"Nginx Direct Delivery"'
+					),
+					sprintf(
+					/* translators: %1$s: setting name, %2$s: setting name */
+						__( '- %1$s, %2$s or similar in the section related to Speed or Caching', 'webp-converter-for-media' ),
+						'"Nginx Direct Delivery"',
+						'"Nginx Caching"'
+					),
+					sprintf(
+					/* translators: %s: setting name */
+						__( '- %s or similar in the section related to Apache and Nginx configuration', 'webp-converter-for-media' ),
+						'"Smart static files processing", "Serve static files directly by Nginx"'
+					),
+				]
+			),
+			sprintf(
+			/* translators: %1$s: open strong tag, %2$s: close strong tag, %3$s: break line tag, %4$s: setting name, %5$s: setting name */
+				__( 'In case of problems with finding such settings, %1$splease contact your hosting support and send them the following message%2$s: %3$s"I would like to disable %4$s (or %5$s) for static content files like .jpg, .jpeg, .png, .gif and .webp. These files should have been handled by Apache server instead of Nginx. I need help on this matter."', 'webp-converter-for-media' ),
+				'<strong>',
+				'</strong>',
+				'<br>',
+				'Nginx Caching',
+				'Nginx Direct Delivery'
+			),
 		];
 	}
 }

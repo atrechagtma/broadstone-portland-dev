@@ -69,6 +69,23 @@ interface MethodInterface {
 	public function get_size_after(): int;
 
 	/**
+	 * @return int
+	 */
+	public function get_files_to_conversion(): int;
+
+	/**
+	 * @return int
+	 */
+	public function get_files_converted(): int;
+
+	/**
+	 * @param string $output_format .
+	 *
+	 * @return int
+	 */
+	public function get_files_converted_to_format( string $output_format ): int;
+
+	/**
 	 * Converts source paths to output formats.
 	 *
 	 * @param string[] $paths            Server paths of source images.

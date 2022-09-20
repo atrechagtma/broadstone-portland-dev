@@ -13,8 +13,12 @@ use WebpConverter\Settings\Option\SupportedExtensionsOption;
  */
 class ImagickMethod extends LibraryMethodAbstract {
 
-	const METHOD_NAME        = 'imagick';
-	const MAX_METHOD_QUALITY = 99.9;
+	const METHOD_NAME              = 'imagick';
+	const MAX_METHOD_QUALITY       = 99.9;
+	const PROTECTED_IMAGE_PROFILES = [
+		'icc',
+		'icm',
+	];
 
 	/**
 	 * {@inheritdoc}
@@ -72,6 +76,7 @@ class ImagickMethod extends LibraryMethodAbstract {
 	 * @throws Exception\ExtensionUnsupportedException
 	 * @throws Exception\ImagickUnavailableException
 	 * @throws Exception\ImageInvalidException
+	 * @throws Exception\ImageAnimatedException
 	 */
 	public function create_image_by_path( string $source_path, array $plugin_settings ) {
 		$extension = strtolower( pathinfo( $source_path, PATHINFO_EXTENSION ) );
@@ -83,7 +88,11 @@ class ImagickMethod extends LibraryMethodAbstract {
 		}
 
 		try {
-			return new \Imagick( $source_path );
+			$imagick = new \Imagick( $source_path );
+			if ( ( $extension === 'gif' ) && ( $imagick->identifyFormat( '%n' ) > 1 ) ) {
+				throw new Exception\ImageAnimatedException( $source_path );
+			}
+			return $imagick;
 		} catch ( \ImagickException $e ) {
 			throw new Exception\ImageInvalidException( $source_path );
 		}
@@ -106,7 +115,12 @@ class ImagickMethod extends LibraryMethodAbstract {
 
 		$image->setImageFormat( $extension );
 		if ( ! in_array( ExtraFeaturesOption::OPTION_VALUE_KEEP_METADATA, $plugin_settings[ ExtraFeaturesOption::OPTION_NAME ] ) ) {
-			$image->stripImage();
+			$image_profiles = $image->getImageProfiles( '*', true );
+			foreach ( $image_profiles as $profile_name => $image_profile ) {
+				if ( ! in_array( $profile_name, self::PROTECTED_IMAGE_PROFILES ) ) {
+					$image->removeImageProfile( $profile_name );
+				}
+			}
 		}
 		$image->setImageCompressionQuality( $output_quality );
 		$blob = $image->getImageBlob();

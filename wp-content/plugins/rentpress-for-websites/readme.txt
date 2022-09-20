@@ -2,13 +2,13 @@
 Contributors: 30lines, chancebcobb, elfirl, mumbles12, ryanmarch, szyam
 Tags: apartments, floor plans, multifamily, property management, rentals, configurable, entrata, rentcafe, realpage, vaultware
 Requires at least: 5.8
-Tested up to: 5.9.2
+Tested up to: 6.0
 Requires PHP: 7.2
-Stable tag: 7.2.0
+Stable tag: 7.4.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Connects property information to any WordPress site to help market your apartments. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan, Appfolio.
+Connects property information to any WordPress site to help market your apartments. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan.
 
 == Description ==
 ### Meet RentPress for Apartments
@@ -17,7 +17,7 @@ RentPress for Apartments is a powerful, extendable plugin that helps you market 
 
 Transform your WordPress website into an incredible apartment marketing tool. Delivering enterprise-level quality and features, all backed and used by industry veterans with a deep understanding of digital marketing best practices and the online rental market.
 
-Supercharge your RentPress experience by connecting your data feeds from RentCafe, Entrata, RealPage, MRI MarketConnect/Vaultware, ResMan, and AppFolio (currently in beta). [Contact 30 Lines](https://via.30lines.com/U1qnf-Pd) for a subscription.
+Supercharge your RentPress experience by connecting your data feeds from RentCafe, Entrata, RealPage, MRI MarketConnect/Vaultware, and ResMan. [Contact 30 Lines](https://via.30lines.com/U1qnf-Pd) for a subscription.
 
 Get started quickly by enabling our out-of-the-box page templates. Or code your own templates using RentPress to import property data. A variety of shortcodes are also available.
 
@@ -37,9 +37,20 @@ All RentPress page templates report full Schema Markup, helping search engines g
 ### Get Started Quickly
 RentPress is designed to let you get started in a flash. Check out our video showing the 3-minute set up process.
 
-https://www.youtube.com/watch?v=-sBC-V4wi94
+https://www.youtube.com/watch?v=h1ld794cmlM
 
 For more information, check out our article [Get Started with RentPress](https://via.30lines.com/ONg6mVRH).
+
+### RentPress Add-ons
+RentPress: Gravity Forms Add-on extends the RentPress experience to Gravity Forms to send your guestcards directly into popular multifamily CRMs:
+
+- RentCafe
+- Entrata
+- Knock
+
+Learn more about [RentPress: Gravity Forms Add-on here »](https://via.30lines.com/xPdGhGjl)
+
+
 == Installation ==
 RentPress can be installed using one of the following methods:
 1. Install and Activate the plugin through the \'Plugins\' screen in WordPress (recommended).
@@ -60,7 +71,6 @@ With a subscription to our RentPress service to parse through property data feed
 - RealPage
 - MRI MarketConnect / Vaultware
 - ResMan
-- AppFolio (beta)
 
 And yes, you can mix multiple data sources on one website.
 
@@ -78,7 +88,86 @@ We have an extended FAQ page that's regularly updated at [https://rentpress.io/f
 
 You can also check our [Getting Started Guide](https://via.30lines.com/ONg6mVRH).
 
+= Do you have a demo site where I can see RentPress in action? =
+
+You can visit [https://demo.rentpress.io/](https://via.30lines.com/J7961PI7) to view our demo site.
+
+== Screenshots ==
+1. Easily add powerful property search and property listing pages.
+2. Single floor plan listing pages support virtual tours from Matterport, YouTube, Vimeo, and more.
+3. Shoppers can filter and sort through a grid of floor plans.
+4. A suite of included templates adds location-based landing pages.
+
 == Changelog ==
+### 7.4.1
+
+### Bugfixes
+* Fixed an issue where floor plans would not be removed from view when availability would update.
+* Addresses an issue where amenities could display twice.
+* Fixes issue where the filters toggle button could display unintentionally.
+
+### 7.4.0 Harbor
+
+### New Features
+* A new look for single floor plan
+  * Floor plan images now bring in multiple images from a data feed (where provided).
+  * Units will show unit-specific features that residents will find in that unit.
+  * Adds a new list to display Floor Plan Features distinct from Community Amenities.
+  * The floor plan's deposit range is displayed to shoppers.
+* Adds Minimum Deposit and Maximum Deposit fields to floor plan editor.
+* New Branding section in property editor
+  * Properties can select a unique color to represent their brand.
+  * When enabled, the property color will be reflected in elements on floor plan search, single floor plan, and property listing views.
+* Adds a new Integrations tab to property editor
+  * Introduces a new extendable integrations framework for developers.
+* City extended description now supports most HTML tags and special characters
+  * For more info, see: [RentPress: Adding City Content](https://via.30lines.com/14_TFXpF)
+  * All taxonomy terms that have an Extended Description field support HTML and special characters as well.
+
+### Updates
+* Adds more robust logic for manually-added units.
+* Shoppers can now cancel their unit selection.
+* Style updates for mobile browsers.
+* Adds and re-orders style classes for easier customizations.
+* Better handling of amenities and terms that have special characters or missing data.
+
+### Bugfixes
+* Bugfixes and improvements to data sync
+
+
+### 7.3.1 Grassland
+
+### Bugfixes
+* Filters out empty prices for better unit price accuracy
+
+### 7.3.0 Grassland
+
+### New Features
+* Floor plan images now can display in a lightbox gallery on click.
+* Single floor plan template restructured to display Amenities and Features in separate lists.
+* City names (taxonomy terms) now include state abbreviation. Only new properties will be affected.
+* Pet policy field now support more content and additional HTML formatting.
+* Data sync has been restructured to handle large portfolios.
+* [RentPress: Gravity Forms Add-on](https://via.30lines.com/xPdGhGjl) is now available separately.
+
+### Updates
+* Admin post list information has been restructured for greater efficiency with large portfolios.
+* Restructures neighborhood assignments for better consistency with properties.
+* Property search uses all neighborhoods.
+* RentPress templates now insert themselves into a child theme.
+* Property info cards display information more efficiently.
+* Single floor plan page CTAs now link to consistent destinations.
+
+### Bugfixes
+* Lease term dropdown will now only display when there are lease terms to display.
+* Fixes issue with property deletion.
+* Fixes issue with deleting units from synced properties.
+* Fixes issue where manually-added units could not be deleted.
+* Fixes issue when pet policy would not save.
+* Fixes issue when comments would be enabled.
+* Fixes issue where bedroom select modal in search filters would not dismiss.
+* Fixes issue with admin error on sync options.
+
 ### 7.2.0 Forest
 
 ### New Features
@@ -199,5 +288,5 @@ You can also check our [Getting Started Guide](https://via.30lines.com/ONg6mVRH)
 	*	Display last time data synced occurred in settings.
 
 == Upgrade Notice ==
-= 7.2.0 =
-Brings Mapbox support, per-bed pricing, per-property guestcards, and more.
+= 7.4.1 =
+A new look for single floor plan, property branding, city description, and better amenities & features.

@@ -19,7 +19,7 @@ interface NoticeInterface {
 	 *
 	 * @return string Default value.
 	 */
-	public function get_default_value(): string;
+	public static function get_default_value(): string;
 
 	/**
 	 * Returns status if notice is available.
@@ -52,7 +52,7 @@ interface NoticeInterface {
 	/**
 	 * Returns variables with values using in view template.
 	 *
-	 * @return string[] Args extract in view template.
+	 * @return string[]|mixed[] Args extract in view template.
 	 */
 	public function get_vars_for_view(): array;
 

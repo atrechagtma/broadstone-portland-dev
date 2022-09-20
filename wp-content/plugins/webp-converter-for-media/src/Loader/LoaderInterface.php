@@ -10,13 +10,6 @@ use WebpConverter\HookableInterface;
 interface LoaderInterface extends HookableInterface {
 
 	/**
-	 * Returns mime types for loader.
-	 *
-	 * @return string[] Output formats with mime types.
-	 */
-	public function get_mime_types(): array;
-
-	/**
 	 * Returns status if loader is active.
 	 *
 	 * @return bool Is loader active?

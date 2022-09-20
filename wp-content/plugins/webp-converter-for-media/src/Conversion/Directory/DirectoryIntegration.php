@@ -4,16 +4,12 @@ namespace WebpConverter\Conversion\Directory;
 
 use WebpConverter\Conversion\OutputPath;
 use WebpConverter\HookableInterface;
+use WebpConverter\Service\PathsGenerator;
 
 /**
  * Returns various types of paths for directories.
  */
 class DirectoryIntegration implements HookableInterface {
-
-	/**
-	 * @var PathsGenerator
-	 */
-	private $paths_generator;
 
 	/**
 	 * Objects of supported directories.
@@ -22,8 +18,13 @@ class DirectoryIntegration implements HookableInterface {
 	 */
 	private $directories = [];
 
-	public function __construct( PathsGenerator $paths_generator ) {
-		$this->paths_generator = $paths_generator;
+	/**
+	 * @var OutputPath
+	 */
+	private $output_path;
+
+	public function __construct( OutputPath $output_path = null ) {
+		$this->output_path = $output_path ?: new OutputPath();
 	}
 
 	/**
@@ -33,7 +34,6 @@ class DirectoryIntegration implements HookableInterface {
 		add_filter( 'webpc_dir_name', [ $this, 'get_dir_as_name' ], 0, 2 );
 		add_filter( 'webpc_dir_path', [ $this, 'get_dir_as_path' ], 0, 2 );
 		add_filter( 'webpc_dir_url', [ $this, 'get_dir_as_url' ], 0, 2 );
-		add_filter( 'webpc_uploads_prefix', [ $this, 'get_prefix_path' ], 0 );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class DirectoryIntegration implements HookableInterface {
 		$values = [];
 		foreach ( $this->directories as $directory ) {
 			if ( ! $directory->is_output_directory()
-				&& ( $output_path = OutputPath::get_directory_path( $directory->get_server_path() ) )
+				&& ( $output_path = $this->output_path->get_directory_path( $directory->get_server_path() ) )
 				&& ( $output_path !== $directory->get_server_path() ) ) {
 				$values[ $directory->get_type() ] = $output_path;
 			}
@@ -83,7 +83,7 @@ class DirectoryIntegration implements HookableInterface {
 	/**
 	 * Returns server path of directory relative to WordPress root directory.
 	 *
-	 * @param mixed  $value          Default value.
+	 * @param string $value          Default value.
 	 * @param string $directory_type Type of directory.
 	 *
 	 * @return string Relative server path of directory.
@@ -99,7 +99,7 @@ class DirectoryIntegration implements HookableInterface {
 	/**
 	 * Returns server path of directory.
 	 *
-	 * @param mixed  $value          Default value.
+	 * @param string $value          Default value.
 	 * @param string $directory_type Type of directory.
 	 *
 	 * @return string Server path of directory.
@@ -115,13 +115,17 @@ class DirectoryIntegration implements HookableInterface {
 			}
 		}
 
-		return sprintf( '%1$s/%2$s', $this->paths_generator->get_wordpress_root_path(), $directory_name );
+		return sprintf(
+			'%1$s/%2$s',
+			rtrim( PathsGenerator::get_wordpress_root_path(), DIRECTORY_SEPARATOR ),
+			$directory_name
+		);
 	}
 
 	/**
 	 * Returns URL of directory.
 	 *
-	 * @param mixed  $value          Default value.
+	 * @param string $value          Default value.
 	 * @param string $directory_type Type of directory.
 	 *
 	 * @return string URL of directory.
@@ -139,20 +143,5 @@ class DirectoryIntegration implements HookableInterface {
 
 		$source_url = apply_filters( 'webpc_site_url', get_site_url() );
 		return sprintf( '%1$s/%2$s', $source_url, $directory_name );
-	}
-
-	/**
-	 * Returns prefix for wp-content directory for rules in .htaccess file.
-	 *
-	 * @return string Prefix for wp-content directory.
-	 * @internal
-	 */
-	public function get_prefix_path(): string {
-		$document_root  = realpath( $_SERVER['DOCUMENT_ROOT'] ) ?: ''; // phpcs:ignore
-		$root_directory = $this->paths_generator->get_wordpress_root_path();
-		$diff_dir       = trim( str_replace( $document_root, '', $root_directory ), '\/' );
-		$diff_path      = sprintf( '/%s/', $diff_dir );
-
-		return str_replace( '//', '/', $diff_path );
 	}
 }

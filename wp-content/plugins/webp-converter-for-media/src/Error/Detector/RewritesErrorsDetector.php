@@ -46,10 +46,21 @@ class RewritesErrorsDetector implements ErrorDetector {
 	 */
 	private $file_loader;
 
-	public function __construct( PluginInfo $plugin_info, PluginData $plugin_data, FileLoader $file_loader = null ) {
+	/**
+	 * @var OutputPath
+	 */
+	private $output_path;
+
+	public function __construct(
+		PluginInfo $plugin_info,
+		PluginData $plugin_data,
+		FileLoader $file_loader = null,
+		OutputPath $output_path = null
+	) {
 		$this->plugin_info = $plugin_info;
 		$this->plugin_data = $plugin_data;
 		$this->file_loader = $file_loader ?: new FileLoader( $plugin_info, $plugin_data );
+		$this->output_path = $output_path ?: new OutputPath();
 	}
 
 	/**
@@ -125,11 +136,11 @@ class RewritesErrorsDetector implements ErrorDetector {
 			copy( $this->plugin_info->get_plugin_directory_path() . self::PATH_SOURCE_FILE_PNG, $path_file_png2 );
 		}
 
-		if ( ( $output_path = OutputPath::get_path( $path_file_png, true, WebpFormat::FORMAT_EXTENSION ) )
+		if ( ( $output_path = $this->output_path->get_path( $path_file_png, true, WebpFormat::FORMAT_EXTENSION ) )
 			&& ! file_exists( $output_path ) ) {
 			copy( $this->plugin_info->get_plugin_directory_path() . self::PATH_SOURCE_FILE_WEBP, $output_path );
 		}
-		if ( ( $output_path = OutputPath::get_path( $path_file_png2, true, WebpFormat::FORMAT_EXTENSION ) )
+		if ( ( $output_path = $this->output_path->get_path( $path_file_png2, true, WebpFormat::FORMAT_EXTENSION ) )
 			&& ! file_exists( $output_path ) ) {
 			copy( $this->plugin_info->get_plugin_directory_path() . self::PATH_SOURCE_FILE_WEBP, $output_path );
 		}
@@ -143,7 +154,7 @@ class RewritesErrorsDetector implements ErrorDetector {
 	private function if_redirects_are_works(): bool {
 		$uploads_dir = apply_filters( 'webpc_dir_path', '', 'uploads' );
 		$uploads_url = apply_filters( 'webpc_dir_url', '', 'uploads' );
-		$ver_param   = sprintf( 'ver=%s', time() );
+		$ver_param   = time();
 
 		$file_size = $this->file_loader->get_file_size_by_path(
 			$uploads_dir . self::PATH_OUTPUT_FILE_PNG
@@ -172,8 +183,12 @@ class RewritesErrorsDetector implements ErrorDetector {
 	 * @return bool Verification status.
 	 */
 	private function if_htaccess_can_be_overwritten(): bool {
+		$ver_param = time();
+
 		$file_size = $this->file_loader->get_file_size_by_url(
-			$this->plugin_info->get_plugin_directory_url() . self::URL_DEBUG_HTACCESS_FILE
+			$this->plugin_info->get_plugin_directory_url() . self::URL_DEBUG_HTACCESS_FILE,
+			true,
+			$ver_param
 		);
 
 		return ( $file_size === 0 );
@@ -186,7 +201,7 @@ class RewritesErrorsDetector implements ErrorDetector {
 	 */
 	private function if_bypassing_apache_is_active(): bool {
 		$uploads_url = apply_filters( 'webpc_dir_url', '', 'uploads' );
-		$ver_param   = sprintf( '&?ver=%s', time() );
+		$ver_param   = time();
 
 		$file_png  = $this->file_loader->get_file_size_by_url(
 			$uploads_url . self::PATH_OUTPUT_FILE_PNG,
@@ -209,7 +224,7 @@ class RewritesErrorsDetector implements ErrorDetector {
 	 */
 	private function if_redirects_are_cached(): bool {
 		$uploads_url = apply_filters( 'webpc_dir_url', '', 'uploads' );
-		$ver_param   = sprintf( 'ver=%s', time() );
+		$ver_param   = time();
 
 		$file_webp     = $this->file_loader->get_file_size_by_url(
 			$uploads_url . self::PATH_OUTPUT_FILE_PNG,

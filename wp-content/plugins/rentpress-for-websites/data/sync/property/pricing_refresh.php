@@ -578,6 +578,7 @@ function rentpress_getCorrespondingWordpressToFeedKeyArray()
             'rentpress_custom_field_property_phone' => 'property_phone_number',
             'rentpress_custom_field_property_import_source' => 'property_source',
             'rentpress_custom_field_property_special_text' => 'property_specials_message',
+            'rentpress_custom_field_property_pet_policy' => 'property_pet_policy',
 
             // TODO: make meta for the following data
             'rentpress_custom_field_property_bed_min' => 'property_bed_min',

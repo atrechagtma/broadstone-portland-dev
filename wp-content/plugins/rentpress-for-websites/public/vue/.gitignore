@@ -2,6 +2,7 @@
 node_modules
 hot
 yarn.lock
+index.html
 
 # local env files
 .env.local

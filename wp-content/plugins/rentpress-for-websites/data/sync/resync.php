@@ -2,7 +2,6 @@
 require_once RENTPRESS_PLUGIN_DATA_MODEL . 'property_model.php';
 require_once RENTPRESS_PLUGIN_DATA_MODEL . 'floorplan_model.php';
 require_once RENTPRESS_PLUGIN_DATA_MODEL . 'unit_model.php';
-require_once RENTPRESS_PLUGIN_DATA_MODEL . 'refresh_model.php';
 require_once RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php';
 
 function rentpress_standardizeSyncData($new_properties, $rentpress_options)
@@ -22,7 +21,7 @@ function rentpress_standardizeSyncData($new_properties, $rentpress_options)
     // to maintain unique IDs, create arrays that house all of the IDs that have been used. Without unique IDs a lot of logic falls apart and the DB updates the same rows over again
     $unit_ids = array();
     $floorplan_ids = array();
-    $property_ids = array();
+    $property_codes = array();
 
     $all_manual_units = rentpress_getAllManualUnits();
     $all_manual_units_data = array();
@@ -36,10 +35,10 @@ function rentpress_standardizeSyncData($new_properties, $rentpress_options)
 
     // the way the feed is structured, everything is nested, so we gotta get through that and put everything into arrays
     foreach ($new_properties as $property) {
-        if (in_array($property->Identification->PropertyCode, $property_ids)) {
+        if (in_array($property->Identification->PropertyCode, $property_codes)) {
             continue;
         } else {
-            array_push($property_ids, $property->Identification->PropertyCode);
+            array_push($property_codes, $property->Identification->PropertyCode);
         }
 
         $feed_floorplans = $property->floorplans->data;
@@ -141,13 +140,11 @@ function rentpress_standardizeSyncData($new_properties, $rentpress_options)
         $rentpress_sync_properties[$property['property_code']] = json_encode($property);
     }
 
-    // Save all unit data
-    // if there is only one property (single property sync), only delete the units for that property
-    if (count($new_properties) == 1) {
-        deleteAllFeedUnitsForAProperty($new_properties[0]->Identification->PropertyCode);
-    } else {
-        deleteAllFeedUnits();
+    // delete all old unit data
+    if (!empty($property_codes)) {
+        rentpress_deleteAllFeedUnitsForProperties($property_codes);
     }
+    // Save all unit data
     foreach ($rentpress_sync_units as $unit_feed_data) {
         rentpress_saveUnitData($unit_feed_data);
     }
@@ -165,6 +162,8 @@ function rentpress_mergeSyncFeedWithWordpressMeta($rentpress_sync_properties, $a
     $selected_price_type = (isset($rentpress_options['rentpress_pricing_display_settings_section_price_display_selection'])) ? $rentpress_options['rentpress_pricing_display_settings_section_price_display_selection'] : 'Best Price';
     $set_available_date = strtotime(' + ' . $rentpress_options['rentpress_unit_availability_section_lookahead']) + 3600;
     $hideUnavailable = isset($rentpress_options['rentpress_hide_floorplans_with_no_availability']);
+    $rentpress_add_on_field_args = get_option('rentpress_add_on_field_args');
+    $rentpress_add_on_field_args = $rentpress_add_on_field_args ? json_decode($rentpress_add_on_field_args) : false;
 
     // start syncing data
     foreach ($rentpress_sync_properties as $property_feed_code => $property_feed_data) {
@@ -184,26 +183,50 @@ function rentpress_mergeSyncFeedWithWordpressMeta($rentpress_sync_properties, $a
         if (is_null($property_post_meta)) {
             rentpress_createPropertyPost($property_feed_data, $corresponding_meta_keys);
         } else {
-            $property_feed_data = rentpress_updateFeedDataWithOverrides($property_feed_data, $property_post_meta, $corresponding_meta_keys['rentpress_custom_field_property']);
+            // Mark this property as synced so that it isn't considered a manual property later
+            rentpress_updatePostMetaValue($property_post_meta, 'rentpress_custom_field_property_is_feed', true);
 
+            $property_feed_data = rentpress_updateFeedDataWithOverrides($property_feed_data, $property_post_meta, $corresponding_meta_keys['rentpress_custom_field_property']);
             $property_feed_data['property_featured_image_src'] = $property_post_meta['rentpress_custom_field_property_featured_image_src'] ?? null;
             $property_feed_data['property_featured_image_srcset'] = $property_post_meta['rentpress_custom_field_property_featured_image_srcset'] ?? null;
             $property_feed_data['property_gallery_images'] = $property_post_meta['rentpress_custom_field_property_gallery_images'];
             $property_feed_data['property_gallery_shortcode'] = $property_post_meta['rentpress_custom_field_property_gallery_shortcode'];
-            $property_feed_data['property_neighborhood_post_id'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_id']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_id'] : null;
+            $property_feed_data['property_primary_neighborhood_post_id'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_id']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_id'] : null;
+            $property_feed_data['property_neighborhood_post_names'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_names']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_names'] : null;
+            $property_feed_data['property_neighborhood_post_ids'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_ids']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_ids'] : null;
             $property_feed_data['property_neighborhood_post_name'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_name']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_name'] : null;
             $property_feed_data['property_gravity_form'] = $property_post_meta['rentpress_custom_field_property_specific_gravity_form'];
             $property_feed_data['property_contact_link'] = $property_post_meta['rentpress_custom_field_property_specific_contact_link'];
             $property_feed_data['property_contact_type'] = $property_post_meta['rentpress_custom_field_property_contact_type'];
+            $property_feed_data['property_name'] = $property_post_meta['post_information']->post_title;
+            $property_feed_data['property_post_id'] = $property_post_meta['post_information']->ID;
+            $property_feed_data['property_post_link'] = get_permalink($property_feed_data['property_post_id']);
+            $property_feed_data['property_rent_type_selection'] = $property_feed_data['property_rent_type_selection'] == 'Global Setting' ? $selected_price_type : $property_feed_data['property_rent_type_selection'];
+            $property_feed_data['property_features'] = rentpress_mergeTaxonomies($property_feed_data['property_features'], $property_feed_data['property_post_id'], 'feature');
+            $property_feed_data['property_community_amenities'] = rentpress_mergeTaxonomies($property_feed_data['property_community_amenities'], $property_feed_data['property_post_id']);
+            $property_feed_data['property_terms'] = rentpress_propertyTerms($property_feed_data);
+            $property_feed_data['property_accent_color'] = !empty($property_post_meta['rentpress_custom_field_property_accent_color']) ? $property_post_meta['rentpress_custom_field_property_accent_color'][0] : null;
+            $property_feed_data['property_use_accent_color'] = !empty($property_post_meta['rentpress_custom_field_property_accent_color_use_property_branding']) ? $property_post_meta['rentpress_custom_field_property_accent_color_use_property_branding'][0] === "on" : false;
+
+            $rentpress_property_add_on_fields = array();
+            if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+                foreach ($rentpress_add_on_field_args->rentpress_property_meta as $rentpress_add_on_property_meta) {
+                    $add_on_field_value = isset($property_post_meta[$rentpress_add_on_property_meta->meta_key][0]) ? $property_post_meta[$rentpress_add_on_property_meta->meta_key][0] : '';
+                    if ($add_on_field_value) {
+                        $rentpress_property_add_on_fields[$rentpress_add_on_property_meta->db_key] = $add_on_field_value;
+                    }
+                }
+            }
+            $property_feed_data['property_add_on_fields'] = !empty($rentpress_property_add_on_fields) ? json_encode($rentpress_property_add_on_fields) : null;
 
             // if a property is overriding apply links, save a different link to all of the units
             if (isset($property_post_meta['rentpress_custom_field_property_link_options'])
                 && $property_post_meta['rentpress_custom_field_property_link_options'][0] == 'Override every apply link') {
                 if (isset($property_post_meta['rentpress_custom_field_property_apply_link'])
                     && !empty($property_post_meta['rentpress_custom_field_property_apply_link'][0])) {
-                    updateApplyLinkForAllUnitsOfAProperty($property_feed_code, $property_post_meta['rentpress_custom_field_property_apply_link'][0]);
+                    rentpress_updateApplyLinkForAllUnitsOfAProperty($property_feed_code, $property_post_meta['rentpress_custom_field_property_apply_link'][0]);
                 } else {
-                    updateApplyLinkForAllUnitsOfAProperty($property_feed_code, '');
+                    rentpress_updateApplyLinkForAllUnitsOfAProperty($property_feed_code, '');
                 }
             }
 
@@ -250,106 +273,126 @@ function rentpress_mergeSyncFeedWithWordpressMeta($rentpress_sync_properties, $a
                 // add all of the office hours to the post meta
                 $office_hours = rentpress_setUpOfficeHoursMetaValues($property_feed_data);
                 foreach ($office_hours as $office_hour_meta_key => $office_hour_meta_value) {
-                    update_post_meta($property_post_meta['post_information']->ID, $office_hour_meta_key, $office_hour_meta_value);
+                    update_post_meta($property_feed_data['property_post_id'], $office_hour_meta_key, $office_hour_meta_value);
                 }
                 // remove any office hours that are no longer in the feed
                 $office_hours_meta_keys = rentpress_setUpOfficeHoursMetaKeys($property_post_meta);
                 $empty_office_hours = array_diff($office_hours_meta_keys, array_keys($office_hours));
                 foreach ($empty_office_hours as $empty_value_key) {
-                    delete_post_meta($property_post_meta['post_information']->ID, $empty_value_key);
+                    delete_post_meta($property_feed_data['property_post_id'], $empty_value_key);
                 }
 
             }
 
-            // TODO: 7.1 @Charles Separate this into a marketing resync to keep this sync lightweight
-            $property_feed_data = rentpress_mergeTaxonomies($property_feed_data, $property_post_meta);
-        }
+            // if property is published save to rentpress DB and add a marker to indicate that it is a feed property, otherwise remove the matched property from both
+            if ($property_post_meta['post_information']->post_status == 'publish') {
+                $isSelectedPropertyPriceOverridden = rentpress_isSelectedPropertyPriceOverridden($property_feed_data['property_rent_type_selection'], $property_post_meta);
+                $isPropertyPriceDisabled = false;
+                // if pricing is disabled, remove the pricing from selected cost
+                if (isset($rentpress_options['rentpress_disable_pricing_section_disable_pricing']) || isset($property_post_meta['rentpress_custom_field_property_disable_pricing'])) {
+                    $property_feed_data['property_rent_type_selection_cost'] = null;
+                    $property_feed_data['property_rent_type_selection'] = 'Disabled';
+                    $isPropertyPriceDisabled = true;
+                }
+                $property_post_meta = rentpress_clearMetaPrices($property_post_meta);
 
-        // if property is published save to rentpress DB and add a marker to indicate that it is a feed property, otherwise remove the matched property from both
-        if (!is_null($property_post_meta) && $property_post_meta['post_information']->post_status == 'publish') {
-            $property_feed_data['property_name'] = $property_post_meta['post_information']->post_title;
-            $property_feed_data['property_post_id'] = $property_post_meta['post_information']->ID;
-            $property_feed_data['property_post_link'] = get_permalink($property_post_meta['post_information']->ID);
-            $property_feed_data['property_rent_type_selection'] = $property_feed_data['property_rent_type_selection'] == 'Global Setting' ? $selected_price_type : $property_feed_data['property_rent_type_selection'];
-            $isSelectedPropertyPriceOverridden = rentpress_isSelectedPropertyPriceOverridden($property_feed_data['property_rent_type_selection'], $property_post_meta);
-            $isPropertyPriceDisabled = false;
-            // if pricing is disabled, remove the pricing from selected cost
-            if (isset($rentpress_options['rentpress_disable_pricing_section_disable_pricing']) || isset($property_post_meta['rentpress_custom_field_property_disable_pricing'])) {
-                $property_feed_data['property_rent_type_selection_cost'] = null;
-                $property_feed_data['property_rent_type_selection'] = 'Disabled';
-                $isPropertyPriceDisabled = true;
-            }
-            $property_post_meta = rentpress_clearMetaPrices($property_post_meta);
+                if (isset($property_feed_data['floorplans'])) {
+                    // get a list of all floorplan features to do one comparison
+                    $published_floorplan_features = array();
 
-            if (isset($property_feed_data['floorplans'])) {
-                foreach ($property_feed_data['floorplans'] as $floorplan_code => $floorplan_feed_data) {
-                    // floorplans are created as published, but if the user marks them as NOT published, then remove them from the db table
-                    if (isset($all_wordpress_meta['all_floorplans'][$floorplan_code]) && $all_wordpress_meta['all_floorplans'][$floorplan_code]['post_information']->post_status == 'publish' && (!$hideUnavailable || $floorplan_feed_data['floorplan_available'])) {
-                        // if pricing is disabled, remove the pricing from selected cost
-                        if (isset($rentpress_options['rentpress_disable_pricing_section_disable_pricing']) || isset($property_post_meta['rentpress_custom_field_property_disable_pricing'])) {
-                            $floorplan_feed_data['floorplan_rent_type_selection_cost'] = null;
-                            $floorplan_feed_data['floorplan_rent_type_selection'] = 'Disabled';
-                            update_post_meta($floorplan_feed_data['floorplan_post_id'], 'rentpress_custom_field_floorplan_rent_type_selection', 'Disabled');
-                        } elseif ($property_feed_data['property_rent_type_selection'] != 'Global Setting') {
-                            $floorplan_feed_data = rentpress_updateFloorplanPriceSelection($floorplan_feed_data, $property_feed_data['property_rent_type_selection']);
-                            update_post_meta($floorplan_feed_data['floorplan_post_id'], 'rentpress_custom_field_floorplan_rent_type_selection_cost', $floorplan_feed_data['floorplan_rent_type_selection_cost']);
+                    foreach ($property_feed_data['floorplans'] as $floorplan_code => $floorplan_feed_data) {
+                        // floorplans are created as published, but if the user marks them as NOT published, then remove them from the db table
+                        if (isset($all_wordpress_meta['all_floorplans'][$floorplan_code]) && $all_wordpress_meta['all_floorplans'][$floorplan_code]['post_information']->post_status == 'publish' && (!$hideUnavailable || $floorplan_feed_data['floorplan_available'])) {
+                            $published_floorplan_features = !empty($floorplan_feed_data['floorplan_features']) ? array_merge($published_floorplan_features, json_decode($floorplan_feed_data['floorplan_features'])) : $published_floorplan_features;
+
+                            // if pricing is disabled, remove the pricing from selected cost
+                            if (isset($rentpress_options['rentpress_disable_pricing_section_disable_pricing']) || isset($property_post_meta['rentpress_custom_field_property_disable_pricing'])) {
+                                $floorplan_feed_data['floorplan_rent_type_selection_cost'] = null;
+                                $floorplan_feed_data['floorplan_rent_type_selection'] = 'Disabled';
+                                update_post_meta($floorplan_feed_data['floorplan_post_id'], 'rentpress_custom_field_floorplan_rent_type_selection', 'Disabled');
+                            } elseif ($property_feed_data['property_rent_type_selection'] != 'Global Setting') {
+                                $floorplan_feed_data = rentpress_updateFloorplanPriceSelection($floorplan_feed_data, $property_feed_data['property_rent_type_selection']);
+                                update_post_meta($floorplan_feed_data['floorplan_post_id'], 'rentpress_custom_field_floorplan_rent_type_selection_cost', $floorplan_feed_data['floorplan_rent_type_selection_cost']);
+                            }
+                            // if a property is overriding apply links, save a different link to the floorplan
+                            if (
+                                isset($property_post_meta['rentpress_custom_field_property_apply_link'])
+                                && !empty($property_post_meta['rentpress_custom_field_property_apply_link'][0])
+                                && ((isset($property_post_meta['rentpress_custom_field_property_link_options']) && $property_post_meta['rentpress_custom_field_property_link_options'][0] == 'Override every apply link')
+                                    || empty($floorplan_feed_data['floorplan_availability_url']))
+                            ) {
+                                $floorplan_feed_data['floorplan_availability_url'] = $property_post_meta['rentpress_custom_field_property_apply_link'][0];
+                            }
+                            $floorplan_feed_data['floorplan_post_link'] = get_permalink($all_wordpress_meta['all_floorplans'][$floorplan_code]['post_information']->ID);
+                            $floorplan_feed_data['floorplan_parent_property_post_id'] = $property_feed_data['property_post_id'];
+                            $floorplan_feed_data['floorplan_parent_property_post_link'] = $property_feed_data['property_post_link'];
+                            $floorplan_feed_data['floorplan_parent_property_name'] = $property_feed_data['property_name'];
+                            $floorplan_feed_data['floorplan_parent_property_gravity_form'] = $property_feed_data['property_gravity_form'];
+                            $floorplan_feed_data['floorplan_parent_property_contact_link'] = $property_feed_data['property_contact_link'];
+                            $floorplan_feed_data['floorplan_parent_property_contact_type'] = $property_feed_data['property_contact_type'];
+                            $floorplan_feed_data['floorplan_parent_property_accent_color'] = $property_feed_data['property_accent_color'];
+                            $floorplan_feed_data['floorplan_parent_property_use_accent_color'] = $property_feed_data['property_use_accent_color'];
+
+                            // add on meta floorplan
+                            $rentpress_floorplan_add_on_fields = array();
+                            if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+                                foreach ($rentpress_add_on_field_args->rentpress_property_meta as $rentpress_add_on_property_meta) {
+                                    $add_on_field_value = isset($property_post_meta[$rentpress_add_on_property_meta->meta_key][0]) ? $property_post_meta[$rentpress_add_on_property_meta->meta_key][0] : '';
+                                    if ($add_on_field_value && $rentpress_add_on_property_meta->add_to_fp) {
+                                        $rentpress_floorplan_add_on_fields[$rentpress_add_on_property_meta->db_key] = $add_on_field_value;
+                                    }
+                                }
+                            }
+                            $floorplan_feed_data['floorplan_parent_property_add_on_fields'] = !empty($rentpress_floorplan_add_on_fields) ? json_encode($rentpress_floorplan_add_on_fields) : null;
+
+                            // update parent property pricing and matrix
+                            $property_feed_data = rentpress_updatePropertyRanges($property_post_meta, $property_feed_data, $floorplan_feed_data, $isSelectedPropertyPriceOverridden, $isPropertyPriceDisabled);
+                            // update meta with published floorplan data
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_max', 'property_rent_max', 'floorplan_rent_max', false, 'greater');
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_min', 'property_rent_min', 'floorplan_rent_min', false);
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_base', 'property_rent_base', 'floorplan_rent_base', false);
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_market', 'property_rent_market', 'floorplan_rent_market', false);
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_term', 'property_rent_term', 'floorplan_rent_term', false);
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_effective', 'property_rent_effective', 'floorplan_rent_effective', false);
+                            $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_best', 'property_rent_best', 'floorplan_rent_best', false);
+
+                            rentpress_saveFloorplanData($floorplan_feed_data);
+                            rentpress_updatePostMetaValue($all_wordpress_meta['all_floorplans'][$floorplan_code], 'rentpress_custom_field_floorplan_is_feed', true);
+                            unset($all_wordpress_meta['all_floorplans'][$floorplan_code]);
+                        } elseif (isset($all_wordpress_meta['all_floorplans'][$floorplan_code])) {
+                            rentpress_removeFloorplanData($floorplan_code);
+                            rentpress_updatePostMetaValue($all_wordpress_meta['all_floorplans'][$floorplan_code], 'rentpress_custom_field_floorplan_is_feed', true);
+                            unset($all_wordpress_meta['all_floorplans'][$floorplan_code]);
+                        } else {
+                            rentpress_removeFloorplanData($floorplan_code);
                         }
-                        // if a property is overriding apply links, save a different link to the floorplan
-                        if (
-                            isset($property_post_meta['rentpress_custom_field_property_apply_link'])
-                            && !empty($property_post_meta['rentpress_custom_field_property_apply_link'][0])
-                            && ((isset($property_post_meta['rentpress_custom_field_property_link_options']) && $property_post_meta['rentpress_custom_field_property_link_options'][0] == 'Override every apply link')
-                                || empty($floorplan_feed_data['floorplan_availability_url']))
-                        ) {
-                            $floorplan_feed_data['floorplan_availability_url'] = $property_post_meta['rentpress_custom_field_property_apply_link'][0];
-                        }
-                        $floorplan_feed_data['floorplan_post_link'] = get_permalink($all_wordpress_meta['all_floorplans'][$floorplan_code]['post_information']->ID);
-                        $floorplan_feed_data['floorplan_parent_property_post_id'] = $property_feed_data['property_post_id'];
-                        $floorplan_feed_data['floorplan_parent_property_post_link'] = $property_feed_data['property_post_link'];
-                        $floorplan_feed_data['floorplan_parent_property_name'] = $property_feed_data['property_name'];
-                        $floorplan_feed_data['floorplan_parent_property_gravity_form'] = $property_feed_data['property_gravity_form'];
-                        $floorplan_feed_data['floorplan_parent_property_contact_link'] = $property_feed_data['property_contact_link'];
-                        $floorplan_feed_data['floorplan_parent_property_contact_type'] = $property_feed_data['property_contact_type'];
-                        // update parent property pricing and matrix
-                        $property_feed_data = rentpress_updatePropertyRanges($property_post_meta, $property_feed_data, $floorplan_feed_data, $isSelectedPropertyPriceOverridden, $isPropertyPriceDisabled);
-                        // update meta with published floorplan data
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_max', 'property_rent_max', 'floorplan_rent_max', false, 'greater');
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_min', 'property_rent_min', 'floorplan_rent_min', false);
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_base', 'property_rent_base', 'floorplan_rent_base', false);
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_market', 'property_rent_market', 'floorplan_rent_market', false);
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_term', 'property_rent_term', 'floorplan_rent_term', false);
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_effective', 'property_rent_effective', 'floorplan_rent_effective', false);
-                        $property_post_meta = rentpress_updatePropertyPricingMetaAndDBWithFloorplanDataField($property_post_meta, $floorplan_feed_data, 'rentpress_custom_field_property_rent_best', 'property_rent_best', 'floorplan_rent_best', false);
-
-                        rentpress_saveFloorplanData($floorplan_feed_data);
-                        unset($all_wordpress_meta['all_floorplans'][$floorplan_code]);
-                    } elseif (isset($all_wordpress_meta['all_floorplans'][$floorplan_code]) && $all_wordpress_meta['all_floorplans'][$floorplan_code]['post_information']->post_status != 'publish') {
-                        rentpress_removeFloorplanData($floorplan_code);
+                    }
+                    if (!empty($published_floorplan_features) && !empty($property_feed_data['property_features'])) {
+                        $property_feed_data['property_features'] = rentpress_mergeTaxonomies(array_diff($published_floorplan_features, json_decode($property_feed_data['property_features'])), $property_feed_data['property_post_id'], 'feature');
+                    } elseif (!empty($published_floorplan_features)) {
+                        $property_feed_data['property_features'] = rentpress_mergeTaxonomies($published_floorplan_features, $property_feed_data['property_post_id'], 'feature');
                     }
                 }
-            }
-            if (!$isPropertyPriceDisabled && !$isSelectedPropertyPriceOverridden) {
-                $property_feed_data = rentpress_updatePropertyPriceSelection($property_feed_data);
-            }
-            rentpress_savePropertyData($property_feed_data);
-
-            // Mark this property as synced so that it isn't considered a manual property later
-            $all_wordpress_meta['all_properties'][$property_feed_code] = $property_post_meta;
-            $all_wordpress_meta['all_properties'][$property_feed_code]['is_feed'] = true;
-            // make fields for later comparisons with manual floorplans
-            $all_wordpress_meta['all_properties'][$property_feed_code]["property_availability_matrix"] = $property_feed_data['property_availability_matrix'];
-            $all_wordpress_meta['all_properties'][$property_feed_code]["property_bed_types"] = $property_feed_data['property_bed_types'];
-        } elseif (!is_null($property_post_meta)) {
-            rentpress_removePropertyData($property_post_meta['rentpress_custom_field_property_code'][0]);
-
-            if (isset($property_post_meta['floorplans'])) {
-                foreach ($property_post_meta['floorplans'] as $floorplan_code => $floorplan_post_meta) {
-                    rentpress_removeFloorplanData($floorplan_code);
-                    unset($all_wordpress_meta['all_floorplans'][$floorplan_code]);
+                if (!$isPropertyPriceDisabled && !$isSelectedPropertyPriceOverridden) {
+                    $property_feed_data = rentpress_updatePropertyPriceSelection($property_feed_data);
                 }
+                rentpress_savePropertyData($property_feed_data);
+
+                // make fields for later comparisons with manual floorplans
+                rentpress_updatePostMetaValue($property_post_meta, 'rentpress_custom_field_property_availability_matrix', $property_feed_data['property_availability_matrix']);
+                rentpress_updatePostMetaValue($property_post_meta, 'rentpress_custom_field_property_bed_types', $property_feed_data['property_bed_types']);
+            } else {
+                // if the property is not null but passed the about if, that means that the property is not published, so remove it and all ots floorplans from DB
+                rentpress_removePropertyData($property_post_meta['rentpress_custom_field_property_code'][0]);
+
+                if (isset($property_post_meta['floorplans'])) {
+                    foreach ($property_post_meta['floorplans'] as $floorplan_code => $floorplan_post_meta) {
+                        rentpress_removeFloorplanData($floorplan_code);
+                        unset($all_wordpress_meta['all_floorplans'][$floorplan_code]);
+                    }
+                }
+                $all_wordpress_meta['all_properties'][$property_post_meta['rentpress_custom_field_property_code'][0]] = null;
             }
-            // Mark this property as synced so that it isn't considered a manual property later
-            $all_wordpress_meta['all_properties'][$property_feed_code]['is_feed'] = true;
         }
 
     }
@@ -371,6 +414,8 @@ function rentpress_saveManualWordpressData($all_wordpress_meta, $corresponding_m
     $selected_price_type = (isset($rentpress_options['rentpress_pricing_display_settings_section_price_display_selection'])) ? $rentpress_options['rentpress_pricing_display_settings_section_price_display_selection'] : 'Best Price';
     $price_range_selection = (isset($rentpress_options['rentpress_unit_availability_section_price_range_selector'])) ? $rentpress_options['rentpress_unit_availability_section_price_range_selector'] : 'Use Floor Plan Price If No Units Are Available';
     $hideUnavailable = isset($rentpress_options['rentpress_hide_floorplans_with_no_availability']);
+    $rentpress_add_on_field_args = get_option('rentpress_add_on_field_args');
+    $rentpress_add_on_field_args = $rentpress_add_on_field_args ? json_decode($rentpress_add_on_field_args) : false;
 
     // sync manual floorplan data
     // first get any manual units and put them in an assoc array for indexing
@@ -379,6 +424,8 @@ function rentpress_saveManualWordpressData($all_wordpress_meta, $corresponding_m
     foreach ($manual_units as $unit) {
         $all_manual_floorplans_units[$unit->unit_parent_floorplan_code][$unit->unit_code] = (array) $unit;
     }
+
+    $published_floorplan_features = array();
 
     // for each floorplan, update all of the pricing
     // then if parent property is published and floorplan is published, save data to db
@@ -444,7 +491,12 @@ function rentpress_saveManualWordpressData($all_wordpress_meta, $corresponding_m
             $fp_data['floorplan_featured_image_thumbnail'] = $all_wordpress_meta['all_floorplans'][$floorplan_code]['rentpress_custom_field_floorplan_featured_image_thumbnail'];
             $fp_data['floorplan_images'] = $all_wordpress_meta['all_floorplans'][$floorplan_code]['rentpress_custom_field_floorplan_gallery_images'] ?? null;
             $fp_data['floorplan_parent_property_post_id'] = $property_post_meta['post_information']->ID;
-            $fp_data['floorplan_parent_property_post_link'] = $property_post_meta['post_information']->guid;
+            $fp_data['floorplan_parent_property_name'] = $property_post_meta['post_information']->post_title;
+            $fp_data['floorplan_parent_property_post_link'] = get_permalink($property_post_meta['post_information']->ID);
+            $fp_data['floorplan_features'] = rentpress_mergeTaxonomies(array(), $fp_data['floorplan_post_id'], 'feature');
+            if (!empty($fp_data['floorplan_features'])) {
+                $published_floorplan_features[$fp_data['floorplan_parent_property_post_id']] = array_merge($published_floorplan_features[$fp_data['floorplan_parent_property_post_id']], json_decode($fp_data['floorplan_features']));
+            }
 
             // if pricing is disabled, remove the pricing from selected cost
             if (isset($rentpress_options['rentpress_disable_pricing_section_disable_pricing']) || isset($property_post_meta['rentpress_custom_field_property_disable_pricing'])) {
@@ -486,13 +538,29 @@ function rentpress_saveManualWordpressData($all_wordpress_meta, $corresponding_m
             $prop_data['property_rent_type_selection'] = $prop_data['property_rent_type_selection'] == 'Global Setting' ? $selected_price_type : $prop_data['property_rent_type_selection'];
             $prop_data['property_name'] = $property_post_meta['post_information']->post_title;
             $prop_data['property_post_id'] = $property_post_meta['post_information']->ID;
-            $prop_data['property_post_link'] = get_permalink($property_post_meta['post_information']->ID);
+            $prop_data['property_post_link'] = get_permalink($prop_data['property_post_id']);
             $prop_data['property_featured_image_src'] = $property_post_meta['rentpress_custom_field_property_featured_image_src'] ?? null;
             $prop_data['property_featured_image_srcset'] = $property_post_meta['rentpress_custom_field_property_featured_image_srcset'] ?? null;
             $prop_data['property_gallery_images'] = $property_post_meta['rentpress_custom_field_property_gallery_images'];
             $prop_data['property_gallery_shortcode'] = $property_post_meta['rentpress_custom_field_property_gallery_shortcode'];
-            $prop_data['property_neighborhood_post_id'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_id']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_id'] : null;
+            $prop_data['property_primary_neighborhood_post_id'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_id']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_id'] : null;
+            $prop_data['property_neighborhood_post_ids'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_ids']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_ids'] : null;
+            $prop_data['property_neighborhood_post_names'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_names']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_names'] : null;
             $prop_data['property_neighborhood_post_name'] = !empty($property_post_meta['rentpress_custom_field_property_neighborhood_post_name']) ? $property_post_meta['rentpress_custom_field_property_neighborhood_post_name'] : null;
+            $prop_data['property_features'] = !empty($published_floorplan_features[$prop_data['property_post_id']]) ? rentpress_mergeTaxonomies($published_floorplan_features[$prop_data['property_post_id']], $prop_data['property_post_id'], 'feature') : rentpress_mergeTaxonomies(array(), $prop_data['property_post_id'], 'feature');
+            $prop_data['property_community_amenities'] = rentpress_mergeTaxonomies(array(), $prop_data['property_post_id']);
+            $prop_data['property_terms'] = rentpress_propertyTerms($prop_data);
+            $prop_data['property_accent_color'] = !empty($property_post_meta['rentpress_custom_field_property_accent_color']) ? $property_post_meta['rentpress_custom_field_property_accent_color'][0] : null;
+            $prop_data['property_use_accent_color'] = !empty($property_post_meta['rentpress_custom_field_property_accent_color_use_property_branding']) ? $property_post_meta['rentpress_custom_field_property_accent_color_use_property_branding'][0] === "on" : false;
+            $prop_data = rentpress_mergeTaxonomies($prop_data, $property_post_meta);
+
+            if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+                foreach ($rentpress_add_on_field_args->rentpress_property_meta as $rentpress_add_on_property_meta) {
+                    if (isset($property_post_meta[$rentpress_add_on_property_meta->meta_key]) ? $property_post_meta[$rentpress_add_on_property_meta->meta_key] : '') {
+                        $prop_data[$rentpress_add_on_property_meta->property_engrain_map] = !empty($property_post_meta[$rentpress_add_on_property_meta->meta_key]) ? $property_post_meta[$rentpress_add_on_property_meta->meta_key] : null;
+                    }
+                }
+            }
 
             $office_hours = rentpress_setUpOfficeHoursMetaValuesOverride($property_post_meta);
             $prop_data['property_office_hours'] = json_encode([
@@ -543,6 +611,7 @@ function rentpress_saveManualWordpressData($all_wordpress_meta, $corresponding_m
                 }
             }
         }
+        rentpress_deleteAllFeedUnitsForAProperty($property_code);
         unset($all_wordpress_meta['all_properties'][$property_code]);
     }
 
@@ -571,6 +640,12 @@ function rentpress_updateManualFloorplanMetaPrices($manual_floorplan)
     }
     if (!isset($manual_floorplan['rentpress_custom_field_floorplan_rent_best_override']) && isset($manual_floorplan['rentpress_custom_field_floorplan_rent_best'])) {
         update_post_meta($manual_floorplan['post_information']->ID, 'rentpress_custom_field_floorplan_rent_best', $manual_floorplan['rentpress_custom_field_floorplan_rent_best'][0]);
+    }
+    if (!isset($manual_floorplan['rentpress_custom_field_floorplan_deposit_min_override']) && isset($manual_floorplan['rentpress_custom_field_floorplan_deposit_min'])) {
+        update_post_meta($manual_floorplan['post_information']->ID, 'rentpress_custom_field_floorplan_deposit_min', $manual_floorplan['rentpress_custom_field_floorplan_deposit_min'][0]);
+    }
+    if (!isset($manual_floorplan['rentpress_custom_field_floorplan_deposit_max_override']) && isset($manual_floorplan['rentpress_custom_field_floorplan_deposit_max'])) {
+        update_post_meta($manual_floorplan['post_information']->ID, 'rentpress_custom_field_floorplan_deposit_max', $manual_floorplan['rentpress_custom_field_floorplan_deposit_max'][0]);
     }
 }
 
@@ -643,7 +718,7 @@ function rentpress_setUpObjectForFloorplanFeedImages($floorplan_images)
             array_push($images, $this_image);
         }
     }
-    return json_encode($images);
+    return !empty($images) ? json_encode($images) : null;
 }
 
 function rentpress_updateAllUnitPricingForAProperty($property_post_meta)
@@ -658,190 +733,70 @@ function rentpress_updateAllUnitPricingForAProperty($property_post_meta)
     }
 }
 
-function rentpress_updateParentPropertyFeatures($property_feed_data, $floorplan_features)
+function rentpress_mergeTaxonomies($feed_terms, $post_id, $taxonomy_type = 'amenity')
 {
-    $floorplan_features = json_decode($floorplan_features, true);
-    if (is_null($property_feed_data['property_features'])) {
-        $property_features = array();
-    } else {
-        $property_features = json_decode($property_feed_data['property_features']);
-    }
-
-    foreach ($floorplan_features as $floorplan_feature) {
-        if (!in_array($floorplan_feature, $property_features)) {
-            array_push($property_features, $floorplan_feature);
-        }
-    }
-
-    $property_feed_data['property_features'] = json_encode($property_features);
-    return $property_feed_data;
-}
-
-function rentpress_mergeFloorplanTaxonomies($floorplan_feed_data, $floorplan_post_meta)
-{
-    $post_id = $floorplan_post_meta['post_information']->ID;
-
-    $terms = array();
-
     // Make checks to see if the floorplan has all features that are in the feed
     // if not add them
-    $floorplan_feed_features = json_decode($floorplan_feed_data['floorplan_features']);
-    $feature_terms = get_the_terms($post_id, 'feature');
+    $feed_terms = is_string($feed_terms) ? json_decode($feed_terms) : $feed_terms;
+    $feature_tax_terms = get_the_terms($post_id, $taxonomy_type);
+    $feature_terms_list = array();
+    if (!empty($feature_tax_terms)) {
+        foreach ($feature_tax_terms as $feature_term) {
+            array_push($feature_terms_list, htmlspecialchars_decode($feature_term->name, ENT_QUOTES));
+        }
+    }
 
     // do features first to save the data into a different DB field
-    if (isset($floorplan_feed_features) && count($floorplan_feed_features) > 0) {
-        foreach ($floorplan_feed_features as $feed_feature) {
+    if (isset($feed_terms) && count($feed_terms) > 0) {
+        foreach ($feed_terms as $feed_term) {
             // if it is bad data, then ignore it
-            if ($feed_feature->Title == 'Custom Amenity' || $feed_feature->Title == 'Other') {
+            if ($feed_term->Title == 'Custom Amenity' || $feed_term->Title == 'Other') {
                 continue;
             }
-            // if it doesn't exist on property in wordpress, create it
-            $exists_in_wp = false;
-            if (!empty($feature_terms)) {
-                foreach ($feature_terms as $feature_term_key => $feature_term) {
-                    if ($feed_feature->Title == $feature_term->name) {
-                        $exists_in_wp = true;
-                        array_push($terms, $feature_term->name);
-                        unset($feature_terms[$feature_term_key]);
-                        break;
-                    }
-                }
+            $term_title = htmlspecialchars_decode($feed_term->Title, ENT_QUOTES);
+
+            // if it doesn't exist on floorplan in wordpress, create it
+            if (!isset($feature_terms_list[$feed_term->Title])) {
+                wp_set_object_terms($post_id, $term_title, $taxonomy_type, true);
             }
 
-            if (!$exists_in_wp) {
-                wp_set_object_terms($post_id, esc_attr($feed_feature->Title), 'feature', true);
+            // if its already in the list dont add it again
+            if (!in_array($term_title, $feature_terms_list)) {
+                array_push($feature_terms_list, $term_title);
             }
-
         }
     }
 
-    // any leftover custom site features are not on the feed, so add them to the terms
-    if ($feature_terms && count($feature_terms) > 0) {
-        foreach ($feature_terms as $feature_term_key => $feature_term) {
-            array_push($terms, htmlspecialchars_decode($feature_term->name, ENT_QUOTES));
-        }
-    }
     // save current terms into features column
-    $floorplan_feed_data['floorplan_features'] = count($terms) > 0 ? json_encode($terms) : null;
-
-    return $floorplan_feed_data;
-
+    return !empty($feature_terms_list) ? json_encode($feature_terms_list) : null;
 }
 
-function rentpress_mergeTaxonomies($property_feed_data, $post_meta)
+function rentpress_propertyTerms($property_feed_data)
 {
-    $post_id = $post_meta['post_information']->ID;
-
-    // Get All current Terms for each taxonomy
-    $terms = array();
-
-    // Make checks to see if the property has all amenities that are in the feed
-    // if not add them
-    $property_feed_amenities = json_decode($property_feed_data['property_community_amenities']);
-    $amenity_terms = get_the_terms($post_id, 'amenity');
-    // do amenities first to save the data into a different DB field
-    if (isset($property_feed_amenities) && count($property_feed_amenities) > 0) {
-        foreach ($property_feed_amenities as $feed_amenity_key => $feed_amenity) {
-            // if it is bad data, then ignore it
-            if ($feed_amenity->Title == 'Custom Amenity' || $feed_amenity->Title == 'Other') {
-                continue;
-            }
-            // if it doesn't exist on property in wordpress, create it
-            $exists_in_wp = false;
-            if (!empty($amenity_terms)) {
-                foreach ($amenity_terms as $amenity_term_key => $amenity_term) {
-                    if ($feed_amenity->Title == $amenity_term->name) {
-                        $exists_in_wp = true;
-                        //trim or contains underscore
-                        array_push($terms, $amenity_term->name);
-                        unset($amenity_terms[$amenity_term_key]);
-                        break;
-                    }
-                }
-            }
-
-            if (!$exists_in_wp) {
-                wp_set_object_terms($post_id, esc_attr($feed_amenity->Title), 'amenity', true);
-            }
-
-        }
-    }
-    // any leftover custom site amenities are not on the feed, so add them to the terms
-    if ($amenity_terms && count($amenity_terms) > 0) {
-        foreach ($amenity_terms as $amenity_term_key => $amenity_term) {
-            array_push($terms, htmlspecialchars_decode($amenity_term->name, ENT_QUOTES));
-        }
-    }
-    // save current terms into amenities column to be used separately
-    $property_feed_data['property_community_amenities'] = count($terms) > 0 ? json_encode($terms) : null;
-
-    // START AGAIN WITH FEATURES
-    $secondary_terms = array();
-
-    // all of the features from the property and floorplans feed are already added to the features array
-    // add all of the feed terms to wordpress, and to the property as needed
-    $feature_terms = get_the_terms($post_id, 'feature');
-    $property_feed_features = json_decode($property_feed_data['property_features']);
-    // var_dump($property_feed_data['property_name']);
-    //         var_dump($property_feed_features);
-    //         var_dump($feature_terms);
-    if (isset($property_feed_features) && count($property_feed_features) > 0) {
-        foreach ($property_feed_features as $feed_feature) {
-            // if it is bad data, then ignore it
-            if ($feed_feature == 'Custom Amenity' || $feed_feature == 'Other') {
-                continue;
-            }
-            // if it doesn't exist on property in wordpress, create it
-            $exists_in_wp = false;
-            if (!empty($feature_terms)) {
-                foreach ($feature_terms as $feature_term_key => $feature_term) {
-                    if ($feed_feature == $feature_term->name) {
-                        $exists_in_wp = true;
-                        array_push($secondary_terms, $feature_term->name);
-                        unset($feature_terms[$feature_term_key]);
-                        break;
-                    }
-                }
-            }
-
-            if (!$exists_in_wp) {
-                wp_set_object_terms($post_id, esc_attr($feed_feature), 'feature', true);
-            }
-
-        }
-    }
-    // any leftover custom site features are not on the feed, so add them to the terms
-    if ($feature_terms && count($feature_terms) > 0) {
-        foreach ($feature_terms as $feature_term_key => $feature_term) {
-            array_push($secondary_terms, htmlspecialchars_decode($feature_term->name, ENT_QUOTES));
-        }
-    }
-    // save the secondary terms into features column to be used separately
-    $property_feed_data['property_features'] = count($secondary_terms) > 0 ? json_encode($secondary_terms) : null;
-
     // combine the features and amenities so that they are able to be searched easier
-    $terms = array_merge($terms, $secondary_terms);
+    $property_features = !empty($property_feed_data['property_features']) ? json_decode($property_feed_data['property_features']) : array();
+    $property_community_amenities = !empty($property_feed_data['property_community_amenities']) ? json_decode($property_feed_data['property_community_amenities']) : array();
+    $terms = array_merge($property_features, $property_community_amenities);
 
-    $pet_terms = get_the_terms($post_id, 'pet');
-    if ($pet_terms) {
+    $pet_terms = get_the_terms($property_feed_data['property_post_id'], 'pet');
+    if (!empty($pet_terms)) {
         foreach ($pet_terms as $pt) {
             array_push($terms, $pt->name);
         }
     }
 
-    $city_terms = get_the_terms($post_id, 'city');
+    $city_terms = get_the_terms($property_feed_data['property_post_id'], 'city');
     if ($city_terms && $city_terms[0]->name == $property_feed_data['property_city']) {
         array_push($terms, $city_terms[0]->name);
     } else {
         $new_term = $property_feed_data['property_city'];
         // put false here because we only want them to be in one city
-        wp_set_object_terms($post_id, $new_term, 'city', false);
-        array_push($terms, $new_term);
+        $new_term_obj = wp_set_object_terms($property_feed_data['property_post_id'], $new_term . ', ' . $property_feed_data['property_state'], 'city', false);
+        add_term_meta($new_term_obj[0], 'rentpress_custom_field_city_state', $property_feed_data['property_state'], true);
+        array_push($terms, $new_term . ', ' . $property_feed_data['property_state']);
     }
 
-    // save all terms to a DB column for advanced searching
-    $property_feed_data['property_terms'] = json_encode($terms);
-    return $property_feed_data;
+    return json_encode($terms);
 }
 
 function rentpress_createOrUpdateFloorplans($property_feed_data, $all_wordpress_meta, $corresponding_meta_keys)
@@ -857,10 +812,7 @@ function rentpress_createOrUpdateFloorplans($property_feed_data, $all_wordpress_
             $floorplan_feed_data['floorplan_featured_image_thumbnail'] = $all_wordpress_meta['all_floorplans'][$floorplans_feed_code]['rentpress_custom_field_floorplan_featured_image_thumbnail'];
             $floorplan_feed_data['floorplan_images'] = $all_wordpress_meta['all_floorplans'][$floorplans_feed_code]['rentpress_custom_field_floorplan_gallery_images'] ?? rentpress_setUpObjectForFloorplanFeedImages($floorplan_feed_data['floorplan_images']);
             // update features taxonomy
-            $floorplan_feed_data = rentpress_mergeFloorplanTaxonomies($floorplan_feed_data, $all_wordpress_meta['all_floorplans'][$floorplans_feed_code]);
-            if (!empty($floorplan_feed_data['floorplan_features'])) {
-                $property_feed_data = rentpress_updateParentPropertyFeatures($property_feed_data, $floorplan_feed_data['floorplan_features']);
-            }
+            $floorplan_feed_data['floorplan_features'] = rentpress_mergeTaxonomies($floorplan_feed_data['floorplan_features'], $all_wordpress_meta['all_floorplans'][$floorplans_feed_code]['post_information']->ID, 'feature');
             $property_feed_data['floorplans'][$floorplans_feed_code] = $floorplan_feed_data;
             unset($all_wordpress_meta['all_floorplans'][$floorplans_feed_code]);
 
@@ -1340,7 +1292,9 @@ function rentpress_updateUnitRanges($unit, $selected_price_type)
     }
 
     // calculate best price
-    $unit['unit_rent_best'] = min(array_filter(array($unit['unit_rent_base'], $unit['unit_rent_effective'], $unit['unit_rent_market'], $unit['unit_rent_min'])));
+    $price_array = array($unit['unit_rent_base'], $unit['unit_rent_effective'], $unit['unit_rent_market'], $unit['unit_rent_min']);
+    $price_array = !empty($price_array) ? array_filter($price_array) : null;
+    $unit['unit_rent_best'] = !empty($price_array) ? min($price_array) : null;
 
     $unit = rentpress_updateUnitPriceSelection($unit);
 
@@ -1622,6 +1576,8 @@ function rentpress_getCorrespondingWordpressToFeedKeyArray()
             'rentpress_custom_field_floorplan_rent_best' => 'floorplan_rent_best',
             'rentpress_custom_field_floorplan_rent_type_selection' => 'floorplan_rent_type_selection',
             'rentpress_custom_field_floorplan_rent_type_selection_cost' => 'floorplan_rent_type_selection_cost',
+            'rentpress_custom_field_floorplan_deposit_max' => 'floorplan_deposit_max',
+            'rentpress_custom_field_floorplan_deposit_min' => 'floorplan_deposit_min',
         ],
         // No meta exists for this feed data, Encasa Feed uses most of these
         // 'property_staff_description'

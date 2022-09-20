@@ -20,22 +20,19 @@ function rentpress_updateDatabaseTablesAfterPluginVersionChange()
         // update plugin version so that this doesn't run again
         update_option('rentpress_plugin_version', RENTPRESS_PLUGIN_VERSION);
 
-        // remove the crons in case they were updated as well
-        if (wp_next_scheduled('rentpress_cron_hook_marketing_sync')) {
-            $timestamp = wp_next_scheduled('rentpress_cron_hook_marketing_sync');
-            wp_unschedule_event($timestamp, 'rentpress_cron_hook_marketing_sync');
-        }
-        if (wp_next_scheduled('rentpress_cron_hook_pricing_sync')) {
-            $timestamp = wp_next_scheduled('rentpress_cron_hook_pricing_sync');
-            wp_unschedule_event($timestamp, 'rentpress_cron_hook_pricing_sync');
-        }
-
         // run install scripts to make new DB and register post types
         require_once RENTPRESS_PLUGIN_ADMIN_DIR . 'admin_install.php';
 
-        // run a data refresh to put the database together if there is any data already
-        require_once RENTPRESS_PLUGIN_DATA_SYNC . 'property/marketing_refresh.php';
-        rentpress_syncFeedAndWPProperties();
+        // remove the crons in case they were updated as well
+        if (wp_next_scheduled('rentpress_cron_hook_start_incremental_data_sync')) {
+            wp_clear_scheduled_hook('rentpress_cron_hook_start_incremental_data_sync');
+        }
+        if (wp_next_scheduled('rentpress_cron_hook_marketing_sync')) {
+            wp_clear_scheduled_hook('rentpress_cron_hook_marketing_sync');
+        }
+        if (wp_next_scheduled('rentpress_cron_hook_pricing_sync')) {
+            wp_clear_scheduled_hook('rentpress_cron_hook_pricing_sync');
+        }
     }
 }
 add_action('init', 'rentpress_updateDatabaseTablesAfterPluginVersionChange', 20);
@@ -84,3 +81,6 @@ function rentpress_removeDBRowForDeletedPost($postid, $post)
     }
 }
 add_action('before_delete_post', 'rentpress_removeDBRowForDeletedPost', 9, 2);
+
+// actions for rentpress add on's
+
