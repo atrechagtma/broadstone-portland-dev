@@ -34,7 +34,7 @@ $layout = get_field('layout_type');
 ?>
 
 <section class="block <?php echo esc_attr($className); ?> <?php echo empty($bg) ? 'theme-dark' : 'theme-light'; ?>" id="<?php echo esc_attr($id); ?>">
-    <div class="masonry-with-columns <?php echo $layout; ?>">test
+    <div class="masonry-with-columns <?php echo $layout; ?>">
         <?php if ($galleries): ?>
             <?php $count = 0; ?>
             <?php foreach ($galleries as $post):
