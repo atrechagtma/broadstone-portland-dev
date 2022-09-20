@@ -1,14 +1,20 @@
 <template class="rentpress-advanced-search-shortcode-property-search-wrapper">
   <div>
-    <v-row justify="center" class="hidden-md-and-up pb-5">
-      <v-col cols="11" sm="11">
-        <v-btn block color="primary" @click="toggleMap = !toggleMap">
-          <v-icon class="pr-4">mdi-tune</v-icon> Toggle Filters and Map
-        </v-btn>
-      </v-col>
-    </v-row>
+    <div v-show="!hideFiltersOption">
+      <v-row justify="center" class="hidden-md-and-up pb-5">
+        <v-col cols="11" sm="11">
+          <v-btn block color="primary" @click="toggleMap = !toggleMap">
+            <v-icon class="pr-4">mdi-tune</v-icon> Toggle Filters and Map
+          </v-btn>
+        </v-col>
+      </v-row>
+    </div>
     <div v-show="!hideFiltersOption && shouldShowMap">
-      <v-row justify="center" class="py-0 rentpress-property-search-filters" align="center">
+      <v-row
+        justify="center"
+        class="py-0 rentpress-property-search-filters"
+        align="center"
+      >
         <v-col xl="3" lg="3" md="4" sm="5" cols="auto">
           <v-combobox
             v-model="selectedTerms"
@@ -190,13 +196,12 @@
             :zoom="10"
             :center="{ lat: avgLat, lng: avgLong }"
             ref="map"
-            @click="toggleOffInfoWndow()"
+            @click="toggleOffInfoWindow()"
           >
             <GmapInfoWindow
               :options="infoOptions"
               :position="infoWindowPos"
               :opened="infoWinOpen"
-              class="info-window-testing"
               @closeclick="infoWinOpen = false"
             >
               <property-card
@@ -204,6 +209,7 @@
                 :property="activeProperty"
                 :formatter="formatter"
                 :options="options"
+                class="rentpress-map-infocard"
                 hideImage
               />
             </GmapInfoWindow>
@@ -312,16 +318,22 @@
           </div>
         </v-col>
       </v-row>
-      <!-- <script v-html="jsonld" type="application/ld+json"></script> -->
     </div>
     <div
       v-else
-      class="rentpress-advanced-search-shortcode-property-search-no-properties-container"
+      class="
+        rentpress-advanced-search-shortcode-property-search-no-properties-container
+      "
     >
       <v-row justify="center" class="text-center">
         <v-col cols="auto">
           <p
-            class="rentpress-inherited-font-family primary--text text-h4 font-weight-black"
+            class="
+              rentpress-inherited-font-family
+              primary--text
+              text-h4
+              font-weight-black
+            "
           >
             No Apartments Found
           </p>
@@ -569,11 +581,17 @@ export default {
           return true;
         }
 
+        var hoods =
+          property.property_neighborhood_post_names !== null &&
+          property.property_neighborhood_post_names
+            ? property.property_neighborhood_post_names.split(",")
+            : [];
         const propertyTerms = [
           property.property_name,
           property.property_zip,
           property.property_state,
-          this.states[property.property_state]
+          this.states[property.property_state],
+          ...hoods
         ];
         if (property.property_additional_keywords) {
           propertyTerms.push(
@@ -584,7 +602,7 @@ export default {
         if (property.property_terms) {
           propertyTerms.push(...JSON.parse(property.property_terms));
         }
-        // get the difference between the arrays, if any value is left, that means the property doea not contain that term
+        // get the difference between the arrays, if any value is left, that means the property does not contain that term
         selectedTermsArray = selectedTermsArray.filter(
           term => !propertyTerms.includes(term)
         );
@@ -800,6 +818,11 @@ export default {
         }
 
         // Set up all possible search terms
+        var hoods =
+          props[y].property_neighborhood_post_names !== null &&
+          props[y].property_neighborhood_post_names
+            ? props[y].property_neighborhood_post_names.split(",")
+            : [];
         var terms = JSON.parse(props[y].property_terms);
         var additionalKeywords = props[y].property_additional_keywords
           ? props[y].property_additional_keywords.split(",")
@@ -813,7 +836,8 @@ export default {
             props[y].property_zip,
             props[y].property_state,
             this.states[props[y].property_state],
-            props[y].property_name
+            props[y].property_name,
+            ...hoods
           ];
         }
 
@@ -853,7 +877,12 @@ export default {
       });
       // Set up all searchable terms
       this.searchableTerms = searchTerms
-        .filter((item, pos) => searchTerms.indexOf(item) === pos)
+        .filter(function(item, pos) {
+          if (item === null || item === undefined) {
+            return false;
+          }
+          return searchTerms.indexOf(item) === pos;
+        })
         .sort((a, b) => {
           let aStartsWith = a.charAt(0);
           let bStartsWith = b.charAt(0);
@@ -869,16 +898,16 @@ export default {
       // Set up price selector by finding min and incrementing until you reach max
       const urlParams = new URLSearchParams(window.location.search);
       if (availablePrices.length > 0) {
-        var minumumPrice = Math.ceil(Math.min(...availablePrices) / 50) * 50;
+        var minimumPrice = Math.ceil(Math.min(...availablePrices) / 50) * 50;
         var maximumPrice = urlParams.get("price")
           ? Math.floor(
               Math.max(...availablePrices, parseInt(urlParams.get("price"))) /
                 50
             ) * 50
           : Math.floor(Math.max(...availablePrices) / 50) * 50;
-        this.priceRanges = [this.formatter.format(minumumPrice)];
-        while (minumumPrice < maximumPrice) {
-          this.priceRanges.push(this.formatter.format((minumumPrice += 50)));
+        this.priceRanges = [this.formatter.format(minimumPrice)];
+        while (minimumPrice < maximumPrice) {
+          this.priceRanges.push(this.formatter.format((minimumPrice += 50)));
         }
       }
     },
@@ -961,7 +990,7 @@ export default {
 
       this.infoWinOpen = true;
     },
-    toggleOffInfoWndow() {
+    toggleOffInfoWindow() {
       this.infoWinOpen = false;
     },
     sleep(ms) {
@@ -1022,5 +1051,10 @@ export default {
 .rentpress-map-sidebar-scroll-no-map > * {
   flex: 1 1 100%;
   max-width: clamp(300px, 100%, 410px);
+}
+
+.property-card-wrapper .v-card,
+.property-card-wrapper > div {
+  height: 100%;
 }
 </style>

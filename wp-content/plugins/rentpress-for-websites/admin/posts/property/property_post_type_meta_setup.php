@@ -1,11 +1,9 @@
 <?php
-
 /*
  *  Save the meta box’s post metadata.
  */
 function rentpress_save_property_meta($post_id, $post)
 {
-
     // Get the post type object
     $post_type = get_post_type_object($post->post_type);
 
@@ -13,15 +11,19 @@ function rentpress_save_property_meta($post_id, $post)
     if (isset($_POST['rentpress_custom_field_property_nonce']) &&
         wp_verify_nonce($_POST['rentpress_custom_field_property_nonce'], basename(__FILE__)) &&
         current_user_can($post_type->cap->edit_post, $post_id)) {
+        // firstly mark this property as no longer a feed property, this will be undone immediately during next resync if it is in the feed still
+        update_post_meta($post_id, 'rentpress_custom_field_property_is_feed', false);
         // get all the post meta
         $rpm = get_post_meta($post_id);
+        $rentpress_add_on_field_args = get_option('rentpress_add_on_field_args');
+        $rentpress_add_on_field_args = $rentpress_add_on_field_args ? json_decode($rentpress_add_on_field_args) : false;
 
-        // delete the override post meta if it doesnt exist in the form submit
+        // delete the override post meta if it doesn't exist in the form submit
         foreach ($rpm as $meta_override_key => $meta_override_value) {
             if (strpos($meta_override_key, 'rentpress_custom_field_property') !== false &&
                 strpos($meta_override_key, 'override') !== false) {
 
-                // if the override doesnt exist in the request delete the unused meta
+                // if the override doesn't exist in the request delete the unused meta
                 if (!isset($_POST[$meta_override_key])) {
                     delete_post_meta($post_id, $meta_override_key);
                 }
@@ -29,10 +31,10 @@ function rentpress_save_property_meta($post_id, $post)
         }
 
         // set up the meta arrays to save them based on type
-        $post_emails = rentpress_createPropertyEmailMetaList();
-        $post_text_fields = rentpress_createPropertyTextFieldMetaList();
-        $post_text_area = rentpress_createPropertyTextAreaMetaList();
-        $post_urls = rentpress_createPropertyURLMetaList();
+        $post_emails = rentpress_createPropertyEmailMetaList($rentpress_add_on_field_args);
+        $post_text_fields = rentpress_createPropertyTextFieldMetaList($rentpress_add_on_field_args);
+        $post_text_area = rentpress_createPropertyTextAreaMetaList($rentpress_add_on_field_args);
+        $post_urls = rentpress_createPropertyURLMetaList($rentpress_add_on_field_args);
 
         // if there is an override set in the request, set the value
         foreach ($_POST as $override_key => $override_value) {
@@ -50,7 +52,7 @@ function rentpress_save_property_meta($post_id, $post)
                 } elseif (in_array($meta_key, $post_text_fields)) {
                     $new_meta_value = (isset($_POST[$meta_key]) ? sanitize_text_field($_POST[$meta_key]) : '');
                 } elseif (in_array($meta_key, $post_text_area)) {
-                    $new_meta_value = (isset($_POST[$meta_key]) ? sanitize_textarea_field($_POST[$meta_key]) : '');
+                    $new_meta_value = (isset($_POST[$meta_key]) ? wp_filter_post_kses($_POST[$meta_key]) : '');
                 } elseif (in_array($meta_key, $post_urls)) {
                     $new_meta_value = (isset($_POST[$meta_key]) ? esc_url_raw($_POST[$meta_key]) : '');
                 }
@@ -102,8 +104,22 @@ function rentpress_save_property_meta($post_id, $post)
             delete_post_meta($post_id, 'rentpress_custom_field_property_office_hours_checkbox');
         }
 
+        if (isset($_POST['rentpress_custom_field_property_accent_color'])) {
+          update_post_meta($post_id, 'rentpress_custom_field_property_accent_color', sanitize_text_field($_POST['rentpress_custom_field_property_accent_color']));
+        }
+
+        if (isset($_POST['rentpress_custom_field_property_accent_color_use_property_branding'])) {
+            update_post_meta($post_id, 'rentpress_custom_field_property_accent_color_use_property_branding', sanitize_text_field($_POST['rentpress_custom_field_property_accent_color_use_property_branding']));
+        } else {
+            delete_post_meta($post_id, 'rentpress_custom_field_property_accent_color_use_property_branding');
+        }
+
         if (isset($_POST['rentpress_custom_field_property_gallery_images'])) {
             update_post_meta($post_id, 'rentpress_custom_field_property_gallery_images', sanitize_text_field($_POST['rentpress_custom_field_property_gallery_images']));
+        }
+
+        if (isset($_POST['rentpress_custom_field_property_accent_color'])) {
+          update_post_meta($post_id, 'rentpress_custom_field_property_accent_color', sanitize_text_field($_POST['rentpress_custom_field_property_accent_color']));
         }
 
         if (isset($_POST['rentpress_custom_field_property_disable_pricing'])) {
@@ -175,13 +191,17 @@ function rentpress_custom_property_data_box_html($post)
     require_once RENTPRESS_PLUGIN_ADMIN_DIR . 'posts/meta/metafields.php';
     require_once RENTPRESS_PLUGIN_ADMIN_POSTS . 'floorplan/floorplan_post_type_data.php';
 
+    $rentpress_add_on_field_args = get_option('rentpress_add_on_field_args');
+    $rentpress_add_on_field_args = $rentpress_add_on_field_args ? json_decode($rentpress_add_on_field_args) : false;
     $rpm = get_post_meta($post->ID); // Get RentPress Property Meta
     $overrides = array();
     $floorplan_posts = array();
     $rentpress_options = get_option('rentpress_options');
     $selected_price_type = (isset($rentpress_options['rentpress_pricing_display_settings_section_price_display_selection'])) ? $rentpress_options['rentpress_pricing_display_settings_section_price_display_selection'] : 'Best Price';
     if (isset($rpm['rentpress_custom_field_property_code']) ? $rpm['rentpress_custom_field_property_code'] : '') {
-        $floorplan_posts = rentpress_getAllFLoorplansPostsForPropertyCode($rpm['rentpress_custom_field_property_code'][0]);
+        require_once RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php';
+        $property_data = rentpress_getAllPropertyDataWithCodeOrPostID($rpm['rentpress_custom_field_property_code'][0]);
+        $floorplan_posts = rentpress_getAllFloorplanPostsForPropertyCode($rpm['rentpress_custom_field_property_code'][0]);
     }
 
     foreach ($rpm as $key => $value) {
@@ -226,8 +246,17 @@ function rentpress_custom_property_data_box_html($post)
     <div class="rentpress-tab-button" onclick="openTab(event, 'prop-info')"><span class="fas fa-info-circle"
         aria-hidden="true"></span> Info
     </div>
-    <div class="rentpress-tab-button" onclick="openTab(event, 'prop-floorplans')"><span class="wp-menu-image dashicons-before dashicons-layout"
-        aria-hidden="true"></span> Floor
+    <?php
+        if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+            foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+                if (isset($property_meta->tab_callback) && isset($property_meta->new_tab) ? $property_meta->new_tab : '') {
+                    call_user_func($property_meta->tab_callback);
+                }
+            }
+        }
+    ?>
+    <div class="rentpress-tab-button" onclick="openTab(event, 'prop-floorplans')"><span
+        class="wp-menu-image dashicons-before dashicons-layout" aria-hidden="true"></span> Floor
       Plans</div>
     <div id="rentpress-expand-all">Expand All</div>
   </div>
@@ -257,25 +286,28 @@ function rentpress_custom_property_data_box_html($post)
 
     <div class="rentpress-accordion"><span aria-hidden="true" class="fas fa-edit"></span> Contact Form</div>
     <div class="rentpress-panel">
-        <p>Set a destination for the "Request Info" CTA for this property and its floor plans. <br /><br />
-           The default <strong>Global Setting</strong> will use the value set in the "Contact Page URL" option from RentPress settings.<br />
-           The <strong>Specific URL</strong> option will allow you to set a URL for a contact for specific to this property.<br />
-           Choosing <strong>Gravity Forms Shortcode</strong> will allow you to enter the shortcode for a Gravity Form you have configured. The form will appear in a modal on page.<br /><br />
-        </p>
-        <div class="rentpress-settings-group">
-            <label class="rentpress-settings-title">Contact Destination</label>
-            <?php echo wp_kses(rentpress_metaFieldSelector('rentpress_custom_field_property_contact_type', $rpm, ['Global Setting' => 1,'Specific URL' => 2, 'Gravity Forms Shortcode' => 3] ), $rentpress_allowed_HTML); ?>
-        </div>
+      <p>Set a destination for the "Request Info" CTA for this property and its floor plans. <br /><br />
+        The default <strong>Global Setting</strong> will use the value set in the "Contact Page URL" option from
+        RentPress settings.<br />
+        The <strong>Specific URL</strong> option will allow you to set a URL for a contact for specific to this
+        property.<br />
+        Choosing <strong>Gravity Forms Shortcode</strong> will allow you to enter the shortcode for a Gravity Form you
+        have configured. The form will appear in a modal on page.<br /><br />
+      </p>
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">Contact Destination</label>
+        <?php echo wp_kses(rentpress_metaFieldSelector('rentpress_custom_field_property_contact_type', $rpm, ['Global Setting' => 1, 'Specific URL' => 2, 'Gravity Forms Shortcode' => 3]), $rentpress_allowed_HTML); ?>
+      </div>
 
-        <div class="rentpress-settings-group" id="rentpress_custom_field_property_specific_contact_link_group">
-            <label class="rentpress-settings-title">Contact Form URL</label>
-            <?php echo wp_kses(rentpress_metaField('rentpress_custom_field_property_specific_contact_link', $rpm, 'url', ''), $rentpress_allowed_HTML); ?>
-        </div>
+      <div class="rentpress-settings-group" id="rentpress_custom_field_property_specific_contact_link_group">
+        <label class="rentpress-settings-title">Contact Form URL</label>
+        <?php echo wp_kses(rentpress_metaField('rentpress_custom_field_property_specific_contact_link', $rpm, 'url', ''), $rentpress_allowed_HTML); ?>
+      </div>
 
-        <div class="rentpress-settings-group" id="rentpress_custom_field_property_specific_gravity_form_group">
-            <label class="rentpress-settings-title">Gravity Form Shortcode</label>
-            <?php echo wp_kses(rentpress_metaField('rentpress_custom_field_property_specific_gravity_form', $rpm, 'text', ''), $rentpress_allowed_HTML); ?>
-        </div>
+      <div class="rentpress-settings-group" id="rentpress_custom_field_property_specific_gravity_form_group">
+        <label class="rentpress-settings-title">Gravity Form Shortcode</label>
+        <?php echo wp_kses(rentpress_metaField('rentpress_custom_field_property_specific_gravity_form', $rpm, 'text', ''), $rentpress_allowed_HTML); ?>
+      </div>
     </div>
 
     <div class="rentpress-accordion"><span class="fas fa-share-alt" aria-hidden="true"></span> Social Profiles</div>
@@ -329,14 +361,15 @@ function rentpress_custom_property_data_box_html($post)
     <div class="rentpress-accordion"><span class="fas fa-paw" aria-hidden="true"></span> Pet Policy Details</div>
     <div class="rentpress-panel">
       <p>Add details about the property's pet policy. Limit to around 100-120 words. This will show if the property has
-        a Pets taxonomy selected</p>
+        a Pets taxonomy selected. Supports HTML tags.</p>
       <div class="rentpress-settings-group">
         <label class="rentpress-settings-title">Pet Policy Details</label>
-        <?php echo wp_kses_post(rentpress_metaTextArea('rentpress_custom_field_property_pet_policy', $rpm, '3'), $rentpress_allowed_HTML); ?>
+        <?php echo wp_kses(rentpress_metaTextArea('rentpress_custom_field_property_pet_policy', $rpm, '10'), $rentpress_allowed_HTML); ?>
       </div>
     </div>
 
-    <div class="rentpress-accordion"><span class="wp-menu-image dashicons-before dashicons-location-alt" aria-hidden="true"></span> Neighborhood Details</div>
+    <div class="rentpress-accordion"><span class="wp-menu-image dashicons-before dashicons-location-alt"
+        aria-hidden="true"></span> Neighborhood Details</div>
     <div class="rentpress-panel">
       <p>Properties can exist within multiple neighborhoods. <br />
         <br />
@@ -365,6 +398,18 @@ function rentpress_custom_property_data_box_html($post)
     <!-- </div>
             </div> -->
 
+    <div class="rentpress-accordion"><span class="fas fa-certificate" aria-hidden="true"></span> Branding</div>
+    <div class="rentpress-panel">
+      <p>Add branding to represent the property.</p>
+
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">Property Accent Color</label>
+        <?php echo rentpress_colorMetaField('rentpress_custom_field_property_accent_color', $rpm); ?>
+        <div style="width:20px;"></div>
+        <?php echo rentpress_checkboxMetaField('rentpress_custom_field_property_accent_color_use_property_branding', $rpm, 'Use Property Accent Where Available'); ?>
+      </div>
+    </div>
+
     <div class="rentpress-accordion"><span class="fas fa-search" aria-hidden="true"></span> Additional Search Keywords
     </div>
     <div class="rentpress-panel">
@@ -375,7 +420,6 @@ function rentpress_custom_property_data_box_html($post)
         <?php echo wp_kses(rentpress_metaTextArea('rentpress_custom_field_property_search_keywords', $rpm, '3', 'Downtown, Westside, Near Bus Line'), $rentpress_allowed_HTML); ?>
       </div>
     </div>
-
   </div>
 
   <div id="prop-info" class="rentpress-tab-section">
@@ -393,6 +437,7 @@ function rentpress_custom_property_data_box_html($post)
     </div>
     <div class="rentpress-panel">
       <p>Header text for Property Description: Enter a description about the property. Limit to around 100-120 words.
+        Supports HTML tags.
       </p>
       <div class="rentpress-settings-group">
         <label class="rentpress-settings-title">Property Description</label>
@@ -403,18 +448,19 @@ function rentpress_custom_property_data_box_html($post)
     <div class="rentpress-accordion"><span class="fas fa-file-signature" aria-hidden="true"></span> Application Link
     </div>
     <div class="rentpress-panel">
-      <p>Enter the URL for property's online application and select how you would like the link to affect the floorplans
+      <p>Enter the URL for property's online application and select how you would like the link to affect the
+        floorplans
         and units. If box is left empty, the "Default Application Link" from the settings page is used.</p>
 
-        <div class="rentpress-settings-group">
-            <label class="rentpress-settings-title">Apply Link</label>
-            <?php echo wp_kses(rentpress_overrideMetaField('rentpress_custom_field_property_apply_link', $rpm, $overrides, 'url', ''), $rentpress_allowed_HTML); ?>
-        </div>
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">Apply Link</label>
+        <?php echo wp_kses(rentpress_overrideMetaField('rentpress_custom_field_property_apply_link', $rpm, $overrides, 'url', ''), $rentpress_allowed_HTML); ?>
+      </div>
 
-        <div class="rentpress-settings-group">
-            <label class="rentpress-settings-title">Link Options</label>
-            <?php echo wp_kses(rentpress_metaFieldSelector('rentpress_custom_field_property_link_options', $rpm, ['Default apply link', 'Override every apply link']), $rentpress_allowed_HTML); ?>
-        </div>
+      <div class="rentpress-settings-group">
+        <label class="rentpress-settings-title">Link Options</label>
+        <?php echo wp_kses(rentpress_metaFieldSelector('rentpress_custom_field_property_link_options', $rpm, ['Default apply link', 'Override every apply link']), $rentpress_allowed_HTML); ?>
+      </div>
 
     </div>
 
@@ -533,7 +579,8 @@ function rentpress_custom_property_data_box_html($post)
 
     <div class="rentpress-accordion"><span class="fas fa-dollar-sign" aria-hidden="true"></span> Pricing</div>
     <div class="rentpress-panel">
-      <p>Values are calculated from the property’s floor plans. You can select which price you would like to display or
+      <p>Values are calculated from the property’s floor plans. You can select which price you would like to display
+        or
         optionally override each value.</p>
       <div class="rentpress-settings-group">
         <label class="rentpress-settings-title">Minimum Rent</label>
@@ -574,11 +621,43 @@ function rentpress_custom_property_data_box_html($post)
         <label class="rentpress-settings-title">Disable Pricing</label>
         <?php echo wp_kses(rentpress_checkboxMetaField('rentpress_custom_field_property_disable_pricing', $rpm, 'Disable pricing at this property'), $rentpress_allowed_HTML); ?>
       </div>
-
     </div>
+
+    <?php 
+        if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+            foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+                if (isset($property_meta->callback) && isset($property_meta->new_tab) ? !$property_meta->new_tab : '') {
+                    call_user_func($property_meta->callback, ['rpm' => $rpm, 'rentpress_allowed_HTML' => $rentpress_allowed_HTML]);
+                }
+            }
+        }
+    ?>
   </div>
 
+  <?php 
+    if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+            if (isset($property_meta->callback) && isset($property_meta->new_tab) ? $property_meta->new_tab : '') {
+                call_user_func($property_meta->callback, ['rpm' => $rpm, 'rentpress_allowed_HTML' => $rentpress_allowed_HTML]);
+            }
+        }
+    }
+  ?>
+
   <div id="prop-floorplans" class="rentpress-tab-section">
+    <div class="rentpress-accordion"><span class="fas fa-regular fa-circle" aria-hidden="true"></span> Floor Plan
+      Stats
+    </div>
+    <div class="rentpress-panel">
+      <h3>Floor Plan Starting Price</h3>
+      <ul>
+        <?php
+$matrix = json_decode($property_data->property_availability_matrix);
+    foreach ($matrix as $data): if ((isset($data->name) ? $data->name : '') && (isset($data->price) ? $data->price : '')): ?>
+        <li><strong><?php echo $data->name; ?></strong> : $<?php echo $data->price; ?></li>
+        <?php endif;endforeach;?>
+      </ul>
+    </div>
     <div class="rentpress-accordion"><span class="fas fa-list" aria-hidden="true"></span> Associated Floor Plans</div>
     <div class="rentpress-panel">
       <p class="rentpress-panel-heading">Floor plans that have this property listed as their parent will appear
@@ -593,20 +672,30 @@ function rentpress_custom_property_data_box_html($post)
 <?php
 }
 
-function rentpress_createPropertyEmailMetaList()
+function rentpress_createPropertyEmailMetaList($rentpress_add_on_field_args)
 {
-    return [
+    $EmailMetaList = [
         'rentpress_custom_field_property_email',
     ];
+    if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+            if (isset($property_meta->meta_type) ? $property_meta->meta_type === 'email' : '') {
+                $EmailMetaList[] = $property_meta->meta_key;
+            }
+        }
+    }
+    return $EmailMetaList;
 }
 
-function rentpress_createPropertyTextFieldMetaList()
+function rentpress_createPropertyTextFieldMetaList($rentpress_add_on_field_args)
 {
-    return [
+    $TextFieldMetaList = [
         'rentpress_custom_field_property_special_text',
         'rentpress_custom_field_property_special_expiration',
         'rentpress_custom_field_property_gallery_shortcode',
+        'rentpress_custom_field_property_accent_color',
         'rentpress_custom_field_property_neighborhood_post_id',
+        'rentpress_custom_field_property_neighborhood_post_ids',
         'rentpress_custom_field_property_search_keywords',
         'rentpress_custom_field_property_phone',
         'rentpress_custom_field_property_address',
@@ -624,21 +713,37 @@ function rentpress_createPropertyTextFieldMetaList()
         'rentpress_custom_field_property_rent_term',
         'rentpress_custom_field_property_rent_effective',
         'rentpress_custom_field_property_rent_best',
-        'rentpress_custom_field_property_specific_gravity_form', 
+        'rentpress_custom_field_property_specific_gravity_form',
     ];
+    if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+            if (isset($property_meta->meta_type) ? $property_meta->meta_type === 'text' : '') {
+                $TextFieldMetaList[] = $property_meta->meta_key;
+            }
+        }
+    }
+    return $TextFieldMetaList;
 }
 
-function rentpress_createPropertyTextAreaMetaList()
+function rentpress_createPropertyTextAreaMetaList($rentpress_add_on_field_args)
 {
-    return [
+    $TextAreaMetaList = [
         'rentpress_custom_field_property_pet_policy',
         'rentpress_custom_field_property_description',
     ];
+    if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+            if (isset($property_meta->meta_type) ? $property_meta->meta_type === 'textarea' : '') {
+                $TextAreaMetaList[] = $property_meta->meta_key;
+            }
+        }
+    }
+    return $TextAreaMetaList;
 }
 
-function rentpress_createPropertyURLMetaList()
+function rentpress_createPropertyURLMetaList($rentpress_add_on_field_args)
 {
-    return [
+    $URLMetaList = [
         'rentpress_custom_field_property_special_link',
         'rentpress_custom_field_property_facebook_url',
         'rentpress_custom_field_property_twitter_url',
@@ -648,4 +753,12 @@ function rentpress_createPropertyURLMetaList()
         'rentpress_custom_field_property_website',
         'rentpress_custom_field_property_specific_contact_link',
     ];
+    if (isset($rentpress_add_on_field_args->rentpress_property_meta) ? count((array)$rentpress_add_on_field_args->rentpress_property_meta ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_property_meta as $property_meta) {
+            if (isset($property_meta->meta_type) ? $property_meta->meta_type === 'url' : '') {
+                $URLMetaList[] = $property_meta->meta_key;
+            }
+        }
+    }
+    return $URLMetaList;
 }

@@ -12,8 +12,6 @@ use WebpConverter\Settings\Option\SupportedExtensionsOption;
  */
 class DirectoryFiles implements HookableInterface {
 
-	use PathsValidator;
-
 	/**
 	 * @var PluginData
 	 */
@@ -52,22 +50,26 @@ class DirectoryFiles implements HookableInterface {
 		}
 
 		$this->server_configurator->set_memory_limit();
-		$this->server_configurator->set_execution_time();
+		$this->server_configurator->set_execution_time( 900 );
 
 		$settings = $this->plugin_data->get_plugin_settings();
-		return $this->find_files_in_directory( $dir_path, $settings[ SupportedExtensionsOption::OPTION_NAME ], $skip_converted );
+		return $this->find_files_in_directory(
+			$dir_path,
+			$settings[ SupportedExtensionsOption::OPTION_NAME ],
+			$skip_converted
+		);
 	}
 
 	/**
 	 * Returns list of source images for directory.
 	 *
-	 * @param string   $dir_path       Server path of source directory.
-	 * @param string[] $allowed_exts   File extensions to find.
-	 * @param bool     $skip_converted Skip images already converted?
+	 * @param string   $dir_path            Server path of source directory.
+	 * @param string[] $allowed_source_exts File extensions to find.
+	 * @param bool     $skip_converted      Skip images already converted?
 	 *
 	 * @return string[] Server paths of source images.
 	 */
-	private function find_files_in_directory( string $dir_path, array $allowed_exts, bool $skip_converted ): array {
+	private function find_files_in_directory( string $dir_path, array $allowed_source_exts, bool $skip_converted ): array {
 		$paths = scandir( $dir_path );
 		$list  = [];
 		if ( ! is_array( $paths ) ) {
@@ -75,13 +77,13 @@ class DirectoryFiles implements HookableInterface {
 		}
 
 		foreach ( $paths as $path ) {
-			$current_path = $dir_path . '/' . urlencode( $path ); // phpcs:ignore
+			$current_path = $dir_path . '/' . $path;
 			if ( is_dir( $current_path ) ) {
-				if ( $this->is_supported_source_directory( $current_path ) ) {
-					$list = array_merge( $list, $this->find_files_in_directory( $current_path, $allowed_exts, $skip_converted ) );
+				if ( apply_filters( 'webpc_supported_source_directory', true, basename( $current_path ), $current_path ) ) {
+					$list = array_merge( $list, $this->find_files_in_directory( $current_path, $allowed_source_exts, $skip_converted ) );
 				}
-			} elseif ( in_array( strtolower( pathinfo( $current_path, PATHINFO_EXTENSION ) ), $allowed_exts ) ) {
-				if ( $this->is_supported_source_file( $current_path, $skip_converted ) ) {
+			} elseif ( in_array( strtolower( pathinfo( $current_path, PATHINFO_EXTENSION ) ), $allowed_source_exts ) ) {
+				if ( apply_filters( 'webpc_supported_source_file', true, basename( $current_path ), $current_path ) ) {
 					$list[] = $current_path;
 				}
 			}

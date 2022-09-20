@@ -2,83 +2,83 @@
 //////////////// GLOBAL RENTPRESS ADMIN STYLES ///////////////////////
 ////////////////////////////////////////////////////////////////////*/
 
-.postbox[id^='rentpress_'] h2.hndle {
-    background: url(../images/30l-square.png) no-repeat;
-    background-size: contain;
-    padding-left: 3.5em !important;
+.postbox[id^="rentpress_"] h2.hndle {
+  background: url(../images/30l-square.png) no-repeat;
+  background-size: contain;
+  padding-left: 3.5em !important;
 }
 
-.postbox[id^='rentpress_'] {
-    margin-bottom: 50px;
+.postbox[id^="rentpress_"] {
+  margin-bottom: 50px;
 }
 
 .rentpress-admin-modal a {
-    color: #fff;
-    cursor: pointer;
-    position: fixed;
-    right: 32px;
-    top: 32px;
-    font-size: 32px;
-    transition: color .3s;
+  color: #fff;
+  cursor: pointer;
+  position: fixed;
+  right: 32px;
+  top: 32px;
+  font-size: 32px;
+  transition: color 0.3s;
 }
 
 .rentpress-admin-modal a:hover {
-    color: #B683E8;
+  color: #b683e8;
 }
 
 .rentpress-admin-modal a:before {
-    font-family: "Font Awesome 5 Free";
-    content: "\f057";
+  font-family: "Font Awesome 5 Free";
+  content: "\f057";
 }
 
 .rentpress-admin-modal {
-    display: none;
-    z-index: 1000000;
-    background-color: #0000008c;
-    width: 100%;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    box-sizing: border-box;
+  display: none;
+  z-index: 1000000;
+  background-color: #0000008c;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
 }
 
 .rentpress-request-results {
-    text-align: center;
-    display: block;
-    height: 1em;
+  text-align: center;
+  display: block;
+  height: 1em;
 }
 
 .rentpress-modal-form-container {
-    background-color: #fff;
-    width: 100%;
-    min-height: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ccd0d4;
-    padding: 6px;
-    position: relative;
+  background-color: #fff;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccd0d4;
+  padding: 6px;
+  position: relative;
 }
 
 .rentpress-modal-form {
-    padding: 0 18px;
-    border: 1px solid #a9a9a9;
-    max-width: 950px;
-    background-color: #f5f5f5;
-    margin: auto;
-    position: absolute;
-    top: 50%;
-    right: 50%;
-    transform: translateX(50%) translateY(-50%);
-    width: 100%;
-    box-sizing: border-box;
+  padding: 0 18px;
+  border: 1px solid #a9a9a9;
+  max-width: 950px;
+  background-color: #f5f5f5;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translateX(50%) translateY(-50%);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .rentpress-success {
-    color: #28a745;
+  color: #28a745;
 }
 
 .rentpress-error {
-    color: #dc3545;
+  color: #dc3545;
 }
 
 /*////////////////////////////////////////////////////////////////////
@@ -86,101 +86,103 @@
 ////////////////////////////////////////////////////////////////////*/
 
 #rentpress-expand-all {
-    cursor: pointer;
-    color: #ffffff;
-    float: right;
-    font-weight: 600;
-    font-size: 16px;
+  cursor: pointer;
+  color: #ffffff;
+  float: right;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 #rentpress-expand-all:after {
-    font-family: "Font Awesome 5 Free";
-    content: "\f13a";
-    float: right;
-    margin: 0 15px 0 12px;
-    font-size: 1.1em;
-    transition: 0.3s;
+  font-family: "Font Awesome 5 Free";
+  content: "\f13a";
+  float: right;
+  margin: 0 15px 0 12px;
+  font-size: 1.1em;
+  transition: 0.3s;
 }
 
 .rentpress-expanded:after {
-    content: "\f139" !important;
+  content: "\f139" !important;
 }
 
-#rentpress-expand-all:hover:after{
-    color: #B683E8;
+#rentpress-expand-all:hover:after {
+  color: #b683e8;
 }
 
 .rentpress-cpt-editor-container {
-    border: 1px solid #a9a9a9;
-    max-width: 950px;
+  border: 1px solid #a9a9a9;
+  max-width: 950px;
 }
 
 .rentpress-tabs {
-    overflow: hidden;
-    background-color: #0f1d4a;
-    padding: 6px 3px;
+  overflow: hidden;
+  background-color: #0f1d4a;
+  padding: 6px 3px;
 }
 
 div.rentpress-tab-button {
-    color: #ffffff;
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 6px 24px;
-    transition: 0.3s;
-    border-radius: 24px;
-    margin-right: 3px;
+  color: #ffffff;
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 6px 24px;
+  transition: 0.3s;
+  border-radius: 24px;
+  margin-right: 3px;
 }
 
-.rentpress-tab-button:hover, .rentpress-tab-button.rentpress-is-active {
-    background-color: #3399ff;
+.rentpress-tab-button:hover,
+.rentpress-tab-button.rentpress-is-active {
+  background-color: #3399ff;
 }
 
 .rentpress-tab-section {
-    display: none;
-    border-top: none;
-    box-sizing: border-box;
+  display: none;
+  border-top: none;
+  box-sizing: border-box;
 }
 
 .rentpress-accordion {
-    color: #444444;
-    cursor: pointer;
-    padding: 18px 18px 18px 8px;
-    width: 100%;
-    text-align: left;
-    border: none;
-    outline: none;
-    transition: 0.3s;
-    box-sizing: border-box;
-    font-weight: 600;
-    font-size: 16px;
+  color: #444444;
+  cursor: pointer;
+  padding: 18px 18px 18px 8px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.3s;
+  box-sizing: border-box;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .rentpress-accordion:after {
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    content: "\f078";
-    float: right;
-    margin-left: 5px;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f078";
+  float: right;
+  margin-left: 5px;
 }
 
 .rentpress-accordion:first-of-type {
-    border-top: 1px solid #a9a9a9;
+  border-top: 1px solid #a9a9a9;
 }
 
-.rentpress-open, .rentpress-accordion:hover {
-    background-color: #3399ff;
-    color: #ffffff;
+.rentpress-open,
+.rentpress-accordion:hover {
+  background-color: #3399ff;
+  color: #ffffff;
 }
 
 .rentpress-open {
-    border-bottom: 1px solid #a9a9a9;
+  border-bottom: 1px solid #a9a9a9;
 }
 
 .rentpress-open:after {
-    content: "\f077";
+  content: "\f077";
 }
 
 .rentpress-panel {
@@ -193,7 +195,7 @@ div.rentpress-tab-button {
 }
 
 .rentpress-panel:last-of-type {
-    border-bottom: none !important;
+  border-bottom: none !important;
 }
 
 /*////////////////////////////////////////////////////////////////////
@@ -201,70 +203,70 @@ div.rentpress-tab-button {
 ////////////////////////////////////////////////////////////////////*/
 
 .rentpress-settings-group {
-    margin-bottom: 1em;
-    display: flex;
+  margin-bottom: 1em;
+  display: flex;
 }
 
 .rentpress-settings-group:last-child {
-    margin-bottom: 42px;
+  margin-bottom: 42px;
 }
 
 .rentpress-settings-title {
-    font-weight: 700;
-    cursor: default;
-    line-height: 2em;
-    min-width: 150px;
+  font-weight: 700;
+  cursor: default;
+  line-height: 2em;
+  min-width: 150px;
 }
 
 input.rentpress-settings-text {
-    border: 1px solid #a9a9a9;
-    flex: 1;
-    line-height: 1;
-    min-height: 2em;
-    font-size: 1em;
-    box-sizing: border-box;
-    margin-right: 24px;
-    border-radius: 4px;
-    padding: 0 8px;
+  border: 1px solid #a9a9a9;
+  flex: 1;
+  line-height: 1;
+  min-height: 2em;
+  font-size: 1em;
+  box-sizing: border-box;
+  margin-right: 24px;
+  border-radius: 4px;
+  padding: 0 8px;
 }
 
 .rentpress-settings-group select {
-    border: 1px solid #a9a9a9;
-    box-shadow: none;
-    outline: none;
-    font-size: 1em;
+  border: 1px solid #a9a9a9;
+  box-shadow: none;
+  outline: none;
+  font-size: 1em;
 }
 
 .rentpress-settings-group select:focus {
-    border-color: #3399ff;
-    box-shadow: none;
-    outline: none;
+  border-color: #3399ff;
+  box-shadow: none;
+  outline: none;
 }
 
 .rentpress-override-row {
-    width: 100%;
-    margin: 1em 0;
+  width: 100%;
+  margin: 1em 0;
 }
 
 .rentpress-override-row::after {
-    content: "";
-    clear: both;
-    display: table;
+  content: "";
+  clear: both;
+  display: table;
 }
 
 .rentpress-override-row span {
-    float: right;
-    margin-right: -6px;
+  float: right;
+  margin-right: -6px;
 }
 
 .rentpress-override-row label {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 input.rentpress-checkbox,
 input.rentpress-override-all {
-    border: 1px solid #a9a9a9;
-    margin-top: 1px;
+  border: 1px solid #a9a9a9;
+  margin-top: 1px;
 }
 
 input:checked.rentpress-checkbox,
@@ -272,136 +274,136 @@ input.rentpress-override:focus,
 input.rentpress-override-all:checked,
 input.rentpress-override-all:focus,
 input.rentpress-checkbox:focus {
-    border: 1px solid #3399ff;
-    box-shadow: none;
-    outline: none;
+  border: 1px solid #3399ff;
+  box-shadow: none;
+  outline: none;
 }
 
 .rentpress-settings-group textarea {
-    border: 1px solid #a9a9a9;
-    flex: 1;
-    resize: none;
-    margin-right: 24px;
-    border-radius: 4px;
-    padding: 0 8px;
+  border: 1px solid #a9a9a9;
+  flex: 1;
+  resize: none;
+  margin-right: 24px;
+  border-radius: 4px;
+  padding: 0 8px;
 }
 
 .rentpress-range-label {
-    margin-right: .5em;
+  margin-right: 0.5em;
 }
 
 input.rentpress-settings-text:focus,
 .rentpress-settings-group textarea:focus {
-    border: 1px solid #3399ff;
-    outline: none;
-    box-shadow: none;
+  border: 1px solid #3399ff;
+  outline: none;
+  box-shadow: none;
 }
 
 input.rentpress-settings-text::placeholder,
 .rentpress-settings-group textarea::placeholder {
-    color: #a9a9a9;
+  color: #a9a9a9;
 }
 
 .rentpress-action-button {
-    padding: 1em;
-    color: #ffffff;
-    border-radius: 12px;
-    background-color: #d4d4d4;
-    font-weight: 600;
-    font-size: 16px;
-    display: inline-block;
-    transition: .3s;
-    cursor: default;
+  padding: 1em;
+  color: #ffffff;
+  border-radius: 12px;
+  background-color: #d4d4d4;
+  font-weight: 600;
+  font-size: 16px;
+  display: inline-block;
+  transition: 0.3s;
+  cursor: default;
 }
 
 .rentpress-action-button-active {
-    cursor: pointer;
-    background-color: #B683E8;
-    transition: 0.3s;
+  cursor: pointer;
+  background-color: #b683e8;
+  transition: 0.3s;
 }
 
 .rentpress-action-button-active:hover {
-    background-color: #974EDF;
+  background-color: #974edf;
 }
 
 .rentpress-delete-button {
-    cursor: pointer;
-    background-color: #e77781;
-    margin-left: 2em;
-    transition: 0.3s;
+  cursor: pointer;
+  background-color: #e77781;
+  margin-left: 2em;
+  transition: 0.3s;
 }
 
 .rentpress-delete-button:hover {
-    background-color: #dc3545;
+  background-color: #dc3545;
 }
 
 .rentpress-cancel-button {
-    cursor: pointer;
-    background-color: #ffd454;
-    transition: 0.3s;
+  cursor: pointer;
+  background-color: #ffd454;
+  transition: 0.3s;
 }
 
 #rentpress-edit-unit-button-container {
-    margin-top: 56px;
+  margin-top: 56px;
 }
 
 #rentpress-delete-confirmation-container {
-    display: none;
+  display: none;
 }
 
 .rentpress-cancel-button:hover {
-    background-color: #ffc107;
+  background-color: #ffc107;
 }
 
 .rentpress-button-container {
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-    margin-bottom: 42px;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  margin-bottom: 42px;
 }
 
 .rentpress-delete-confirm-message {
-    height: 24px;
-    font-weight: 700;
-    cursor: default;
-    font-size: 1.25em;
-    margin: 16px 0;
+  height: 24px;
+  font-weight: 700;
+  cursor: default;
+  font-size: 1.25em;
+  margin: 16px 0;
 }
 
 .rentpress-override-bottom {
-    margin: 1em 0 0 0;
+  margin: 1em 0 0 0;
 }
 
 .rentpress-p-top {
-    margin: 0 0 1em 0;
+  margin: 0 0 1em 0;
 }
 
 .rentpress-panel-heading {
-    margin: 1em 0 2em 0;
+  margin: 1em 0 2em 0;
 }
 
 /* new options styles */
 .rentpress-settings-main h2 {
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-    color: #0f1d4a;
-    font-size: 28px;
-    font-weight: 400;
-    border-bottom: 2px solid #cecece;
-    margin: 20px 0px;
-    padding: 10px 0px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  color: #0f1d4a;
+  font-size: 28px;
+  font-weight: 400;
+  border-bottom: 2px solid #cecece;
+  margin: 20px 0px;
+  padding: 10px 0px;
 }
 
 .rentpress-settings-main .rentpress-settings-sub-title {
-    font-size: 20px;
-    font-weight: 300;
-    color: #333;
+  font-size: 20px;
+  font-weight: 300;
+  color: #333;
 }
 
 .rentpress-settings-main .rentpress_row label:first-child {
-    font-size: 20px;
-    color: #333;
+  font-size: 20px;
+  color: #333;
 }
-
 
 /*radio button styles*/
 .rentpress-settings-main .rentpress-radio-field-wrapper {
@@ -410,7 +412,7 @@ input.rentpress-settings-text::placeholder,
   margin: 10px 0 0;
 }
 
-.rentpress-settings-main .rentpress-radio-field-wrapper input[type='radio'] {
+.rentpress-settings-main .rentpress-radio-field-wrapper input[type="radio"] {
   display: none;
 }
 
@@ -432,201 +434,211 @@ input.rentpress-settings-text::placeholder,
   background-color: transparent;
 }
 
-.rentpress-settings-main .rentpress-radio-field-wrapper input[type=radio]:checked + label:after {
-    border-radius: 11px;
-    width: 8px;
-    height: 8px;
-    position: absolute;
-    top: 7px;
-    left: 8px;
-    content: " ";
-    display: block;
-    border: 4px solid #3399FF;
+.rentpress-settings-main
+  .rentpress-radio-field-wrapper
+  input[type="radio"]:checked
+  + label:after {
+  border-radius: 11px;
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  top: 7px;
+  left: 8px;
+  content: " ";
+  display: block;
+  border: 4px solid #3399ff;
 }
 
-.rentpress-settings-main .rentpress-radio-field-wrapper input[type=radio]:checked+label:before {
-    border-color: #3399FF;
+.rentpress-settings-main
+  .rentpress-radio-field-wrapper
+  input[type="radio"]:checked
+  + label:before {
+  border-color: #3399ff;
 }
 
 .rentpress-settings-main .rentpress-settings-dark-btn {
-    padding: 12px 22px;
-    border-radius: 13px;
-    background-color: #0F1D4A;
-    color: white;
-    font-size: 20px;
-    font-weight: 700;
-    border: 0px;
-    line-height: 1;
-    transition: 0.3s;
+  padding: 12px 22px;
+  border-radius: 13px;
+  background-color: #0f1d4a;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  border: 0px;
+  line-height: 1;
+  transition: 0.3s;
 }
 
 .rentpress-settings-main .rentpress-settings-dark-btn:hover {
-    background-color: #3399FF;
-    color: #f9f9f9;
+  background-color: #3399ff;
+  color: #f9f9f9;
 }
 
 /*checkbox styles*/
-.rentpress-settings-main input[type=checkbox].rentpress-checkbox-field {
-    background-color: white;
-    border: 2px solid #797979;
-    width: 20px;
-    height: 20px;
+.rentpress-settings-main input[type="checkbox"].rentpress-checkbox-field {
+  background-color: white;
+  border: 2px solid #797979;
+  width: 20px;
+  height: 20px;
 }
 
 /*main cotainer and menu styles*/
 .rentpress-settings-controls {
-    display: flex;
+  display: flex;
 }
 
 .rentpress-settings-main {
-    background-color: white;
-    margin: 30px 5px;
+  background-color: white;
+  margin: 30px 5px;
 }
 
 .rentpress-settings-main #submit {
-    font-size: 20px;
-    padding: 10px;
-    height: auto;
-    border: none;
-    text-shadow: none;
-    background-color: #3399FF;
-    box-shadow: none;
-    border-radius: 10px;
-    transition: 0.3s;
+  font-size: 20px;
+  padding: 10px;
+  height: auto;
+  border: none;
+  text-shadow: none;
+  background-color: #3399ff;
+  box-shadow: none;
+  border-radius: 10px;
+  transition: 0.3s;
 }
 
 .rentpress-settings-main #submit:hover {
-    background-color: #0F1D4A;
+  background-color: #0f1d4a;
 }
 
 .rentpress-settings-main .rentpress-settings-header {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    background-color: #0F1D4A;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  background-color: #0f1d4a;
 }
 
 .rentpress-settings-main .rentpress-settings-title {
-    font-size: 300%;
-    color: white;
-    margin: 10px 0;
+  font-size: 300%;
+  color: white;
+  margin: 10px 0;
 }
 
 .rentpress-settings-main .rentpress-tabs-menu {
-    width: 400px;
-    border-right: 4px solid #cecece;
-    margin: 10px 30px 10px 10px;
-    position: sticky;
-    top: 40px;
-    padding: 10px;
-    padding-right: 30px;
-    min-height: 90vh;
+  width: 400px;
+  border-right: 4px solid #cecece;
+  margin: 10px 30px 10px 10px;
+  position: sticky;
+  top: 40px;
+  padding: 10px;
+  padding-right: 30px;
+  min-height: 90vh;
 }
 
 .rentpress-settings-main .rentpress-tabs-menu-item {
-    padding: 0px;
-    margin: 0px;
+  padding: 0px;
+  margin: 0px;
 }
 
 .rentpress-settings-main .rentpress-tabs-menu-item h2 {
-    margin: 0px;
-    font-weight: 600;
-    display: flex;
+  margin: 0px;
+  font-weight: 600;
+  display: flex;
 }
 
 .rentpress-settings-main .rentpress-active-settings-tab-item span:after {
-    content: '>';
-    float: right;
+  content: ">";
+  float: right;
 }
 
 .rentpress-settings-main .rentpress-active-settings-tab-item span {
-    background-color: #3399FF;
-    padding: 0px 10px;
-    display: block;
-    line-height: 1.5;
-    border-radius: 5px;
-    color: white;
-    width: 100%;
+  background-color: #3399ff;
+  padding: 0px 10px;
+  display: block;
+  line-height: 1.5;
+  border-radius: 5px;
+  color: white;
+  width: 100%;
 }
 
 .rentpress-settings-main .rentpress-tabs-menu-item span {
-    /*background-color: #3399FF;*/
-    padding: 0px 10px;
-    display: block;
-    line-height: 1.5;
-    border-radius: 5px;
-   /* color: white;*/
-    width: 100%;
+  /*background-color: #3399FF;*/
+  padding: 0px 10px;
+  display: block;
+  line-height: 1.5;
+  border-radius: 5px;
+  /* color: white;*/
+  width: 100%;
 }
 
 .rentpress-settings-main .rentpress-active-settings-tab-item span:after {
-    float: right;
-    content: "\f345";
-    font-family: dashicons;
-    display: inline-block;
-    line-height: 1.5;
-    font-weight: 400;
-    font-style: normal;
-    speak: never;
-    text-decoration: inherit;
-    text-transform: none;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    width: 20px;
-    height: 20px;
-    font-size: 28px;
-    vertical-align: middle;
-    text-align: center;
-    transition: color .1s ease-in;
+  float: right;
+  content: "\f345";
+  font-family: dashicons;
+  display: inline-block;
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: normal;
+  speak: never;
+  text-decoration: inherit;
+  text-transform: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 20px;
+  height: 20px;
+  font-size: 28px;
+  vertical-align: middle;
+  text-align: center;
+  transition: color 0.1s ease-in;
 }
 
 .rentpress-settings-main .rentpress-admin-tab {
-    display: none;
-    -webkit-transition: opacity 600ms, visibility 600ms;
-    transition: opacity 600ms, visibility 600ms;
+  display: none;
+  -webkit-transition: opacity 600ms, visibility 600ms;
+  transition: opacity 600ms, visibility 600ms;
 }
 
 .rentpress-settings-main .is-active-rentpress-admin-tab {
-    display: block;
-    -webkit-transition: opacity 600ms, visibility 600ms;
-    transition: opacity 600ms, visibility 600ms;
+  display: block;
+  -webkit-transition: opacity 600ms, visibility 600ms;
+  transition: opacity 600ms, visibility 600ms;
 }
 
 .rentpress-settings-main .resync-options-container {
-    text-align: center;
+  text-align: center;
 }
 
 .rentpress-settings-main #rentpress-resync-loading-image {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
+  display: block;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .rentpress-settings-main .submit {
-    position: sticky;
-    top: 86vh;
-    padding: 40px 0px;
-    background-image: linear-gradient(rgb(255 255 255 / 73%), rgb(255 255 255));
+  position: sticky;
+  top: 86vh;
+  padding: 40px 0px;
+  background-image: linear-gradient(rgb(255 255 255 / 73%), rgb(255 255 255));
 }
 
 @media only screen and (max-width: 600px) {
-    .rentpress-settings-controls {
-        display: inline-block;
-    }
+  .rentpress-settings-controls {
+    display: inline-block;
+  }
 
-    .rentpress-admin-tabs-container {
-        padding: 10px;
-    }
+  .rentpress-admin-tabs-container {
+    padding: 10px;
+  }
 
-    .rentpress-settings-main h2 {
-        line-height: 1;
-    }
+  .rentpress-settings-main h2 {
+    line-height: 1;
+  }
 }
 
 .rentpress-settings-title-alt {
-    font-weight: 700;
-    width: 150px;
+  font-weight: 700;
+  width: 150px;
+}
+
+input[type="color"].rentpress-settings-text {
+  max-width: 80px;
 }
 
 /*////////////////////////////////////////////////////////////////////
@@ -634,83 +646,88 @@ input.rentpress-settings-text::placeholder,
 ////////////////////////////////////////////////////////////////////*/
 
 #rentpress-unit-display {
-    padding: 1em;
-    margin-bottom: 42px;
-    display: flex;
-    flex-wrap: wrap;
+  padding: 1em;
+  margin-bottom: 42px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .rentpress-unit-card {
-    background: #d4d4d4;
-    border: 1px solid #a9a9a9;
-    border-radius: 12px;
-    outline: none;
-    position: relative;
-    min-width: 200px;
-    flex-basis: calc(25% - 1.5em);
-    margin: .5em;
-    box-sizing: border-box;
+  background: #d4d4d4;
+  border: 1px solid #a9a9a9;
+  border-radius: 12px;
+  outline: none;
+  position: relative;
+  min-width: 200px;
+  flex-basis: calc(25% - 1.5em);
+  margin: 0.5em;
+  box-sizing: border-box;
 }
 
 .rentpress-unit-card::before {
-    content: '';
-    display: block;
-    padding-top: 100%;
+  content: "";
+  display: block;
+  padding-top: 100%;
 }
 
 .rentpress-unit-card-info {
-    padding: .5em;
-    position: absolute;
-    top: 0; left: 0;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
+  padding: 0.5em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .rentpress-unit-card-info h3 {
-    font-size: 20px;
-    margin: .5em 0;
+  font-size: 20px;
+  margin: 0.5em 0;
 }
 
 .rentpress-unit-card-info span {
-    display: block;
-    line-height: 1.3;
-    font-weight: 400;
-    font-size: 16px;
+  display: block;
+  line-height: 1.3;
+  font-weight: 400;
+  font-size: 16px;
 }
 
 .rentpress-edit-unit {
-    font-size: 20px;
-    font-weight: 700;
-    cursor: pointer;
-    margin: 0 auto;
-    padding: .75em 0;
-    transition: color .3s;
-    color: #182e74;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    text-align: center;
-    width: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0 auto;
+  padding: 0.75em 0;
+  transition: color 0.3s;
+  color: #182e74;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  width: inherit;
 }
 
 .rentpress-edit-unit:hover {
-    color: #974EDF;
+  color: #974edf;
 }
 
 h1.rentpress-edit-unit-title {
-    text-align: center;
-    font-weight: 600;
-    padding: 0;
-    margin: .5em 0;
+  text-align: center;
+  font-weight: 600;
+  padding: 0;
+  margin: 0.5em 0;
 }
 
-.taxonomy-city .form-table, .taxonomy-amenity .form-table, .taxonomy-feature .form-table, .taxonomy-pet .form-table, .taxonomy-property_type .form-table {
-    display: none;
+.taxonomy-city .form-table,
+.taxonomy-amenity .form-table,
+.taxonomy-feature .form-table,
+.taxonomy-pet .form-table,
+.taxonomy-property_type .form-table {
+  display: none;
 }
 
 .rentpress-gallery-single-image-wrapper img {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 /*////////////////////////////////////////////////////////////////////
@@ -718,159 +735,163 @@ h1.rentpress-edit-unit-title {
 ////////////////////////////////////////////////////////////////////*/
 
 .rentpress-prop-selector {
-    width: 100%;
-    padding: 1em;
-    border: 2px solid #cccccc;
-    background-color: #fff;
-    border-radius: 1em;
+  width: 100%;
+  padding: 1em;
+  border: 2px solid #cccccc;
+  background-color: #fff;
+  border-radius: 1em;
 }
 
 .rentpress-prop-selector-row {
-    padding: .5em .5em .5em 1em;
+  padding: 0.5em 0.5em 0.5em 1em;
 }
 
 .rentpress-prop-selector-title {
-    font-weight: 500;
-    vertical-align: middle;
-    font-size: 16px;
-    margin-left: 8px;
+  font-weight: 500;
+  vertical-align: middle;
+  font-size: 16px;
+  margin-left: 8px;
 }
 
 input.rentpress-admin-search-bar {
-    flex: 1;
-    color: #444;
-    font-weight: 600;
-    font-size: 16px;
-    border-radius: 0 .5em .5em 0;
-    border-color: #a9a9a9;
-    border-left: none;
-    outline: none;
-    margin-bottom: .5em;
-    margin-left: 0;
-    padding: 0 8px 0 0;
-    background-color: #dddddd;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  flex: 1;
+  color: #444;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 0 0.5em 0.5em 0;
+  border-color: #a9a9a9;
+  border-left: none;
+  outline: none;
+  margin-bottom: 0.5em;
+  margin-left: 0;
+  padding: 0 8px 0 0;
+  background-color: #dddddd;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 .rentpress-admin-search-bar-container {
-    width: 100%;
-    display: flex;
+  width: 100%;
+  display: flex;
 }
 
 .rentpress-admin-search-bar-container span {
-    background-color: #dddddd;
-    font-size: 16px;
-    border-radius: .5em 0 0 .5em;
-    height: 32px;
-    vertical-align: middle;
-    padding: 0 8px;
-    line-height: 2;
-    min-height: 30px;
-    border: 1px solid #a9a9a9;
-    border-right: none;
-    color: #9c9c9c;
+  background-color: #dddddd;
+  font-size: 16px;
+  border-radius: 0.5em 0 0 0.5em;
+  height: 32px;
+  vertical-align: middle;
+  padding: 0 8px;
+  line-height: 2;
+  min-height: 30px;
+  border: 1px solid #a9a9a9;
+  border-right: none;
+  color: #9c9c9c;
 }
 
 input.rentpress-admin-search-bar:focus {
-    border: 1px solid #a9a9a9;
-    box-shadow: none;
-    outline: none;
-    border-left: none;
+  border: 1px solid #a9a9a9;
+  box-shadow: none;
+  outline: none;
+  border-left: none;
 }
 
 input.rentpress-admin-search-bar::placeholder {
-    font-weight: 600;
-    font-size: 16px;
-    color: #9c9c9c;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #9c9c9c;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 .rentpress-prop-selector-heading {
-    margin: 1em 0 1em 0;
+  margin: 1em 0 1em 0;
 }
 
 .rentpress-prop-selector-container {
-    max-height: 50vh;
-    overflow-y: scroll;
+  max-height: 50vh;
+  overflow-y: scroll;
 }
 
-.rentpress-custom-cluster-pin-image, .rentpress-image-upload-preview {
-    max-width: 210px;
-    margin-top: 20px;
-    padding: 10px;
-    background: #f7f7f7;
-    border: 1px solid #b9b9b9;
+.rentpress-custom-cluster-pin-image,
+.rentpress-image-upload-preview {
+  max-width: 210px;
+  margin-top: 20px;
+  padding: 10px;
+  background: #f7f7f7;
+  border: 1px solid #b9b9b9;
 }
 
 .rentpress-gallery-upload-previews img {
-    max-width: 250px;
-    padding: 10px;
+  max-width: 250px;
+  padding: 10px;
 }
 
 .rentpress-gallery-upload-previews-grid {
-    max-height: 500px;
-    overflow-y: scroll;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 5%;
+  max-height: 500px;
+  overflow-y: scroll;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 5%;
 }
 
 .rentpress-gallery-single-image-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .rentpress-gallery-single-image-wrapper span {
-    position: absolute;
-    left: 5%;
-    top: 3%;
-    background-color: red;
-    color: white;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
+  position: absolute;
+  left: 5%;
+  top: 3%;
+  background-color: red;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
 
-.rentpress_row input[type=url], .rentpress_row input[type=text] {
-    width: calc(100% - 100px);
+.rentpress_row input[type="url"],
+.rentpress_row input[type="text"] {
+  width: calc(100% - 100px);
 }
 
 .rentpress-pop-up-background {
-    z-index: 1;
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    background: #000000de;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  z-index: 1;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: #000000de;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rentpress-pop-up-background div {
-    width: 80px;
-    height: 80px;
-    padding: 20px;
-    background-color: #fff;
-    pointer-events: none;
-    border: 0.4em solid transparent;
-    border-color: #eee;
-    border-top-color: #3499ff;
-    border-radius: 50%;
-    -webkit-animation: rentpress-spinner 1s linear infinite;
-    animation: rentpress-spinner 1s linear infinite;
+  width: 80px;
+  height: 80px;
+  padding: 20px;
+  background-color: #fff;
+  pointer-events: none;
+  border: 0.4em solid transparent;
+  border-color: #eee;
+  border-top-color: #3499ff;
+  border-radius: 50%;
+  -webkit-animation: rentpress-spinner 1s linear infinite;
+  animation: rentpress-spinner 1s linear infinite;
 }
 
 @keyframes rentpress-spinner {
-    100% {
-        transform: rotate(360deg)
-    }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /*////////////////////////////////////////////////////////////////////
@@ -878,27 +899,27 @@ input.rentpress-admin-search-bar::placeholder {
 ////////////////////////////////////////////////////////////////////*/
 
 @media screen and (max-width: 782px) {
-    #rentpress-expand-all {
-        margin-top: 1em;
-    }
+  #rentpress-expand-all {
+    margin-top: 1em;
+  }
 
-    div.rentpress-tab-button {
-        float: none;
-    }
+  div.rentpress-tab-button {
+    float: none;
+  }
 
-    .rentpress-panel {
-      padding: 0 18px;
-    }
+  .rentpress-panel {
+    padding: 0 18px;
+  }
 
-    .rentpress-settings-group {
-        display: block;
-    }
+  .rentpress-settings-group {
+    display: block;
+  }
 
-    .rentpress-settings-text {
-        width: 100%;
-    }
+  .rentpress-settings-text {
+    width: 100%;
+  }
 
-    .rentpress-settings-group textarea {
-        width: 100%;
-    }
+  .rentpress-settings-group textarea {
+    width: 100%;
+  }
 }

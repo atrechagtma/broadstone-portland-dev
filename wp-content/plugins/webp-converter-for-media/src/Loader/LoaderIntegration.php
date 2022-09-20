@@ -24,7 +24,7 @@ class LoaderIntegration implements HookableInterface {
 	 * {@inheritdoc}
 	 */
 	public function init_hooks() {
-		add_action( 'plugins_loaded', [ $this, 'load_loader_actions' ] );
+		add_action( 'init', [ $this, 'load_loader_actions' ] );
 		add_action( LoaderAbstract::ACTION_NAME, [ $this, 'refresh_loader' ], 10, 2 );
 	}
 

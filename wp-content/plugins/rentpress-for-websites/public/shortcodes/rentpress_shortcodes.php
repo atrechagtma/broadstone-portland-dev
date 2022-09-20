@@ -53,14 +53,14 @@ function rentpress_single_floorplan_shortcode_cb($atts = [], $content = '')
     }
 
     $formShortcodeHTML = '';
-    $hasFormShortcode = !is_null($floorplan->floorplan_parent_property_contact_type) && isset($floorplan->floorplan_parent_property_contact_type) ? $floorplan->floorplan_parent_property_contact_type == "3" : '';
+    $hasFormShortcode = isset($floorplan->floorplan_parent_property_contact_type) ? $floorplan->floorplan_parent_property_contact_type == "3" : '';
     if ($hasFormShortcode) {
         $shortcode = $floorplan->floorplan_parent_property_gravity_form;
-        $shortcode = str_replace("[","",$shortcode);
-        $shortcode = str_replace("]","",$shortcode);
-        $shortcode = '[' . $shortcode . ' field_values="property_code='. $floorplan->floorplan_parent_property_code .'&floorplan_code=floorplan_code"]';
+        $shortcode = str_replace("[", "", $shortcode);
+        $shortcode = str_replace("]", "", $shortcode);
+        $shortcode = '[' . $shortcode . ' field_values="property_code=' . $floorplan->floorplan_parent_property_code . '&floorplan_code=floorplan_code"]';
 
-        $formShortcodeHTML = '<div id="'. $floorplan->floorplan_parent_property_code .'_form_wrapper">' . do_shortcode($shortcode) . '</div>';
+        $formShortcodeHTML = '<div id="' . $floorplan->floorplan_parent_property_code . '_form_wrapper">' . do_shortcode($shortcode) . '</div>';
     }
 
     $similar_floorplans = rentpress_getSimilarFloorplans($floorplan);
@@ -123,15 +123,15 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
     }
 
     $formShortcodeHTML = '';
-    $hasFormShortcode = !is_null($property->property_contact_type) && isset($property->property_contact_type) ? $property->property_contact_type == "3" : '';
+    $hasFormShortcode = ( isset($property->property_contact_type) ? !is_null($property->property_contact_type) : '' ) ? $property->property_contact_type == "3" : '';
 
     if ($hasFormShortcode) {
         $shortcode = $property->property_gravity_form;
-        $shortcode = str_replace("[","",$shortcode);
-        $shortcode = str_replace("]","",$shortcode);
-        $shortcode = '[' . $shortcode . ' field_values="property_code='. $property->property_code .'&floorplan_code=floorplan_code"]';
+        $shortcode = str_replace("[", "", $shortcode);
+        $shortcode = str_replace("]", "", $shortcode);
+        $shortcode = '[' . $shortcode . ' field_values="property_code=' . $property->property_code . '&floorplan_code=floorplan_code"]';
 
-        $formShortcodeHTML = '<div id="'. $property->property_code .'_form_wrapper">' . do_shortcode($shortcode) . '</div>';
+        $formShortcodeHTML = '<div id="' . $property->property_code . '_form_wrapper">' . do_shortcode($shortcode) . '</div>';
     }
 
     $nearby_properties = rentpress_getNearbyProperties($property->property_city, 3, $property->property_code);
@@ -151,10 +151,12 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
     $hide_neighborhood = 'false';
     $neighborhood_meta = '';
     $city_meta = '';
+    $atts_neighborhood_is_publish = isset($atts['neighborhood_id']) ? get_post_status($atts['neighborhood_id']) === 'publish' : '';
+    $post_neighborhood_is_publish = isset($property->property_primary_neighborhood_post_id) ? get_post_status($property->property_primary_neighborhood_post_id) === 'publish' : '';
     if (isset($atts['hide_neighborhood']) && $atts['hide_neighborhood'] == 'true') {
         $hide_neighborhood = 'true';
-    } elseif (isset($atts['neighborhood_id']) || isset($property->property_neighborhood_post_id)) {
-        $neighborhood_id = $atts['neighborhood_id'] ?? $property->property_neighborhood_post_id;
+    } elseif ( (isset($atts['neighborhood_id']) || isset($property->property_primary_neighborhood_post_id)) && ($atts_neighborhood_is_publish || $post_neighborhood_is_publish) ) {
+        $neighborhood_id = $atts_neighborhood_is_publish && $atts['neighborhood_id'] ? $atts['neighborhood_id'] : $property->property_primary_neighborhood_post_id;
         $neighborhood_meta = get_post_meta($neighborhood_id);
         $neighborhood_post = get_post($neighborhood_id);
         $neighborhood_meta['post']['post_title'] = $neighborhood_post->post_title;
@@ -166,7 +168,7 @@ function rentpress_single_property_shortcode_cb($atts = [], $content = '')
         }
         $neighborhood_meta = htmlspecialchars(json_encode($neighborhood_meta), ENT_QUOTES, 'UTF-8');
     } else {
-        $city_term = get_term_by('name', $property->property_city, 'city');
+        $city_term = get_the_terms($property->property_post_id, 'city')[0];
         $city_meta = get_term_meta($city_term->term_id);
         $city_meta['post']['post_title'] = $city_term->name;
         $city_meta['post']['guid'] = get_term_link($city_term);
@@ -241,7 +243,7 @@ function rentpress_floorplan_search_shortcode_cb($atts = [], $content = '')
         $floorplans = rentpress_getFloorplansAndUnitsWithCodesOrPostIDs($floorplans_info);
     } elseif (isset($atts['property_codes'])) {
         $floorplans_info = explode(',', $atts['property_codes']);
-        $floorplans = rentpress_getFloorplansAndUnitsWithParentPropertyCodesOrPostIDs($floorplans_info);
+        $floorplans = rentpress_getAllFloorplansDataWithParentPropertyCodesOrPostIDs($floorplans_info);
     } elseif (isset($atts['property_post_ids'])) {
         $floorplans_info = explode(',', $atts['property_post_ids']);
         $floorplans = rentpress_getFloorplansAndUnitsWithParentPropertyCodesOrPostIDs($floorplans_info);
@@ -251,26 +253,35 @@ function rentpress_floorplan_search_shortcode_cb($atts = [], $content = '')
 
     $formShortcodes = [];
     $formShortcodesHTML = [];
+    $parent_property_codes = [];
     foreach ($floorplans as $floorplan) {
+        $parent_property_codes[] = $floorplan->floorplan_parent_property_code;
         $parent_property_contact_type = isset($floorplan->floorplan_parent_property_contact_type) ? $floorplan->floorplan_parent_property_contact_type : null;
         $hasFormShortcode = !is_null($parent_property_contact_type) && isset($parent_property_contact_type) ? $parent_property_contact_type == "3" : '';
         if ($hasFormShortcode) {
             if (!in_array($floorplan->floorplan_parent_property_gravity_form, $formShortcodes)) {
 
                 $shortcode = $floorplan->floorplan_parent_property_gravity_form;
-                $shortcode = str_replace("[","",$shortcode);
-                $shortcode = str_replace("]","",$shortcode);
-                $shortcode = '[' . $shortcode . ' field_values="property_code='. $floorplan->floorplan_parent_property_code .'&floorplan_code=floorplan_code"]';
+                $shortcode = str_replace("[", "", $shortcode);
+                $shortcode = str_replace("]", "", $shortcode);
+                $shortcode = '[' . $shortcode . ' field_values="property_code=' . $floorplan->floorplan_parent_property_code . '&floorplan_code=floorplan_code"]';
 
-                $formShortcodesHTML[] = '<div id="'. $floorplan->floorplan_parent_property_code .'_form_wrapper">' . do_shortcode($shortcode) . '</div>';
+                $formShortcodesHTML[] = '<div id="' . $floorplan->floorplan_parent_property_code . '_form_wrapper">' . do_shortcode($shortcode) . '</div>';
                 $formShortcodes[$floorplan->floorplan_parent_property_code] = $floorplan->floorplan_parent_property_gravity_form;
             }
         }
     }
 
+    if ( isset($parent_property_codes) ? count($parent_property_codes) : '' ) {
+        $properties = rentpress_getAllPropertiesWithCodesOrIDs($parent_property_codes);
+        $properties = htmlspecialchars(json_encode($properties), ENT_QUOTES, 'UTF-8');
+    }
+
     if (is_countable($formShortcodesHTML) ? count($formShortcodesHTML) : '') {
         $formShortcodesHTML = implode($formShortcodesHTML);
         $options['floorplan_forms'] = $formShortcodes;
+    } else {
+        $formShortcodesHTML = "";
     }
 
     if (count($floorplans) == 0) {
@@ -295,12 +306,18 @@ function rentpress_floorplan_search_shortcode_cb($atts = [], $content = '')
         $use_modals = 'true';
     }
 
+    $hide_community_filter = 'false';
+    if (strpos($attributes_string, 'HIDECOMMUNITYFILTER')) {
+        $hide_community_filter = 'true';
+    }
+
     // a lot of special characters in floorplans descriptions
     $floorplans = htmlspecialchars(json_encode($floorplans), ENT_QUOTES, 'UTF-8');
+    $options['rentpress_shortcode_atts'] = $atts;
     $options = json_encode($options);
 
     $content = $content . "
-        <div id='rentpress-app' data-floorplans='$floorplans' data-options='$options' data-shortcode='floorplan-search' data-hidefilters='$hidefilters' data-sidebarfilters='$sidebarfilters' data-use_modals='$use_modals'/></div><div id='floorplan-search-form-shortcodes' style='display: none;'>$formShortcodesHTML</div>
+        <div id='rentpress-app' data-floorplans='$floorplans' data-parentproperties='$properties' data-options='$options' data-shortcode='floorplan-search' data-hidefilters='$hidefilters' data-sidebarfilters='$sidebarfilters' data-use_modals='$use_modals' data-hidecommunityfilter='$hide_community_filter' /></div>
     ";
     return $content;
 }

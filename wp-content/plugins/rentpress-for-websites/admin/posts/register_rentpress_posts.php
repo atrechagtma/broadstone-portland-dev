@@ -1,5 +1,11 @@
 <?php
 
+$rentpressPostData = [
+    'properties' => [],
+    'floorplans' => [],
+    'neighborhoods' => [],
+];
+
 function rentpress_registerAllPostTypes()
 {
     require_once RENTPRESS_PLUGIN_ADMIN_POSTS . 'property/register_property_post_type.php';
@@ -18,21 +24,6 @@ function rentpress_allPostMetaSetup()
     require_once RENTPRESS_PLUGIN_ADMIN_POSTS . 'neighborhood/neighborhood_post_type_meta_setup.php';
 }
 
-// This function removes comments from rentpress's post types
-function rentpress_disable_comments_for_all_custom_post_types($open, $post_id)
-{
-    $post_type = get_post_type($post_id);
-
-    if ($post_type == 'rentpress_property' ||
-        $post_type == 'rentpress_floorplan' ||
-        $post_type == 'rentpress_hood') {
-        return false;
-    }
-    // leave comments enabled for any other post types
-    return true;
-}
-add_filter('comments_open', 'rentpress_disable_comments_for_all_custom_post_types', 10, 2);
-
 add_action('pre_get_posts', 'rentpress_posts_orderby');
 function rentpress_posts_orderby($query)
 {
@@ -43,6 +34,79 @@ function rentpress_posts_orderby($query)
     if ('rentpress_custom_field_floorplan_parent_property_code' === $query->get('orderby')) {
         $query->set('orderby', 'meta_value');
         $query->set('meta_key', 'rentpress_custom_field_floorplan_parent_property_code');
+    }
+}
+
+function rentpress_column_display_logic($compare, $column_value, $display)
+{
+    if (isset($compare)) {
+        $new_column_value = '';
+        $compare_value = isset($display['compare_value']) ? $display['compare_value'] : '';
+        $replace = isset($display['replace']) ? $display['replace'] : '';
+        switch ($compare) {
+            case '==':
+                $new_column_value = $column_value == $compare_value;
+                break;
+
+            case '>':
+                $new_column_value = $column_value > $compare_value;
+                break;
+
+            case '<':
+                $new_column_value = $column_value < $compare_value;
+                break;
+
+            case '>=':
+                $new_column_value = $column_value >= $compare_value;
+                break;
+
+            case '<=':
+                $new_column_value = $column_value <= $compare_value;
+                break;
+
+            default:
+                $new_column_value = $column_value;
+            break;
+        }
+    }
+
+    if ($new_column_value && $replace) {
+        if (strpos($replace, '%val%') !== false) {
+            $replace = str_replace("%val%", $new_column_value, $replace);
+        }
+        $new_column_value = $replace;
+    }
+
+    return $new_column_value;
+}
+
+function rentpress_column_capitalization_logic($column_capitalization, $column_style, $column_value)
+{
+    if ( $column_value && !empty($column_value) ) {
+        $value = $column_value;
+        if ($column_capitalization) {
+            switch ($column_capitalization) {
+                case 'upper':
+                    $value = strtoupper($column_value);
+                    break;
+
+                case 'lower':
+                    $value = strtolower($column_value);
+                    break;
+
+                case 'first':
+                    $value = ucfirst($column_value);
+                    break;
+
+                case 'words':
+                    $value = ucwords($column_value);
+                    break;
+            }
+        }
+        if ($column_style) {
+            return "<span style='" . esc_attr($column_style) . "'>" . esc_html($column_value) . "</span>";
+        }
+        return $value;
     }
 }
 
@@ -80,6 +144,7 @@ function rentpress_add_custom_column($column_title, $id, $post_type, $cb, $order
 
 function rentpress_add_custom_column_helper($args)
 {
+    global $rentpressPostData;
     $query_post_type = (isset($_GET['post_type'])) ? sanitize_text_field($_GET['post_type']) : 'post';
     if ($args['has_column'] && $query_post_type == $args['post_type']) {
         // check the data type
@@ -118,49 +183,26 @@ function rentpress_add_custom_column_helper($args)
 
             // make calls
             require_once (RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php');
-            switch ($data_type) {
-                case 'bedbath':
-                case 'meta':
-                    // case start
-                    if (!isset($thisMeta)) {
-                        $thisMeta = get_post_meta($post_id);
-                    }
-                    // case end
-                    break;
-                case 'availability':
-                    // case start
-                    if (!isset($floorplan)) {
-                        $floorplan = rentpress_getFloorplanDataWithCodeOrPostID($post_id);
-                    }
-                    // case end
-                    break;
-                case 'prop_codes_nh':
-                case 'prop_codes_fp':
-                    // case start
-                    if (!isset($thisMeta)) {
-                        $thisMeta = get_post_meta($post_id);
-                    }
-                    // case end
-                    break;
-
-                case 'post':
-                    // case start
-                    $data = get_post($post_id);
-                    // case end
-                    break;
-
-                case 'term':
-                    // case start
-                    $terms = wp_get_post_terms($post_id, $taxonomy);
-                    // case end
-                    break;
-
-                case 'neighborhood':
-                case 'property_data':
-                    // case start
-                    $property = rentpress_getAllPropertyDataWithCodeOrPostID($post_id);
-                    // case end
-                    break;
+            if ($post_type === 'rentpress_floorplan' ? !count($GLOBALS['rentpressPostData']['floorplans']) : "") {
+                $Allfloorplans = rentpress_getAllFloorplansAndUnits();
+                foreach ($Allfloorplans as $floorplan) {
+                    $GLOBALS['rentpressPostData']['floorplans'][$floorplan->floorplan_post_id] = $floorplan;
+                }
+            }
+            if ($post_type === 'rentpress_property' || $post_type === 'rentpress_hood' ? !count($GLOBALS['rentpressPostData']['properties']) : '') {
+                $AllProperties = rentpress_getAllProperties();
+                foreach ($AllProperties as $property) {
+                    $GLOBALS['rentpressPostData']['properties'][$property->property_post_id] = $property;
+                }
+            }
+            if ($post_type === 'rentpress_hood' ? !count($GLOBALS['rentpressPostData']['neighborhoods']) : '') {
+                $GLOBALS['rentpressPostData']['neighborhoods'][$post_id] = get_post_meta($post_id);
+            }
+            if ($data_type === 'post') {
+                $data = get_post($post_id);
+            }
+            if ($data_type === 'term') {
+                $terms = wp_get_post_terms($post_id, $taxonomy);
             }
 
             switch ($data_type) {
@@ -173,222 +215,85 @@ function rentpress_add_custom_column_helper($args)
                         foreach ($column_display as $key => $display) {
                             $compare = isset($display['compare_type']) ? $display['compare_type'] : '';
                             $compare = $compare == "=" ? '==' : $compare;
-                            $compare_value = isset($display['compare_value']) ? $display['compare_value'] : '';
-                            $replace = isset($display['replace']) ? $display['replace'] : '';
-                            $style = isset($display['style']) ? $display['style'] : '';
-                            if (isset($compare) && isset($compare_value)) {
-                                switch ($compare) {
-                                    case '==':
-                                        $eval = $column_value == $compare_value;
-                                        break;
-
-                                    case '>':
-                                        $eval = $column_value > $compare_value;
-                                        break;
-
-                                    case '<':
-                                        $eval = $column_value < $compare_value;
-                                        break;
-
-                                    case '>=':
-                                        $eval = $column_value >= $compare_value;
-                                        break;
-
-                                    case '<=':
-                                        $eval = $column_value <= $compare_value;
-                                        break;
-
-                                    default:
-                                        $eval = '';
-                                        break;
-                                }
-                            }
-
-                            if ($eval) {
-                                if ($replace) {
-                                    if (strpos($replace, '%val%') !== false) {
-                                        $replace = str_replace("%val%", $column_value, $replace);
-                                    }
-                                    $column_value_display = $replace;
-                                }
-                                if ($style) {
-                                    $column_style .= $style;
-                                }
-                            }
+                            $column_value_display = rentpress_column_display_logic($compare, $column_value, $display);
                         }
                         $column_value = $column_value_display;
                     }
-                    if ($column_value && (!empty($thisMeta[$meta_key][0] || $allow_false))) {
-                        if ($column_capitalization) {
-                            switch ($column_capitalization) {
-                                case 'upper':
-                                    $column_value = strtoupper($column_value);
-                                    break;
-
-                                case 'lower':
-                                    $column_value = strtolower($column_value);
-                                    break;
-
-                                case 'first':
-                                    $column_value = ucfirst($column_value);
-                                    break;
-
-                                case 'words':
-                                    $column_value = ucwords($column_value);
-                                    break;
-                            }
-                        }
-                        if ($column_style) {
-                            echo "<span style='" . esc_attr($column_style) . "'>" . esc_html($column_prefix . $column_value . $column_suffix) . "</span>";
-                            break;
-                        }
-                        echo esc_html($column_prefix . $column_value . $column_suffix);
-                    }
+                    $column_value = rentpress_column_capitalization_logic($column_capitalization, $column_style, $column_value);
+                    echo esc_html($column_prefix . $column_value . $column_suffix);
                     // case end
                     break;
 
                 case 'property_data':
                     // case start
                     $column_value = isset($property[$meta_key]) ? $property[$meta_key] : '';
-                    if ($column_capitalization) {
-                        switch ($column_capitalization) {
-                            case 'upper':
-                                $column_value = strtoupper($column_value);
-                                break;
-
-                            case 'lower':
-                                $column_value = strtolower($column_value);
-                                break;
-
-                            case 'first':
-                                $column_value = ucfirst($column_value);
-                                break;
-
-                            case 'words':
-                                $column_value = ucwords($column_value);
-                                break;
-                        }
-                    }
-                    echo esc_html($column_prefix . isset($property[$meta_key]) ? $property[$meta_key] : '' . $column_suffix);
+                    $column_value = rentpress_column_capitalization_logic($column_capitalization, '', $column_value);
+                    echo esc_html($column_prefix . $column_value . $column_suffix);
                     // case end
                     break;
 
                 case 'neighborhood':
                     // case start
-                    $hoodID = isset($property->{$meta_key}) ? $property->{$meta_key} : '';
-                    if ($hoodID) {
-                        $hood = get_post($hoodID);
-                        $column_value = $hood->post_title;
-                        if ($column_capitalization) {
-                            switch ($column_capitalization) {
-                                case 'upper':
-                                    $column_value = strtoupper($column_value);
-                                    break;
-
-                                case 'lower':
-                                    $column_value = strtolower($column_value);
-                                    break;
-
-                                case 'first':
-                                    $column_value = ucfirst($column_value);
-                                    break;
-
-                                case 'words':
-                                    $column_value = ucwords($column_value);
-                                    break;
-                            }
-                        }
-                        $columnHTML = $column_prefix . $column_value . $column_suffix;
-                        $link = get_edit_post_link($hoodID);
-                        if ($link) {
-                            $columnHTML = '<a href="' . esc_url($link) . '">' . wp_kses_post($columnHTML) . '</a>';
-                        }
-                        echo wp_kses_post($columnHTML);
+                    $thisPost = isset($GLOBALS['rentpressPostData']['properties'][$post_id]) ? $GLOBALS['rentpressPostData']['properties'][$post_id] : '';
+                    if ($thisPost) {
+                        $hoodName = isset($thisPost->property_neighborhood_post_name) ? $thisPost->property_neighborhood_post_name : '';
+                        $link = "/wp-admin/post.php?post=". $thisPost->property_primary_neighborhood_post_id ."&action=edit";
+                        $column_value = rentpress_column_capitalization_logic($column_capitalization, '', $hoodName);
+                        $column_value = "<a href='" . $link . "'>" . $column_value . "</a>";
+                        echo wp_kses_post($column_prefix . $column_value . $column_suffix);
                     }
                     // case end
                     break;
 
                 case 'bedbath':
                     // case start
-                    $bed = isset($thisMeta['rentpress_custom_field_floorplan_bedroom_count'][0]) ? $thisMeta['rentpress_custom_field_floorplan_bedroom_count'][0] : '';
-                    $bath = isset($thisMeta['rentpress_custom_field_floorplan_bathroom_count'][0]) ? $thisMeta['rentpress_custom_field_floorplan_bathroom_count'][0] : '';
-                    if (intval($bed) == 0) {
-                        $bed = 'Studio';
-                    } else {
-                        $bed = $bed ? $bed . ' Bed' : '';
-                    }
-                    $hasBoth = $bed && $bath ? ' | ' : '';
-                    $bath = $bath ? $bath . ' Bath' : '';
-                    $column_value = $bed . $hasBoth . $bath;
-                    if ($column_capitalization) {
-                        switch ($column_capitalization) {
-                            case 'upper':
-                                $column_value = strtoupper($column_value);
-                                break;
-
-                            case 'lower':
-                                $column_value = strtolower($column_value);
-                                break;
-
-                            case 'first':
-                                $column_value = ucfirst($column_value);
-                                break;
-
-                            case 'words':
-                                $column_value = ucwords($column_value);
-                                break;
+                    $thisPost = isset($GLOBALS['rentpressPostData']['floorplans'][$post_id]) ? $GLOBALS['rentpressPostData']['floorplans'][$post_id] : '';
+                    if ($thisPost) {
+                        $bed = isset($thisPost->floorplan_bedrooms) ? $thisPost->floorplan_bedrooms : '';
+                        $bath = isset($thisPost->floorplan_bathrooms) ? $thisPost->floorplan_bathrooms : '';
+                        if (intval($bed) == 0 && $bed != '') {
+                            $bed = 'Studio';
+                        } else {
+                            $bed = $bed ? $bed . ' Bed' : '';
                         }
+                        $hasBoth = $bed && $bath ? ' | ' : '';
+                        $bath = $bath ? $bath . ' Bath' : '';
+                        $column_value = $bed . $hasBoth . $bath;
+                        $column_value = rentpress_column_capitalization_logic($column_capitalization, '', $column_value);
+                        echo esc_html($column_prefix . $column_value . $column_suffix);
                     }
-                    echo esc_html($column_prefix . $column_value . $column_suffix);
                     // case end
                     break;
 
-                case 'prop_codes_nh':
                 case 'prop_codes_fp':
                     // case start
-                    $codesHTML = '';
-                    $codes = explode(',', $thisMeta[$meta_key][0]);
-                    $properties = [];
-                    foreach ($codes as $key => $code) {
-                        if ($code) {
-                            $property = rentpress_getAllPropertyDataWithCodeOrPostID($code);
-                            $link = get_edit_post_link(isset($property->property_post_id) ? $property->property_post_id : '');
-                            $column_value = isset($property->property_name) ? $property->property_name : '';
-                            if ($column_capitalization) {
-                                switch ($column_capitalization) {
-                                    case 'upper':
-                                        $column_value = strtoupper($column_value);
-                                        break;
+                    $thisPost = isset($GLOBALS['rentpressPostData']['floorplans'][$post_id]) ? $GLOBALS['rentpressPostData']['floorplans'][$post_id] : '';
+                    if ($thisPost) {
+                        $link = $thisPost->floorplan_parent_property_post_link;
+                        $column_value = isset($thisPost->floorplan_parent_property_name) ? rentpress_column_capitalization_logic($column_capitalization, '', $thisPost->floorplan_parent_property_name) : '';
+                        $column_value = "<a href='" . $link . "'>" . $column_value . "</a>";
+                        echo wp_kses_post($column_prefix . $column_value . $column_suffix);
+                    }
+                    // case end
+                    break; 
 
-                                    case 'lower':
-                                        $column_value = strtolower($column_value);
-                                        break;
-
-                                    case 'first':
-                                        $column_value = ucfirst($column_value);
-                                        break;
-
-                                    case 'words':
-                                        $column_value = ucwords($column_value);
-                                        break;
-                                }
-                            }
-                            if ($link && $column_value) {
-                                $properties[$column_value] = "<a href='" . $link . "'>" . $column_value . "</a>";
+                case 'prop_codes_nh':
+                    // case start
+                    $thisPost = isset($GLOBALS['rentpressPostData']['neighborhoods'][$post_id]) ? $GLOBALS['rentpressPostData']['neighborhoods'][$post_id] : '';
+                    if ($thisPost) {
+                        $codes = isset($thisPost['rentpress_custom_field_neighborhood_property_codes'][0]) ? $thisPost['rentpress_custom_field_neighborhood_property_codes'][0] : '';
+                        $column_value = "";
+                        $properties = '';
+                        if ($codes) {
+                            $properties = rentpress_getAllPropertiesWithCodesOrIDs(explode(',', $codes));
+                        }
+                        foreach ($properties as $key => $property) {
+                            $column_value .= "<a href='". $property->property_post_link ."'>". $property->property_name ."</a>";
+                            if (count($properties) > $key + 1) {
+                                $column_value .= ", ";
                             }
                         }
-                    } //
-
-                    // sort values before display
-                    ksort($properties);
-                    $thisPropCount = 0;
-                    foreach ($properties as $key => $prop) {
-                        $thisPropCount++;
-                        $comma = ', ';
-                        if ($thisPropCount == count(array_keys($properties))) {
-                            $comma = ' ';
-                        }
-                        echo wp_kses_post($prop . $comma);
+                        echo wp_kses_post($column_prefix . $column_value . $column_suffix);
                     }
                     // case end
                     break;
@@ -397,26 +302,8 @@ function rentpress_add_custom_column_helper($args)
                     // case start
                     if (isset($termsStr) && !empty($termsStr) && $termsStr) {
                         $column_value = $data->{$meta_key};
-                        if ($column_capitalization) {
-                            switch ($column_capitalization) {
-                                case 'upper':
-                                    $column_value = strtoupper($column_value);
-                                    break;
-
-                                case 'lower':
-                                    $column_value = strtolower($column_value);
-                                    break;
-
-                                case 'first':
-                                    $column_value = ucfirst($column_value);
-                                    break;
-
-                                case 'words':
-                                    $column_value = ucwords($column_value);
-                                    break;
-                            }
-                        }
-                        echo esc_html($column_prefix . $data->{$meta_key} . $column_suffix);
+                        $column_value = rentpress_column_capitalization_logic($column_capitalization, $column_style, $column_value);
+                        echo esc_html($column_prefix . $column_value . $column_suffix);
                     }
                     // case end
                     break;
@@ -431,27 +318,11 @@ function rentpress_add_custom_column_helper($args)
                     }
                     if ($terms && isset($terms[0])) {
                         foreach ($terms as $term) {
-                            $term_value = $term->name;
+                            $column_value = $term->name;
                             if ($column_capitalization) {
-                                switch ($column_capitalization) {
-                                    case 'upper':
-                                        $term_value = strtoupper($term_value);
-                                        break;
-
-                                    case 'lower':
-                                        $term_value = strtolower($term_value);
-                                        break;
-
-                                    case 'first':
-                                        $term_value = ucfirst($term_value);
-                                        break;
-
-                                    case 'words':
-                                        $term_value = ucwords($term_value);
-                                        break;
-                                }
+                                $column_value = rentpress_column_capitalization_logic($column_capitalization, '', $term_value);
                             }
-                            $termsStr .= $term_value . ' ';
+                            $termsStr .= $column_value . ' ';
                         }
                     }
                     if (isset($termsStr) && !empty($termsStr) && $termsStr) {
@@ -462,11 +333,14 @@ function rentpress_add_custom_column_helper($args)
 
                 case 'availability':
                     // case start
-                    $units = isset($floorplan->{$meta_key}) ? $floorplan->{$meta_key} : '';
-                    if ($units && !is_null($units)) {
-                        echo $units == 1 ? "1 Unit" : esc_html($units) . " Units";
-                    } else {
-                        echo "No Available Units";
+                    $thisPost = isset($GLOBALS['rentpressPostData']['floorplans'][$post_id]) ? $GLOBALS['rentpressPostData']['floorplans'][$post_id] : '';
+                    if ($thisPost) {
+                        $units = isset($thisPost->floorplan_units_available) ? $thisPost->floorplan_units_available : '';
+                        if ($units && !is_null($units)) {
+                            echo $units == 1 ? "1 Unit" : esc_html($units) . " Units";
+                        } else {
+                            echo "No Available Units";
+                        }
                     }
                     // case end
                     break;
@@ -589,17 +463,14 @@ function rentpress_add_custom_column_restrict_manage_posts($args)
 
                         case 'prop_codes_fp':
                             // case start
-                            $floorplan = rentpress_getFloorplanDataWithCodeOrPostID($data->ID);
+                            $floorplan = isset($rentpressPostData[$data->ID]) ? $rentpressPostData[$data->ID] : '';
                             $prop_code = isset($floorplan->floorplan_parent_property_code) ? $floorplan->floorplan_parent_property_code : '';
-                            if ($prop_code) {
-                                $property = rentpress_getAllPropertyDataWithCodeOrPostID($prop_code);
-                                if (isset($property->property_name)) {
-                                    $prop_name = $property->property_name ? $property->property_name : '';
-                                    $values[] = array(
-                                        'name' => $prop_name,
-                                        'code' => $prop_code,
-                                    );
-                                }
+                            if ($prop_code ? isset($floorplan->floorplan_parent_property_name) : '') {
+                                $prop_name = $floorplan->floorplan_parent_property_name ? $floorplan->floorplan_parent_property_name : '';
+                                $values[] = array(
+                                    'name' => $prop_name,
+                                    'code' => $prop_code,
+                                );
                             }
                             // case end
                             break;
@@ -657,6 +528,33 @@ $current_v = isset($_GET[$field_name]) ? sanitize_text_field($_GET[$field_name])
                             $label = isset($value['name']) ? $value['name'] : '';
                         }
                         echo '<option value="' . esc_attr($val) . '" ' . $selected . '>' . esc_html($field_prefix . $label . $field_suffix) . '</option>';
+                    }
+                    ?>
+</select>
+<?php
+// case end
+                    break;
+
+                case 'term_select':
+                    // case start
+                    ?><select name="<?php echo esc_html($field_name); ?>">
+  <option value=""><?php echo esc_html($placeholder); ?></option>
+
+  <?php
+$current_v = isset($_GET[$field_name]) ? sanitize_text_field($_GET[$field_name]) : '';
+                    foreach ($values as $label => $value) {
+                        $label = $value;
+                        $val = $value;
+                        if ($val === 0) {
+                            $val = -1;
+                        }
+                        $selected = $value === $current_v ? ' selected="selected"' : '';
+
+                        if ((is_array($value) && $data_type == 'prop_codes_fp') || (is_array($value) && $data_type == 'prop_codes_nh')) {
+                            $val = isset($value['code']) ? $value['code'] : '';
+                            $label = isset($value['name']) ? $value['name'] : '';
+                        }
+                        echo '<option value="' . sanitize_title(str_replace("+"," ",$val)) . '" ' . $selected . '>' . esc_html($field_prefix . $label . $field_suffix) . '</option>';
                     }
                     ?>
 </select>
@@ -753,7 +651,7 @@ function rentpress_add_custom_column_parse_query($args)
                                     'relation' => 'AND',
                                     array(
                                         'taxonomy' => $taxonomy,
-                                        'field' => 'name',
+                                        'field' => 'slug',
                                         'terms' => array(sanitize_text_field($_GET[$field_name])),
                                     ),
                                 )

@@ -44,6 +44,8 @@
         <floorplan-search
           v-if="floorplansArray[0] && floorplansArray[0].floorplan_code"
           :floorplans="floorplansArray"
+          :parentproperties="parentPropertiesArray"
+          :hidecommunityfilter="hideCommunityFilterOption"
           :options="optionsObject"
           :hideFiltersOption="hideFiltersOption"
           :useModals="useModals"
@@ -94,6 +96,8 @@ export default {
       propertyObject: {},
       floorplanObject: {},
       floorplansArray: [],
+      parentPropertiesArray: [],
+      hideCommunityFilterOption: false,
       propertiesArray: [],
       optionsObject: {},
       cityObject: {},
@@ -149,6 +153,14 @@ export default {
     floorplans: {
       type: String,
       default: ""
+    },
+    parentproperties: {
+      type: String,
+      default: ""
+    },
+    hidecommunityfilter: {
+      type: String,
+      default: "false"
     },
     property: {
       type: String,
@@ -226,6 +238,12 @@ export default {
     if (this.floorplans !== "") {
       this.floorplansArray = JSON.parse(this.floorplans);
     }
+    if (this.parentproperties !== "") {
+      this.parentPropertiesArray = JSON.parse(this.parentproperties);
+    }
+    if (this.hidecommunityfilter == "true") {
+      this.hideCommunityFilterOption = true;
+    }
     if (this.properties !== "") {
       this.propertiesArray = JSON.parse(this.properties);
     }
@@ -299,7 +317,7 @@ export default {
   min-height: 10vh !important;
 }
 .rentpress-shortcode-wrapper .rentpress-inherited-font-family {
-  font-family: var(--user-font-fam) !important;
+  font-family: var(--user-font-fam);
   word-break: keep-all;
 }
 .rentpress-shortcode-wrapper .rentpress-floorplan-sidebar ::selection, .rentpress-shortcode-wrapper .rentpress-top-floorplan-search-filter-wrapper ::selection, .rentpress-shortcode-wrapper .rentpress-property-search-filters ::selection, .rentpress-shortcode-wrapper .v-input ::selection {

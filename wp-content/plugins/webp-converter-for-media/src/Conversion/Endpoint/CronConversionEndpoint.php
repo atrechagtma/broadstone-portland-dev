@@ -42,6 +42,13 @@ class CronConversionEndpoint extends EndpointAbstract {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function get_http_methods(): string {
+		return \WP_REST_Server::CREATABLE;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function is_valid_request( \WP_REST_Request $request ): bool {
 		$nonce_value = $this->cron_status_manager->get_conversion_request_id();
 		if ( $nonce_value === null ) {
@@ -60,10 +67,9 @@ class CronConversionEndpoint extends EndpointAbstract {
 		return get_rest_url(
 			null,
 			sprintf(
-				'%1$s/%2$s?%3$s=%4$s',
+				'%1$s/%2$s-%3$s',
 				EndpointIntegration::ROUTE_NAMESPACE,
 				$this->get_route_name(),
-				EndpointIntegration::ROUTE_NONCE_PARAM,
 				$nonce_value
 			)
 		);

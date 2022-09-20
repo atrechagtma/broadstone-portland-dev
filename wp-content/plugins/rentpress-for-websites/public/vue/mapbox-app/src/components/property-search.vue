@@ -1,12 +1,14 @@
 <template class="rentpress-advanced-search-shortcode-property-search-wrapper">
   <div>
-    <v-row justify="center" class="hidden-md-and-up pb-5">
-      <v-col cols="11" sm="11">
-        <v-btn block color="primary" @click="toggleMap = !toggleMap">
-          <v-icon class="pr-4">mdi-tune</v-icon> Toggle Filters and Map
-        </v-btn>
-      </v-col>
-    </v-row>
+    <div v-show="!hideFiltersOption">
+      <v-row justify="center" class="hidden-md-and-up pb-5">
+        <v-col cols="11" sm="11">
+          <v-btn block color="primary" @click="toggleMap = !toggleMap">
+            <v-icon class="pr-4">mdi-tune</v-icon> Toggle Filters and Map
+          </v-btn>
+        </v-col>
+      </v-row>
+    </div>
     <div v-show="!hideFiltersOption && shouldShowMap">
       <v-row justify="center" class="py-0 rentpress-property-search-filters" align="center">
         <v-col xl="3" lg="3" md="4" sm="5" cols="auto">

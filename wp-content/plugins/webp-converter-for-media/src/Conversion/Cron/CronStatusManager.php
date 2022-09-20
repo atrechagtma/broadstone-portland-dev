@@ -14,14 +14,15 @@ class CronStatusManager {
 	const CRON_PATHS_LIMIT             = 1000;
 
 	/**
-	 * @param string[] $paths .
+	 * @param string[] $paths           .
+	 * @param bool     $use_paths_limit .
 	 *
 	 * @return void
 	 */
-	public function set_paths_to_conversion( array $paths ) {
+	public function set_paths_to_conversion( array $paths, bool $use_paths_limit = true ) {
 		set_site_transient(
 			self::CRON_PATHS_TRANSIENT,
-			array_slice( $paths, 0, self::CRON_PATHS_LIMIT ),
+			( $use_paths_limit ) ? array_slice( $paths, 0, self::CRON_PATHS_LIMIT ) : $paths,
 			3600
 		);
 	}

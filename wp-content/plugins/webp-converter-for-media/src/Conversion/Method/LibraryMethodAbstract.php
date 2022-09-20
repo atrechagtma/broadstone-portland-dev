@@ -33,6 +33,7 @@ abstract class LibraryMethodAbstract extends MethodAbstract implements LibraryMe
 		SkipLarger $skip_larger,
 		ServerConfigurator $server_configurator
 	) {
+		parent::__construct();
 		$this->skip_crashed        = $skip_crashed;
 		$this->skip_larger         = $skip_larger;
 		$this->server_configurator = $server_configurator;
@@ -46,6 +47,7 @@ abstract class LibraryMethodAbstract extends MethodAbstract implements LibraryMe
 		foreach ( $output_formats as $output_format ) {
 			foreach ( $paths as $path ) {
 				try {
+					$this->files_to_conversion++;
 					$this->convert_path( $path, $output_format, $plugin_settings );
 				} catch ( \Exception $e ) {
 					$this->errors[] = $e->getMessage();
@@ -76,13 +78,15 @@ abstract class LibraryMethodAbstract extends MethodAbstract implements LibraryMe
 			$output_path = $this->get_image_output_path( $source_path, $format );
 
 			$this->skip_crashed->create_crashed_file( $output_path );
+			$this->output_files_converted[ $format ]++;
 
 			$image = $this->create_image_by_path( $source_path, $plugin_settings );
 			$this->convert_image_to_output( $image, $source_path, $output_path, $format, $plugin_settings );
+			do_action( 'webpc_after_conversion', $output_path, $source_path );
 
 			$this->skip_crashed->delete_crashed_file( $output_path );
 			$this->skip_larger->remove_image_if_is_larger( $output_path, $source_path, $plugin_settings );
-			$this->update_conversion_stats( $source_path, $output_path );
+			$this->update_conversion_stats( $source_path, $output_path, $format );
 		} catch ( \Exception $e ) {
 			$this->log_conversion_error( $e->getMessage(), $plugin_settings );
 			throw $e;

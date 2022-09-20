@@ -43,7 +43,7 @@ class Update implements HookableInterface {
 			return;
 		}
 
-		( new DefaultSettings( $this->plugin_info ) )->add_default_options();
+		( new DefaultSettings( $this->plugin_info ) )->add_default_notices_values();
 		do_action( LoaderAbstract::ACTION_NAME, true );
 
 		OptionsAccessManager::update_option( self::VERSION_OPTION, $this->plugin_info->get_plugin_version() );

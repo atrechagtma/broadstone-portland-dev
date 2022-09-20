@@ -61,8 +61,11 @@ function rentpress_removeTrashedFloorplanFromRefreshDatabase($post_id)
         return;
     }
 
-    require_once RENTPRESS_PLUGIN_DATA_MODEL . 'refresh_model.php';
-    rentpress_deleteRefreshData();
+    $property_code = get_post_meta($post_id, 'rentpress_custom_field_floorplan_parent_property_code', true);
+    if (!empty($property_code)) {
+        require_once RENTPRESS_PLUGIN_DATA_MODEL . 'refresh_model.php';
+        rentpress_deleteRefreshDataForProperty($property_code);
+    }
 }
 add_action('trashed_post', 'rentpress_removeTrashedFloorplanFromRefreshDatabase');
 
@@ -78,7 +81,7 @@ rentpress_add_custom_column_filters([
     'field_config' => [
         'field_type' => 'select',
         'data_type' => 'prop_codes_fp',
-        'meta_key' => 'rentpress_custom_field_floorplan_parent_property_code',
+        'meta_key' => 'floorplan_parent_property_code',
         'field_sort' => SORT_STRING,
         'data_compare' => '=',
         'field_placeholder' => 'Property',
@@ -171,7 +174,7 @@ rentpress_add_custom_column('Starting Price', 'price', 'rentpress_floorplan', fu
     if (!empty($thisMeta['rentpress_custom_field_floorplan_rent_type_selection'][0]) && $thisMeta['rentpress_custom_field_floorplan_rent_type_selection'][0] == 'Disabled') {
         echo '<strong style="color: orange;">Disabled</strong>';
     } elseif ($rentDisplay == 'Bad Data') {
-        echo '<strong style="color: red;">Bad Data</strong><br/>';
+        echo '<strong style="color: red;">Bad Data</strong><br/>Selected: ' . $thisMeta['rentpress_custom_field_floorplan_rent_type_selection'][0];
     } else {
         esc_attr_e($rentDisplay);
     }

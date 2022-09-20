@@ -60,9 +60,11 @@ function rentpress_removeTrashedPropertyFromRefreshDatabase($post_id)
     if ('rentpress_property' != get_post_type($post_id)) {
         return;
     }
-
-    require_once RENTPRESS_PLUGIN_DATA_MODEL . 'refresh_model.php';
-    rentpress_deleteRefreshData();
+    $property_code = get_post_meta($post_id, 'rentpress_custom_field_property_code', true);
+    if (!empty($property_code)) {
+        require_once RENTPRESS_PLUGIN_DATA_MODEL . 'refresh_model.php';
+        rentpress_deleteRefreshDataForProperty($property_code);
+    }
 }
 add_action('trashed_post', 'rentpress_removeTrashedPropertyFromRefreshDatabase');
 
@@ -77,7 +79,7 @@ rentpress_add_custom_column_filters([
         'column_header' => 'City',
     ],
     'field_config' => [
-        'field_type' => 'select',
+        'field_type' => 'term_select',
         'data_type' => 'term',
         'field_sort' => SORT_STRING,
         'taxonomy' => 'city',
@@ -108,19 +110,26 @@ rentpress_add_custom_column_filters([
         'data_type' => 'neighborhood',
         'field_sort' => SORT_STRING,
         'data_compare' => '=',
-        'meta_key' => 'property_neighborhood_post_id',
+        'meta_key' => 'property_neighborhood_post_ids',
         'field_placeholder' => 'Neighborhood',
     ],
 ]);
 
 rentpress_add_custom_column('Starting Price', 'price', 'rentpress_property', function ($post_id) {
-    $thisMeta = get_post_meta($post_id);
-    $propRent = isset($thisMeta['rentpress_custom_field_property_rent_type_selection_cost'][0]) ? $thisMeta['rentpress_custom_field_property_rent_type_selection_cost'][0] : '';
+    if (!count($GLOBALS['rentpressPostData']['properties'])) {
+        require_once (RENTPRESS_PLUGIN_DATA_ACCESS . 'data_layer.php');
+        $AllProperties = rentpress_getAllProperties();
+        foreach ($AllProperties as $property) {
+            $GLOBALS['rentpressPostData']['properties'][$property->property_post_id] = $property;
+        }
+    }
+    $thisProp = $GLOBALS['rentpressPostData']['properties'][$post_id];
+    $propRent = isset($thisProp->property_rent_type_selection_cost) ? $thisProp->property_rent_type_selection_cost : '';
     $rentDisplay = ($propRent > 100 && !empty($propRent)) ? '$' . esc_attr($propRent) : 'Bad Data';
-    if (!empty($thisMeta['rentpress_custom_field_property_disable_pricing'][0])) {
+    if (!empty($thisProp->property_disable_pricing)) {
         echo '<strong style="color: orange;">Disabled</strong>';
     } elseif ($rentDisplay == 'Bad Data') {
-        echo '<strong style="color: red;">' . esc_html($rentDisplay) . '</strong><br />';
+        echo '<strong style="color: red;">' . esc_html($rentDisplay) . '</strong><br /> Selected: ' . $thisProp->property_rent_type_selection;
         esc_attr_e($propRent);
     } else {
         esc_attr_e($rentDisplay);

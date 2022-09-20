@@ -44,6 +44,8 @@
         <floorplan-search
           v-if="floorplansArray[0] && floorplansArray[0].floorplan_code"
           :floorplans="floorplansArray"
+          :parentproperties="parentPropertiesArray"
+          :hidecommunityfilter="hideCommunityFilterOption"
           :options="optionsObject"
           :hideFiltersOption="hideFiltersOption"
           :useModals="useModals"
@@ -89,11 +91,13 @@ import propertySearch from "./components/property-search.vue";
 
 export default {
   name: "App",
-  data: function () {
+  data: function() {
     return {
       propertyObject: {},
       floorplanObject: {},
       floorplansArray: [],
+      parentPropertiesArray: [],
+      hideCommunityFilterOption: false,
       propertiesArray: [],
       optionsObject: {},
       cityObject: {},
@@ -149,6 +153,14 @@ export default {
     floorplans: {
       type: String,
       default: ""
+    },
+    parentproperties: {
+      type: String,
+      default: ""
+    },
+    hidecommunityfilter: {
+      type: String,
+      default: "false"
     },
     property: {
       type: String,
@@ -213,7 +225,7 @@ export default {
       window.open("https://rentpress.io", "_blank");
     }
   },
-  mounted: function () {
+  mounted: function() {
     if (this.property !== "") {
       this.propertyObject = JSON.parse(this.property);
     }
@@ -225,6 +237,12 @@ export default {
     }
     if (this.floorplans !== "") {
       this.floorplansArray = JSON.parse(this.floorplans);
+    }
+    if (this.parentproperties !== "") {
+      this.parentPropertiesArray = JSON.parse(this.parentproperties);
+    }
+    if (this.hidecommunityfilter == "true") {
+      this.hideCommunityFilterOption = true;
     }
     if (this.properties !== "") {
       this.propertiesArray = JSON.parse(this.properties);
@@ -281,12 +299,12 @@ export default {
       window.dataLayer.push(arguments);
     }
     if (this.optionsObject.rentpress_google_analytics_api_section_tracking_id) {
-      let trackingID =
-        this.optionsObject.rentpress_google_analytics_api_section_tracking_id;
+      let trackingID = this.optionsObject
+        .rentpress_google_analytics_api_section_tracking_id;
       window.dataLayer = window.dataLayer || [];
       gtag("js", new Date());
       gtag("config", trackingID);
-      window.addEventListener("load", function () {
+      window.addEventListener("load", function() {
         window.ga("create", trackingID, "auto");
       });
     }
@@ -299,16 +317,26 @@ export default {
   min-height: 10vh !important;
 }
 .rentpress-shortcode-wrapper .rentpress-inherited-font-family {
-  font-family: var(--user-font-fam) !important;
+  font-family: var(--user-font-fam);
   word-break: keep-all;
 }
 
-.rentpress-shortcode-wrapper .rentpress-floorplan-sidebar ::selection, .rentpress-shortcode-wrapper .rentpress-top-floorplan-search-filter-wrapper ::selection, .rentpress-shortcode-wrapper .rentpress-property-search-filters ::selection, .rentpress-shortcode-wrapper .v-input ::selection {
+.rentpress-shortcode-wrapper .rentpress-floorplan-sidebar ::selection,
+.rentpress-shortcode-wrapper
+  .rentpress-top-floorplan-search-filter-wrapper
+  ::selection,
+.rentpress-shortcode-wrapper .rentpress-property-search-filters ::selection,
+.rentpress-shortcode-wrapper .v-input ::selection {
   background: var(--primary-color);
   color: white;
 }
 
-.rentpress-shortcode-wrapper .rentpress-floorplan-sidebar input, .rentpress-shortcode-wrapper .rentpress-top-floorplan-search-filter-wrapper input, .rentpress-shortcode-wrapper .rentpress-property-search-filters input, .rentpress-shortcode-wrapper .v-input input{
+.rentpress-shortcode-wrapper .rentpress-floorplan-sidebar input,
+.rentpress-shortcode-wrapper
+  .rentpress-top-floorplan-search-filter-wrapper
+  input,
+.rentpress-shortcode-wrapper .rentpress-property-search-filters input,
+.rentpress-shortcode-wrapper .v-input input {
   box-shadow: none !important;
   border: none !important;
   background-color: transparent !important;

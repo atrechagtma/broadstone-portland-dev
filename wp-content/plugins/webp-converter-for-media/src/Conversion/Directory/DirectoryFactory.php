@@ -11,25 +11,21 @@ use WebpConverter\Plugin\Uninstall\WebpFiles;
 class DirectoryFactory implements HookableInterface {
 
 	/**
-	 * @var PathsGenerator
-	 */
-	private $paths_generator;
-
-	/**
 	 * Object of directories integration.
 	 *
 	 * @var DirectoryIntegration
 	 */
 	private $directories_integration;
 
-	public function __construct( PathsGenerator $paths_generator = null ) {
-		$this->paths_generator = $paths_generator ?: new PathsGenerator();
-
-		$this->set_integration( new GalleryDirectory( $this->paths_generator ) );
-		$this->set_integration( new PluginsDirectory( $this->paths_generator ) );
-		$this->set_integration( new ThemesDirectory( $this->paths_generator ) );
-		$this->set_integration( new UploadsDirectory( $this->paths_generator ) );
-		$this->set_integration( new UploadsWebpcDirectory( $this->paths_generator ) );
+	public function __construct() {
+		$this->set_integration( new SourceDirectory( 'gallery' ) );
+		$this->set_integration( new SourceDirectory( 'plugins' ) );
+		$this->set_integration( new SourceDirectory( 'themes' ) );
+		$this->set_integration( new SourceDirectory( 'uploads', true ) );
+		foreach ( apply_filters( 'webpc_source_directories', [] ) as $directory_name ) {
+			$this->set_integration( new SourceDirectory( $directory_name ) );
+		}
+		$this->set_integration( new UploadsWebpcDirectory() );
 	}
 
 	/**
@@ -41,7 +37,7 @@ class DirectoryFactory implements HookableInterface {
 	 */
 	private function set_integration( DirectoryInterface $directory ) {
 		if ( $this->directories_integration === null ) {
-			$this->directories_integration = new DirectoryIntegration( $this->paths_generator );
+			$this->directories_integration = new DirectoryIntegration();
 		}
 		$this->directories_integration->add_directory( $directory );
 	}
@@ -50,6 +46,18 @@ class DirectoryFactory implements HookableInterface {
 	 * {@inheritdoc}
 	 */
 	public function init_hooks() {
+		$this->directories_integration->init_hooks();
+		add_action( 'init', [ $this, 'init_hooks_after_setup' ] );
+	}
+
+	/**
+	 * @return void
+	 * @internal
+	 */
+	public function init_hooks_after_setup() {
+		foreach ( apply_filters( 'webpc_source_directories', [] ) as $directory_name ) {
+			$this->set_integration( new SourceDirectory( $directory_name ) );
+		}
 		$this->directories_integration->init_hooks();
 	}
 

@@ -5,8 +5,8 @@
 /*
 Plugin Name: RentPress for Websites
 Plugin URI: https://rentpress.io/
-Description: Connects real estate agents to their property information for any WordPress site. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan, Encasa, Appfolio.
-Version: 7.2.0
+Description: Connects real estate agents to their property information for any WordPress site. Supports data feeds from: RentCafe, Entrata, RealPage, MRI Software/Vaultware, ResMan, Encasa.
+Version: 7.4.1
 Requires at least: 5.8
 Requires PHP: 7.2
 Author: 30 Lines
@@ -26,7 +26,7 @@ if (defined('RENTPRESS_PLUGIN_DIR')) {
     die();
 }
 
-define('RENTPRESS_PLUGIN_VERSION', '7.2.0');
+define('RENTPRESS_PLUGIN_VERSION', '7.4.1');
 define('RENTPRESS_MINIMUM_WP_VERSION', '5.3.2');
 define('RENTPRESS_DELETE_LIMIT', 100000);
 define('RENTPRESS_MENU_POSITION', 5);

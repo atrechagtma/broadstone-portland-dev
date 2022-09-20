@@ -8,18 +8,16 @@ namespace WebpConverter\Settings\Option;
 interface OptionInterface {
 
 	/**
-	 * Returns order priority (ascending).
-	 *
-	 * @return int
-	 */
-	public function get_priority(): int;
-
-	/**
 	 * Returns name of option.
 	 *
 	 * @return string
 	 */
 	public function get_name(): string;
+
+	/**
+	 * @return string
+	 */
+	public function get_form_name(): string;
 
 	/**
 	 * Returns type of field.
@@ -48,13 +46,29 @@ interface OptionInterface {
 	public function get_info();
 
 	/**
-	 * Returns available values for field.
-	 *
 	 * @param mixed[] $settings Plugin settings.
 	 *
 	 * @return string[]|null
 	 */
-	public function get_values( array $settings );
+	public function get_available_values( array $settings );
+
+	/**
+	 * @param mixed[] $settings Plugin settings.
+	 *
+	 * @return string[]|null
+	 */
+	public function get_disabled_values( array $settings );
+
+	/**
+	 * Returns verified value of field.
+	 *
+	 * @param mixed|null    $current_value    .
+	 * @param string[]|null $available_values .
+	 * @param string[]|null $disabled_values  .
+	 *
+	 * @return mixed|null
+	 */
+	public function get_valid_value( $current_value, array $available_values = null, array $disabled_values = null );
 
 	/**
 	 * Returns default value of field.
@@ -66,13 +80,13 @@ interface OptionInterface {
 	public function get_default_value( array $settings = null );
 
 	/**
-	 * Returns unavailable values for field.
+	 * Returns value of field without sensitive data.
 	 *
-	 * @param mixed[] $settings Plugin settings.
+	 * @param mixed|null $current_value .
 	 *
-	 * @return string[]|null
+	 * @return mixed|null
 	 */
-	public function get_disabled_values( array $settings );
+	public function get_public_value( $current_value = null );
 
 	/**
 	 * Returns default value of field when debugging.
@@ -81,5 +95,5 @@ interface OptionInterface {
 	 *
 	 * @return string|string[]
 	 */
-	public function get_value_for_debug( array $settings );
+	public function get_debug_value( array $settings );
 }

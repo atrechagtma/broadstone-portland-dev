@@ -25,8 +25,16 @@ function rentpress_saveRefreshData($property_code, $response)
     }
 }
 
-// TODO: make this function only delete a single property based on property code, for now truncated the table works fine
-function rentpress_deleteRefreshData()
+function rentpress_deleteRefreshDataForProperty($property_code)
+{
+    global $wpdb;
+    $charset_collate = $wpdb->get_charset_collate();
+    $table_name = $wpdb->prefix . 'rentpress_refresh';
+
+    $wpdb->query("DELETE FROM $table_name WHERE `property_code` = '$property_code'");
+}
+
+function rentpress_deleteAllRefreshData()
 {
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();

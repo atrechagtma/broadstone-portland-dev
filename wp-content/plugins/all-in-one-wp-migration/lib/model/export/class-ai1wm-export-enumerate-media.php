@@ -70,7 +70,7 @@ class Ai1wm_Export_Enumerate_Media {
 				$iterator = new Ai1wm_Recursive_Directory_Iterator( ai1wm_get_uploads_dir() );
 
 				// Exclude media files
-				$iterator = new Ai1wm_Recursive_Exclude_Filter( $iterator, apply_filters( 'ai1wm_exclude_media_from_export', $exclude_filters ) );
+				$iterator = new Ai1wm_Recursive_Exclude_Filter( $iterator, apply_filters( 'ai1wm_exclude_media_from_export', ai1wm_media_filters( $exclude_filters ) ) );
 
 				// Recursively iterate over content directory
 				$iterator = new Ai1wm_Recursive_Iterator_Iterator( $iterator, RecursiveIteratorIterator::LEAVES_ONLY, RecursiveIteratorIterator::CATCH_GET_CHILD );
@@ -78,7 +78,7 @@ class Ai1wm_Export_Enumerate_Media {
 				// Write path line
 				foreach ( $iterator as $item ) {
 					if ( $item->isFile() ) {
-						if ( ai1wm_write( $media_list, $iterator->getSubPathname() . PHP_EOL ) ) {
+						if ( ai1wm_putcsv( $media_list, array( $iterator->getPathname(), $iterator->getSubPathname(), $iterator->getSize(), $iterator->getMTime() ) ) ) {
 							$total_media_files_count++;
 
 							// Add current file size

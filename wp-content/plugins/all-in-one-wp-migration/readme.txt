@@ -2,9 +2,9 @@
 Contributors: yani.iliev, bangelov, pimjitsawang
 Tags: move, transfer, copy, migrate, backup, clone, restore, db migration, wordpress migration, website migration, database export, database import, apoyo, sauvegarde, di riserva, バックアップ
 Requires at least: 3.3
-Tested up to: 5.8
+Tested up to: 6.0
 Requires PHP: 5.2.17
-Stable tag: 7.47
+Stable tag: 7.65
 License: GPLv2 or later
 
 Move, transfer, copy, migrate, and backup a site with 1-click. Quick, easy, and reliable.
@@ -24,12 +24,13 @@ Follow these three simple steps, and your site will be live at its new location 
 
 One feature that makes All-in-One WP Migration widely loved (to the tune of over 6,000 5-star user reviews) is that the technical requirements for installing the plugin are simple.
 
-If you have WordPress version between 3.3 and 5.8.1 and PHP version between 5.2.17 and 8.0.10, you are good to go. All-in-One WP Migration also supports all versions of MySQL and MariaDB.
+If you have WordPress version between 3.3 and 6.0 and PHP version between 5.2.17 and 8.1.6, you are good to go. All-in-One WP Migration also supports all versions of MySQL and MariaDB.
 
 **Features Spotlight:**
 
 * Supports custom uploads, plugins, theme folders, and more.
 * Available in over 50 language translations - including Japanese.
+* Accessible for individuals with disabilities (WCAG 2.1 AA Level compliant)
 * No limitations on host or operating system.
 * Supports a vast range of hosting providers -- [click here for a full list of supported providers.](https://help.servmask.com/knowledgebase/supported-hosting-providers/)
 * A long list of [premium extensions](https://servmask.com/products) that gives you the power to do more.
@@ -44,7 +45,8 @@ Here are other reasons to use All-in-One WP Migration ...
 
 **Trusted by the Government and Big Corporations:**
 
-Many enterprise customers, government organizations, and universities use, love, and trust All-in-One WP Migration. Here are some: Boeing, Lockheed Martin, NASA, VW, Harvard University, Stanford University, Lego, P&G, Automattic, State of California, State of Hawaii, EMC2, etc.
+Many enterprise customers, government organizations, and universities use,
+love, and trust All-in-One WP Migration. Here are some: Boeing, NASA, VW, IBM, Harvard University, Stanford University, Lego, P&G, Automattic, State of California, State of Hawaii.
 This broad adoption and usage of All-in-One WP Migration demonstrate how **safe, reliable and adaptable** the plugin is for just about any website migration need.
 
 **Full Compatibility and Support:**
@@ -74,7 +76,7 @@ Plugins dashboard.
 1. Click "Add New" and Search for "All-in-One WP Migration"
 1. Install and Activate
 
-Alternatively, you can download the plugin using the download button on this page and then upload the all-in-one-wp-migration folder to the /wp-content/plugins/ directory then activate throught the Plugins dashboard in WordPress
+Alternatively, you can download the plugin using the download button on this page and then upload the all-in-one-wp-migration folder to the /wp-content/plugins/ directory then activate throught the Plugins dashboard in WordPress
 
 == Screenshots ==
 1. Mobile Export page
@@ -87,6 +89,100 @@ All-in-One WP Migration is in full compliance with General Data Protection Regul
 See our [GDPR Compliant Privacy Policy here](https://www.iubenda.com/privacy-policy/946881).
 
 == Changelog ==
+= 7.65 =
+**Added**
+
+* Improved support for single-letter prefixed databases
+
+= 7.64 =
+**Added**
+
+* Better support for database binary fields
+
+= 7.63 =
+**Fixed**
+
+* CSRF and XSS issue in the plugin. Thank you, WPScan, for reporting it
+
+= 7.62 =
+**Added**
+
+* Password-protect and encrypt backups
+
+= 7.61 =
+**Fixed**
+
+* Issue with 7.60 release
+
+= 7.60 =
+**Added**
+
+* What's new page - easy way to get up to speed with the newest features
+* List of all the items in a backup file, then select and download archived files
+* Support for WordPress v6
+
+= 7.59 =
+**Fixed**
+
+* Fix a flaw in which the admin user has the ability to remove files other than backups
+
+= 7.58 =
+**Changed**
+
+* Hide the backups count if there are no backups
+
+= 7.57 =
+**Added**
+
+* Improved UX on backups page
+
+= 7.56 =
+**Added**
+
+* Better support for PHP 8.1
+
+= 7.55 =
+**Changed**
+
+* When importing or restoring across various PHP versions, the notice has been improved
+
+= 7.54 =
+**Added**
+
+* Improved YouTube and Twitter buttons
+
+= 7.53 =
+**Added**
+
+* Total number of backups in the plugin menu
+
+= 7.52 =
+**Fixed**
+
+* Out of disk space when exporting database.sql
+
+= 7.51 =
+**Added**
+
+* Link to YouTube Channel
+
+= 7.50 =
+**Added**
+
+* Improved reliability for scheduling events
+
+= 7.49 =
+**Added**
+
+* Better error handling when making HTTP requests
+* Store a list of site files as CSV
+* Filter to change the request method
+
+= 7.48 =
+**Added**
+
+* Support for BuddyPress plugin
+
 = 7.47 =
 **Added**
 
@@ -143,14 +239,3 @@ See our [GDPR Compliant Privacy Policy here](https://www.iubenda.com/privacy-pol
 **Fixed**
 
 * Remove deprecated jQuery methods
-
-= 7.38 =
-**Added**
-
-* Improved MySQL error handling
-
-= 7.37 =
-**Added**
-
-* Improved detection of pretty permalink support
-* Improved DB error handling

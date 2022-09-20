@@ -53,7 +53,7 @@ class MethodFactory {
 
 		$this->set_integration( new ImagickMethod( $this->skip_crashed, $this->skip_larger, $this->server_configurator ) );
 		$this->set_integration( new GdMethod( $this->skip_crashed, $this->skip_larger, $this->server_configurator ) );
-		$this->set_integration( new RemoteMethod( $this->skip_larger, $this->token_repository, $this->server_configurator ) );
+		$this->set_integration( new RemoteMethod( $this->skip_crashed, $this->skip_larger, $this->token_repository, $this->server_configurator ) );
 	}
 
 	/**

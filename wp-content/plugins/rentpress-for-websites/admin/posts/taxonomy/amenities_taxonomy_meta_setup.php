@@ -49,7 +49,7 @@ function rentpress_edit_amenity_meta($term) {
 
       <div class="rentpress-settings-group">
         <label class="rentpress-settings-title">Short Description</label>
-        <?php echo wp_kses(rentpress_metaShadowField('rentpress_custom_field_amenity_short_description', $rpd, 'text', '', 'description'), $rentpress_allowed_HTML); ?>
+        <?php echo wp_kses(rentpress_metaShadowTextArea('rentpress_custom_field_amenity_short_description', $rpd, 6, '', 'description'), $rentpress_allowed_HTML); ?>
       </div>
     </div>
     <!-- tab accordion end -->
@@ -125,16 +125,14 @@ function rentpress_edit_amenity_meta($term) {
 add_action( 'amenity_edit_form_fields', 'rentpress_edit_amenity_meta', 10, 2 );
 
 function rentpress_save_amenity_meta( $term_id ) {
-    $termFields = [
-        'rentpress_custom_field_amenity_name',
-        'rentpress_custom_field_amenity_slug',
-        'rentpress_custom_field_amenity_descrition',
-    ];
-    $args = array();
     foreach ($_POST as $key => $value) {
         if ( strpos($key, 'rentpress_custom_field') !== false ) {
             if (!get_term_meta($term_id, $key)) {
                 add_term_meta($term_id, $key, '', true);
+            } 
+            if ($key === "rentpress_custom_field_amenity_extended_content" && isset($_POST[$key])) {
+              update_term_meta( $term_id, $key, wp_kses_post($_POST[$key]) );
+              continue ;
             }
             if (isset($_POST[$key])) {
                 update_term_meta($term_id, $key, sanitize_text_field($_POST[$key]));

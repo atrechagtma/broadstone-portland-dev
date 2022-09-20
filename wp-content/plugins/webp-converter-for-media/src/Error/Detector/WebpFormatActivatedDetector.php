@@ -2,7 +2,6 @@
 
 namespace WebpConverter\Error\Detector;
 
-use WebpConverter\Conversion\Format\WebpFormat;
 use WebpConverter\Error\Notice\WebpRequiredNotice;
 use WebpConverter\PluginData;
 use WebpConverter\Settings\Option\OutputFormatsOption;
@@ -26,7 +25,7 @@ class WebpFormatActivatedDetector implements ErrorDetector {
 	 */
 	public function get_error() {
 		$plugin_settings = $this->plugin_data->get_plugin_settings();
-		if ( in_array( WebpFormat::FORMAT_EXTENSION, $plugin_settings[ OutputFormatsOption::OPTION_NAME ] ) ) {
+		if ( $plugin_settings[ OutputFormatsOption::OPTION_NAME ] ) {
 			return null;
 		}
 

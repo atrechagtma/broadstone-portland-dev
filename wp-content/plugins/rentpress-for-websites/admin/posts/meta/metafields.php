@@ -4,12 +4,36 @@ add_filter('safe_style_css', function ($styles) {
     return $styles;
 });
 
+$defaultAtts = array(
+    'id' => array(),
+    'class' => array(),
+    'style' => array(
+        'display',
+    ),
+);
+
 $rentpress_allowed_HTML = array(
-    'input' => array(
+    'br' => array(),
+    'b' => array(),
+    'strong' => array(),
+    'em' => array(),
+    'table' => $defaultAtts,
+    'thead' => $defaultAtts,
+    'tr' => $defaultAtts,
+    'td' => $defaultAtts,
+    'th' => $defaultAtts,
+    'h1' => $defaultAtts,
+    'h2' => $defaultAtts,
+    'h3' => $defaultAtts,
+    'h4' => $defaultAtts,
+    'h5' => $defaultAtts,
+    'ul' => $defaultAtts,
+    'ol' => $defaultAtts,
+    'li' => $defaultAtts,
+    'p' => $defaultAtts,
+    'input' => array_merge($defaultAtts, array(
         'type' => array(),
         'name' => array(),
-        'id' => array(),
-        'class' => array(),
         'value' => array(),
         'placeholder' => array(),
         'data' => array(),
@@ -17,18 +41,13 @@ $rentpress_allowed_HTML = array(
         'data-limit' => array(),
         'data-start-value' => array(),
         'data-base-field' => array(),
-        'style' => array(
-            'display',
-        ),
         'checked' => array(),
         'disabled' => array(),
         'onchange' => array(),
-    ),
-    'textarea' => array(
+    )),
+    'textarea' => array_merge($defaultAtts, array(
         'rows' => array(),
         'name' => array(),
-        'id' => array(),
-        'class' => array(),
         'value' => array(),
         'data' => array(),
         'data-target' => array(),
@@ -36,28 +55,20 @@ $rentpress_allowed_HTML = array(
         'data-start-value' => array(),
         'data-base-field' => array(),
         'disabled' => array(),
-    ),
-    'select' => array(
-        'id' => array(),
-        'class' => array(),
+    )),
+    'select' => array_merge($defaultAtts, array(
         'name' => array(),
         'disabled' => array(),
-    ),
-    'option' => array(
-        'id' => array(),
-        'class' => array(),
+    )),
+    'option' => array_merge($defaultAtts, array(
         'value' => array(),
         'selected' => array(),
-    ),
-    'label' => array(
-        'id' => array(),
-        'class' => array(),
+    )),
+    'label' => array_merge($defaultAtts, array(
         'name' => array(),
         'for' => array(),
-    ),
-    'span' => array(
-        'id' => array(),
-        'class' => array(),
+    )),
+    'span' => array_merge($defaultAtts, array(
         'onkeyup' => array(),
         'onclick' => array(),
         'data' => array(),
@@ -65,10 +76,8 @@ $rentpress_allowed_HTML = array(
         'data-limit' => array(),
         'data-start-value' => array(),
         'data-base-field' => array(),
-    ),
-    'div' => array(
-        'id' => array(),
-        'class' => array(),
+    )),
+    'div' => array_merge($defaultAtts, array(
         'onkeyup' => array(),
         'onchange' => array(),
         'data' => array(),
@@ -76,16 +85,12 @@ $rentpress_allowed_HTML = array(
         'data-limit' => array(),
         'data-start-value' => array(),
         'data-base-field' => array(),
-    ),
-    'i' => array(
-        'id' => array(),
-        'class' => array(),
-    ),
-    'img' => array(
-        'id' => array(),
-        'class' => array(),
+    )),
+    'i' => $defaultAtts,
+    'em' => $defaultAtts,
+    'img' => array_merge($defaultAtts, array(
         'src' => array(),
-    ),
+    )),
 );
 
 function rentpress_metaField($field, $rpm, $type, $placeholder = '')
@@ -155,7 +160,7 @@ function rentpress_metaFieldImage($field, $rpm, $type, $placeholder = '', $limit
 
 function rentpress_metaShadowTextArea($field, $rpm, $rows = '6', $placeholder = '', $baseField)
 {
-    $value = isset($rpm[$field][0]) ? esc_attr($rpm[$field][0]) : '';
+    $value = (isset($rpm->{$baseField})) ? esc_attr($rpm->{$baseField}) : '';
 
     return "<textarea name='$field' id='$field' class='rentpress-settings-text rentpress-shadow-field' data-start-value='$value' data-base-field='$baseField' placeholder='$placeholder' rows='$rows'>$value</textarea>";
 }
@@ -214,6 +219,13 @@ function rentpress_checkboxMetaField($field, $rpm, $label)
             <label>$label</label>";
 }
 
+function rentpress_colorMetaField($field, $rpm)
+{
+    $value = !empty($rpm[$field]) ? $rpm[$field][0] : '';
+
+    return "<input type='color' name='$field' id='$field' class='rentpress-color' value='$value'>";
+}
+
 function rentpress_overrideMetaField($field, $rpm, $overrides, $type = 'text', $placeholder = '')
 {
     $override_field = $field . '_override';
@@ -240,7 +252,7 @@ function rentpress_overrideMetaTextArea($field, $rpm, $overrides, $rows = '6', $
 
 function rentpress_metaTextArea($field, $rpm, $rows = '6', $placeholder = '')
 {
-    $value = (isset($rpm[$field][0])) ? esc_textarea($rpm[$field][0]) : '';
+    $value = (isset($rpm[$field][0])) ? wp_kses_post($rpm[$field][0]) : '';
     $override_field = $field . '_override';
 
     return "<textarea name='$field' id='$field' class='rentpress-settings-text' placeholder='$placeholder' rows='$rows'>$value</textarea>

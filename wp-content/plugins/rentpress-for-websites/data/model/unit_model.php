@@ -22,32 +22,43 @@ function rentpress_saveUnitData($unit)
     }
 }
 
-function updateApplyLinkForAllUnitsOfAProperty($property_code, $apply_link)
+function rentpress_updateApplyLinkForAllUnitsOfAProperty($property_code, $apply_link)
 {
     if (isset($property_code)) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'rentpress_units';
-
-        $sql = "
-		UPDATE `wp_rentpress_units` SET `unit_availability_url` = '$apply_link'
-		WHERE `unit_parent_property_code` = '$property_code'";
-
-        $results = $wpdb->get_results($sql);
+        $wpdb->query("UPDATE $table_name SET `unit_availability_url` = '$apply_link' WHERE `unit_parent_property_code` = '$property_code'");
     }
 }
 
-function deleteAllFeedUnits()
+function rentpress_deleteAllFeedUnits()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'rentpress_units';
     $wpdb->query("DELETE FROM $table_name WHERE `unit_is_feed` = 1");
 }
 
-function deleteAllFeedUnitsForAProperty($property_code)
+function rentpress_deleteAllFeedUnitsForAProperty($property_code)
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'rentpress_units';
     $wpdb->query("DELETE FROM $table_name WHERE `unit_is_feed` = 1 AND `unit_parent_property_code` = '$property_code'");
+}
+
+function rentpress_deleteAllFeedUnitsForProperties($property_codes)
+{
+    global $wpdb;
+
+    $codes_count = count($property_codes);
+    $sql_code_str = "";
+    foreach ($property_codes as $key => $code) {
+        $sql_code_str .= "(`unit_parent_property_code` = '$code')";
+        if ($key != $codes_count - 1) {
+            $sql_code_str .= " OR ";
+        }
+    }
+    $table_name = $wpdb->prefix . 'rentpress_units';
+    $wpdb->query("DELETE FROM $table_name WHERE `unit_is_feed` = 1 AND $sql_code_str");
 }
 
 function rentpress_standardizeUnitFeedData($unit)
@@ -83,7 +94,9 @@ function rentpress_standardizeUnitFeedData($unit)
         'unit_floor_level' => isset($unit->Rooms->FloorLevel) ? $unit->Rooms->FloorLevel : null,
         'unit_sqft' => isset($unit->SquareFeet->Max) ? $unit->SquareFeet->Max : null,
         'unit_features' => isset($unit->Amenities) && count($unit->Amenities) > 0 ? json_encode($unit->Amenities) : null,
-        'unit_images' => isset($unit->Images) && count($unit->Images) > 0 ? json_encode($unit->Images) : null,
+        'unit_images' => isset($unit->StandardizedImages) && count($unit->StandardizedImages) > 0 ? json_encode($unit->StandardizedImages) : null,
+        'unit_image_urls' => isset($unit->ImageUrls) && count($unit->ImageUrls) > 0 ? json_encode($unit->ImageUrls) : null,
+        'unit_images_raw' => isset($unit->Images) && count($unit->Images) > 0 ? json_encode($unit->Images) : null,
         'unit_videos' => isset($unit->Videos) && count($unit->Videos) > 0 ? json_encode($unit->Videos) : null,
         'unit_is_feed' => true,
     ];
@@ -127,6 +140,8 @@ function rentpress_makeUnitDBTable()
 		unit_sqft longtext,
 		unit_features longtext,
 		unit_images longtext,
+		unit_image_urls longtext,
+		unit_images_raw longtext,
 		unit_videos longtext,
 		unit_rent_type_selection_cost int,
 		unit_rent_type_selection varchar(191),

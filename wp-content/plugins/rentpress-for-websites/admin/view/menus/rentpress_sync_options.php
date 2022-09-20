@@ -2,7 +2,6 @@
 /**
  * Create Admin Menu
  */
-
 function rentpress_sync_options_page()
 {
     add_menu_page(
@@ -122,7 +121,7 @@ function rentpress_sync_options_page_html()
         // add settings saved message with the class of "updated"
         add_settings_error('rentpress_messages', 'rentpress_message', __('Settings Saved', 'rentpress'), 'updated');
     }
-
+ 
     // show error/update messages
     settings_errors('rentpress_messages');
 
@@ -178,7 +177,10 @@ function rentpress_sync_options_page_html()
       <div class="rentpress-admin-tab is-active-rentpress-admin-tab" id="rentpress_settings">
         <h1><?php esc_html(get_admin_page_title());?></h1>
         <h3 style="color: red">
-          <div id="results_for_sync"></div>
+          <div id="results-for-sync-topline-call"></div>
+          <div id="results-for-marketing-sync"></div>
+          <div id="results-for-manual-sync"></div>
+          <div id="results-for-template-changes"></div>
         </h3>
 
         <form action="options.php" method="post" id="main-rentpress-settings">
@@ -193,7 +195,6 @@ function rentpress_sync_options_page_html()
             style="display: none;">
             <input id="rentpress-marketing-resync-button" class="rentpress-resync-button rentpress-settings-dark-btn"
               type="button" value="Sync Properties">
-            <!-- <input id="rentpress-pricing-resync-button"  class="rentpress-resync-button rentpress-settings-dark-btn" type="button" value="Resync Pricing"> -->
           </div>
         </form>
       </div>
@@ -211,6 +212,21 @@ function rentpress_settings_init()
 {
     // register a new setting for "rentpress_settings" page
     register_setting('rentpress_settings', 'rentpress_options');
+
+    $rentpress_add_on_field_args = get_option('rentpress_add_on_field_args');
+    $rentpress_add_on_field_args = $rentpress_add_on_field_args ? json_decode($rentpress_add_on_field_args) : false;
+
+    if (isset($rentpress_add_on_field_args->rentpress_settings_sections) ? count((array)$rentpress_add_on_field_args->rentpress_settings_sections ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_settings_sections as $setting_section) {
+            add_settings_section_with_page($setting_section[0], $setting_section[1], $setting_section[2], $setting_section[3], $setting_section[4]);
+        }
+    }
+
+    if (isset($rentpress_add_on_field_args->rentpress_settings_fields) ? count((array)$rentpress_add_on_field_args->rentpress_settings_fields ) : '') {
+        foreach ($rentpress_add_on_field_args->rentpress_settings_fields as $setting_field) {
+            add_settings_field($setting_field[0], $setting_field[1], $setting_field[2], $setting_field[3], $setting_field[4], $setting_field[5]);
+        }
+    }
 
     // register a new section in the "rentpress_settings" page
     add_settings_section_with_page(
@@ -234,10 +250,10 @@ function rentpress_settings_init()
         ]
     );
 
-//register a new section in the "rentpress_settings" page
+//appearance jump section
     add_settings_section_with_page(
         'rentpress_appearance_jump_section',
-        'Jump to Section',
+        'Appearance',
         'rentpress_appearance_jump_section_field_cb',
         'rentpress_settings',
         [
@@ -552,7 +568,7 @@ function rentpress_settings_init()
 
     add_settings_field(
         'rentpress_hide_floorplans_with_no_availability',
-        'Visibilty by Available',
+        'Visibility by Available',
         'rentpress_createSettingsCheckboxField_cb',
         'rentpress_settings',
         'rentpress_floorplan_display_settings_section',
@@ -637,24 +653,6 @@ function rentpress_settings_init()
         ]
     );
 
-    // add_settings_field(
-    //     'rentpress-pricing-display-settings-section',
-    //     'Default Lease Term',
-    //     'rentpress_createSettingsNumberField_cb',
-    //     'rentpress_settings',
-    //     'rentpress-pricing-display-settings-section',
-    //     [
-    //         'label_for' => 'rentpress-pricing-display-settings-section',
-    //         'class' => 'rentpress_row',
-    //         'rentpress_custom_data' => [
-    //             'display'  => 'none',
-    //             'min' => 1,
-    //             'max' => 24,
-    //             'placeholder_text' => 'Term Rent in Months'
-    //         ],
-    //     ]
-    // );
-
     // register a new field in the "rentpress_unit_rent_type_section" section, inside the "rentpress_settings" page
 
     // register a new section in the "rentpress_settings" page
@@ -733,6 +731,17 @@ function rentpress_settings_init()
                     'xxxxxxxxxx',
                 ],
             ],
+        ]
+    );
+
+//integrations jump section
+    add_settings_section_with_page(
+        'rentpress_integrations_jump_section',
+        'Integrations',
+        'rentpress_integrations_jump_section_field_cb',
+        'rentpress_settings',
+        [
+            'setting_page' => 'Integrations',
         ]
     );
 
@@ -842,6 +851,29 @@ function rentpress_settings_init()
                 ],
             ],
         ]
+    );
+
+    // Gravity Forms Add-on
+    add_settings_section_with_page(
+        'rentpress_gravity_forms_addon_section',
+        'Gravity Forms Add-on',
+        'rentpress_gravity_forms_addon_section_field_cb',
+        'rentpress_settings',
+        [
+            'setting_page' => 'Integrations',
+        ]
+    );
+
+    add_settings_field(
+    'rentpress_gravity_addon', // what the field value will be saved as
+    'Gravity Forms '. '‎ ‎ ‎ ‎ ‎  '.'Add-on', // Title
+    'rentpress_gravity_addon_section_cb', // function to generate html
+    'rentpress_settings', // settings page that it is added to
+    'rentpress_gravity_forms_addon_section', // what section the field will be added to
+    [
+        'label_for' => 'rentpress_gravity_addon',
+        'class' => 'rentpress_row',
+    ]// any data that will be used in the callback function
     );
 
     // Map cluster image upload
@@ -1015,11 +1047,13 @@ function rentpress_api_credentials_section_cb($args)
 {
     ?>
 <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
-  <?php esc_html_e('Fill out these credentials to connect RentPress to your property data. Contact 30 Lines to get your license key for this website. ')?><a href="https://via.30lines.com/vXP1UPFD" target="_blank" rel="noopener noreferrer">Purchase a subscription.</a>
+  <?php esc_html_e('Fill out these credentials to connect RentPress to your property data. Contact 30 Lines to get your license key for this website. ')?><a
+    href="https://via.30lines.com/vXP1UPFD" target="_blank" rel="noopener noreferrer">Purchase a subscription.</a>
   <br /><br />
   <?php esc_html_e('Once connected, your website will automatically resync every hour.', 'rentpress_settings');?>
   <br /><br />
-  <strong>Need Help?</strong> Check the support site for assistance setting up RentPress: <a href="https://via.30lines.com/0F-Q2UnT">Get Started with RentPress</a>.
+  <strong>Need Help?</strong> Check the support site for assistance setting up RentPress: <a
+    href="https://via.30lines.com/0F-Q2UnT">Get Started with RentPress</a>.
 </p>
 <?php
 }
@@ -1090,7 +1124,9 @@ function rentpress_post_templates_section_cb($args)
 <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
   <?php esc_html_e('Click Add Theme Files to add your chosen templates to your active theme.', 'rentpress_settings');?>
 </p>
-<p><strong>Need Help? </strong>Check the support site for assistance setting up page templates: <a href="https://via.30lines.com/ZFHb1gFC" target="_blank" rel="noopener noreferrer">RentPress Settings: Enable Templates</a>.</p>
+<p><strong>Need Help? </strong>Check the support site for assistance setting up page templates: <a
+    href="https://via.30lines.com/ZFHb1gFC" target="_blank" rel="noopener noreferrer">RentPress Settings: Enable
+    Templates</a>.</p>
 <input type="button" value="Add Theme Files" id="rentpress-theme-template-create" class="rentpress-settings-dark-btn">
 <br />
 <?php endif;?>
@@ -1109,7 +1145,7 @@ function rentpress_application_link_section_cb($args)
 {
     ?>
 <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
-  <?php esc_html_e('Use these fields to set default link targets for CTA\'s. Empty fields will not be used.', 'rentpress_settings');?>
+  <?php esc_html_e('Use these fields to set default link targets for CTA buttons. Empty fields will not be used.', 'rentpress_settings');?>
 </p>
 <?php
 }
@@ -1127,16 +1163,36 @@ function rentpress_appearance_jump_section_field_cb($args)
 {
     ?>
 <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
-  <a href="#rentpress_accent_color_section">Color</a> | 
-  <a href="#rentpress-floor-plan-display-settings-settings-section">Floor Plan Display</a> | 
-  <a href="#rentpress-pricing-display-settings-settings-section">Price Display</a> | 
-  <a href="#rentpress-disable-pricing-settings-section">Disable Pricing</a> | 
-  <a href="#rentpress-format-phone-numbers-settings-section">Phone Format</a> | 
-  <a href="#rentpress-placeholder-images-settings-section">Images</a> | 
+  <a href="#rentpress_accent_color_section">Color</a> |
+  <a href="#rentpress-floor-plan-display-settings-settings-section">Floor Plan Display</a> |
+  <a href="#rentpress-pricing-display-settings-settings-section">Price Display</a> |
+  <a href="#rentpress-disable-pricing-settings-section">Disable Pricing</a> |
+  <a href="#rentpress-format-phone-numbers-settings-section">Phone Format</a> |
+  <a href="#rentpress-placeholder-images-settings-section">Images</a> |
   <a href="#rentpress-default-urls-settings-section">Default URLs</a>
   </a>
   <br /><br />
-  <strong>Need Help? </strong>Check the support site for assistance setting up page templates: <a href="https://via.30lines.com/tFezGUBS" target="_blank" rel="noopener noreferrer">RentPress Settings: Appearance</a>.
+  <strong>Need Help? </strong>Check the support site for assistance setting up page templates: <a
+    href="https://via.30lines.com/tFezGUBS" target="_blank" rel="noopener noreferrer">RentPress Settings:
+    Appearance</a>.
+</p>
+<?php
+}
+
+function rentpress_integrations_jump_section_field_cb($args)
+{
+    ?>
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+  <a href="#rentpress_google_analytics_api_section">Analytics</a> |
+  <a href="#rentpress-google-maps-api-settings-section">Google Maps</a> |
+  <a href="#rentpress_mapbox_maps_api_section">Mapbox</a> |
+  <a href="#rentpress_map_source_api_section">Map Source</a> |
+  <a href="#rentpress-gravity-forms-add-on-settings-section">Forms</a>
+  </a>
+  <br /><br />
+  <strong>Need Help? </strong>Check the support site for assistance with integrations: <a
+    href="https://via.30lines.com/tFezGUBS" target="_blank" rel="noopener noreferrer">RentPress Settings:
+    Integrations</a>.
 </p>
 <?php
 }
@@ -1145,12 +1201,10 @@ function rentpress_google_maps_api_section_field_cb($args)
 {
     ?>
 <p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
-  Enter your Google API key to use in RentPress templates. You can find the API key from your <a target="_blank"
-    href="https://developers.google.com/maps/documentation/javascript/">Google Map Developer console</a>. <br /><br />
+  Enter your Google API key to use in RentPress templates. You can find the API key from your <a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/maps/documentation/javascript/">Google Map Developer console</a>. <br /><br />
 
   This API key will be used to retrieve reviews when using the Reviews Add-On, and can be used to display maps on this
-  site. More information can be found at: <a target="blank" rel="noopener noreferrer"
-    href="https://via.30lines.com/X7TllTnK">Understanding RentPress + Google Maps integration</a>.
+  site. More information can be found at: <a target="_blank" rel="noopener noreferrer" href="https://via.30lines.com/X7TllTnK">Understanding RentPress + Google Maps integration</a>.
 </p>
 <?php
 }
@@ -1173,6 +1227,17 @@ function rentpress_map_source_api_section_field_cb($args)
 <?php
 }
 
+function rentpress_gravity_forms_addon_section_field_cb($args)
+{
+    ?>
+<p id="<?php echo esc_attr($args['id']); ?>" class="rentpress-settings-sub-title">
+    RentPress: Gravity Forms Add-on connects your contact forms with your multifamily CRMs.
+    <br /><br />
+    More information about available shortcodes is available at <a href="https://via.30lines.com/xPdGhGjl" target="_blank" rel="noopener noreferrer">RentPress: Gravity Forms Add-on Documentation</a>.
+</p>
+<?php
+}
+
 function rentpress_google_analytics_api_section_field_cb($args)
 {
     ?>
@@ -1180,7 +1245,7 @@ function rentpress_google_analytics_api_section_field_cb($args)
   actions on RentPress templates will be automatically reported into your Google Analytics account. To find your
   tracking ID, go to your Google Analytics account and click on Admin in the sidebar. <br /><br />
 
-  More information can be found at: <a target="blank" rel="noopener noreferrer"
+  More information can be found at: <a target="_blank" rel="noopener noreferrer"
     href="https://via.30lines.com/WIoDyQiF">Understanding RentPress + Google Analytics integration</a>.</p>
 <?php
 }
@@ -1223,8 +1288,8 @@ function rentpress_createSettingsNumberField_cb($args)
     ?>
 <input type="number" id="<?php echo esc_attr($args['label_for']); ?>"
   class="<?php echo esc_attr($args['class']); ?> rentpress-text-field rentpress-settings-input" data-custom=""
-  max="<?php echo esc_attr($args['rentpress_custom_data']['max']) ?? '' ?>"
-  min="<?php echo esc_attr($args['rentpress_custom_data']['min']) ?? '' ?>"
+  max="<?php echo isset($args['rentpress_custom_data']['max']) ? esc_attr($args['rentpress_custom_data']['max']) : '' ?>"
+  min="<?php echo isset($args['rentpress_custom_data']['min']) ? esc_attr($args['rentpress_custom_data']['min']) : '' ?>"
   placeholder="<?php echo isset($args['rentpress_custom_data']['placeholder_text']) ? esc_attr($args['rentpress_custom_data']['placeholder_text']) : '' ?>"
   name="rentpress_options[<?php echo esc_attr($args['label_for']); ?>]"
   value="<?php echo isset($options[$args['label_for']]) ? esc_attr($options[$args['label_for']]) : '' ?>">
@@ -1316,6 +1381,17 @@ function rentpress_accent_color_section_cb($args)
 <?php
 }
 
+function rentpress_gravity_addon_section_cb($args)
+{
+    if (class_exists( 'rentPressGravityForms_Leads' )) :
+        $gformAddonIsInstalled = "<p><b style='font-size:1.5em; color: #64C956;'>Installed</b></p>";
+    else :
+        $gformAddonIsInstalled = "<p><b style='font-size:1.5em; color: #EC4D3E;'>Not Installed</b></p>";
+    endif;?>
+        <label for="<?php echo esc_attr($args['label_for']); ?>" class="rentpress-settings-label"> <?php echo $gformAddonIsInstalled; ?></label>
+<?php
+}
+
 function rentpress_cluster_image_section_cb($args)
 {
     $options = get_option('rentpress_options');
@@ -1361,7 +1437,7 @@ function rentpress_image_upload_section_cb($args)
 <?php else: ?>
 <div style="display: none;" id="<?php echo esc_attr($args['label_for']); ?>-image-wrapper"
   class="<?php echo esc_attr($args['label_for']); ?>-image-wrapper">
-  <img id="<?php echo esc_attr($args['label_for']); ?>-image"
+  <img alt="Image upload preview" id="<?php echo esc_attr($args['label_for']); ?>-image"
     class="<?php echo esc_attr($args['label_for']); ?>-image rentpress-image-upload-preview">
 </div>
 <?php endif;
@@ -1374,16 +1450,8 @@ add_action('admin_enqueue_scripts', function () {
     wp_enqueue_media();
 });
 
-add_action('wp_ajax_rentpress_getAllMarketingDataForProperties', 'rentpress_getAllMarketingDataForProperties');
 add_action('wp_ajax_rentpress_getAllPricingDataForProperties', 'rentpress_getAllPricingDataForProperties');
 add_action('wp_ajax_rentpress_createThemeTemplateFile', 'rentpress_createThemeTemplateFile');
-
-function rentpress_getAllMarketingDataForProperties()
-{
-    require_once RENTPRESS_PLUGIN_DATA_SYNC . 'property/marketing_refresh.php';
-    rentpress_syncFeedAndWPProperties();
-    wp_die(); // this is required to terminate immediately and return a proper response
-}
 
 function rentpress_getAllPricingDataForProperties()
 {
@@ -1391,10 +1459,6 @@ function rentpress_getAllPricingDataForProperties()
     rentpress_syncFeedAndWPProperties();
     wp_die(); // this is required to terminate immediately and return a proper response
 }
-
-add_action('admin_enqueue_scripts', function () {
-    wp_enqueue_media();
-});
 
 function rentpress_createThemeTemplateFile()
 {
@@ -1437,7 +1501,7 @@ function rentpress_createThemeTemplateFile()
 
     foreach ($templates as $key => $template) {
         if ($template) {
-            $theme = get_template_directory() . '/' . $template;
+            $theme = get_stylesheet_directory() . '/' . $template;
             $plugin = RENTPRESS_PLUGIN_DIR . 'public/templates/' . $template;
 
             if ($template == 'taxonomy.php' && file_exists($theme) && !file_exists(get_template_directory() . '/original_taxonomy.php')) {

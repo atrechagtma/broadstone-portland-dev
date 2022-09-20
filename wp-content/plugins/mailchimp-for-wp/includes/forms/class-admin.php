@@ -220,7 +220,7 @@ class MC4WP_Forms_Admin {
 	 * @param array $data
 	 * @return array
 	 */
-	public function sanitize_form_data( $data ) {
+	public function sanitize_form_data( array $data ) {
 		$raw_data = $data;
 
 		// strip <form> tags from content
@@ -243,6 +243,14 @@ class MC4WP_Forms_Admin {
 		}
 
 		$data['settings']['lists'] = array_filter( (array) $data['settings']['lists'] );
+
+		// if current user can not post unfiltered HTML, run HTML through whitelist using wp_kses
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			$data['content'] = mc4wp_kses( $data['content'] );
+			foreach ( $data['messages'] as $key => $message ) {
+				$data['messages'][ $key ] = mc4wp_kses( $data['messages'][ $key ] );
+			}
+		}
 
 		/**
 		 * Filters the form data just before it is saved.
